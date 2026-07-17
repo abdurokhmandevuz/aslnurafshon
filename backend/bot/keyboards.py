@@ -12,12 +12,13 @@ from aiogram.types import (
 
 def main_menu_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
     """Main inline keyboard with "Open shop" WebApp button."""
+    web_app_url = f"{frontend_url.rstrip('/')}/start/"
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
                     text="🛑 Do'konni ochish",
-                    web_app=WebAppInfo(url=f"{frontend_url}start/"),
+                    web_app=WebAppInfo(url=web_app_url),
                 )
             ],
             [
