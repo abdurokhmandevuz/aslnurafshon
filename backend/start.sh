@@ -12,4 +12,10 @@ else
 fi
 
 echo "Starting web server on port ${PORT:-8080}..."
-exec gunicorn config.wsgi:application --bind "0.0.0.0:${PORT:-8080}" --workers 2 --timeout 120
+exec gunicorn config.wsgi:application \
+  --bind "0.0.0.0:${PORT:-8080}" \
+  --workers 2 \
+  --timeout 120 \
+  --access-logfile - \
+  --error-logfile - \
+  --forwarded-allow-ips "*"
