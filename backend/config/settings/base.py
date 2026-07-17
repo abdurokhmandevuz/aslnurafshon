@@ -7,6 +7,15 @@ from pathlib import Path
 from decouple import config, Csv
 
 RAILWAY_APP_URL = 'https://aslnurafshon.up.railway.app'
+RAILWAY_APP_HOST = 'aslnurafshon.up.railway.app'
+
+
+def clean_env_value(value):
+    return str(value).strip().strip('"').strip("'")
+
+
+def clean_csv_values(values):
+    return [clean_env_value(value) for value in values if clean_env_value(value)]
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -14,7 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # ─── Security ────────────────────────────────────────────────────────────────
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-prod')
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
+ALLOWED_HOSTS = clean_csv_values(config('ALLOWED_HOSTS', default='*', cast=Csv()))
+if '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS += [RAILWAY_APP_HOST, '.up.railway.app']
 
 # ─── Applications ─────────────────────────────────────────────────────────────
 DJANGO_APPS = [
@@ -148,16 +159,20 @@ REST_FRAMEWORK = {
 }
 
 # ─── CORS ────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = config(
+CORS_ALLOWED_ORIGINS = clean_csv_values(config(
     'CORS_ALLOWED_ORIGINS',
     default=RAILWAY_APP_URL,
     cast=Csv(),
-)
-CSRF_TRUSTED_ORIGINS = config(
+))
+if RAILWAY_APP_URL not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append(RAILWAY_APP_URL)
+CSRF_TRUSTED_ORIGINS = clean_csv_values(config(
     'CSRF_TRUSTED_ORIGINS',
     default=RAILWAY_APP_URL,
     cast=Csv(),
-)
+))
+if RAILWAY_APP_URL not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(RAILWAY_APP_URL)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
@@ -178,11 +193,11 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # ─── Bot & Frontend ──────────────────────────────────────────────────────────
-BOT_TOKEN = config('BOT_TOKEN', default='')
-BOT_WEBHOOK_URL = config('BOT_WEBHOOK_URL', default='')
+BOT_TOKEN = clean_env_value(config('BOT_TOKEN', default=''))
+BOT_WEBHOOK_URL = clean_env_value(config('BOT_WEBHOOK_URL', default=''))
 ADMIN_GROUP_ID = config('ADMIN_GROUP_ID', default='', cast=lambda x: int(x) if x else None)
-CLICK_PROVIDER_TOKEN = config('CLICK_PROVIDER_TOKEN', default='')
-FRONTEND_URL = config('FRONTEND_URL', default=RAILWAY_APP_URL)
+CLICK_PROVIDER_TOKEN = clean_env_value(config('CLICK_PROVIDER_TOKEN', default=''))
+FRONTEND_URL = clean_env_value(config('FRONTEND_URL', default=RAILWAY_APP_URL)).rstrip('/')
 
 # ─── Payments ─────────────────────────────────────────────────────────────────
 PAYMENTS_MOCK_MODE = config('PAYMENTS_MOCK_MODE', default=True, cast=bool)

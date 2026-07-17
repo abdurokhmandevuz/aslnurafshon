@@ -9,7 +9,7 @@ DEBUG = False
 # ─── Database (Local PostgreSQL on Oracle) ────────────────────────────────────
 DATABASES = {
     'default': dj_database_url.parse(
-        config('DATABASE_URL'),
+        clean_env_value(config('DATABASE_URL')),
         conn_max_age=600,
         ssl_require=False,  # Local PostgreSQL on Oracle — SSL not needed
     )
