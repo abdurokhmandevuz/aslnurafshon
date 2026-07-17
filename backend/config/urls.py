@@ -1,12 +1,19 @@
 """Root URL configuration for Nurafshon backend."""
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
 from apps.orders.views_ssr import set_language_exempt
 
+
+def health_check(_request):
+    return JsonResponse({'status': 'ok'})
+
+
 urlpatterns = [
+    path('health/', health_check, name='health_check'),
     path('admin/', admin.site.urls),
     path('i18n/', include('django.conf.urls.i18n')),
     path('set-language-exempt/', set_language_exempt, name='set_language_exempt'),

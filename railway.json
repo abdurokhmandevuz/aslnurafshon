@@ -3,7 +3,7 @@
     "command": "cd backend && pip install -r requirements.txt && python manage.py collectstatic --noinput"
   },
   "start": {
-    "command": "cd backend && python manage.py migrate && sh -c 'if [ -n \"$BOT_TOKEN\" ]; then BOT_WEBHOOK_URL= python -m bot.main & else echo \"BOT_TOKEN is not set; skipping bot\"; fi; exec gunicorn config.wsgi:application --bind 0.0.0.0:${PORT}'"
+    "command": "cd backend && bash start.sh"
   },
   "staticFilesDirectory": "frontend"
 }
