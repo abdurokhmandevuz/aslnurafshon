@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="py-lg">
+<!-- Page Title -->
+<div class="mb-lg">
+<h2 class="font-display-lg-mobile md:font-display-lg text-primary">Katalog</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Barcha mahsulotlar</p>
+</div>
+<!-- Filter & Sort Bar -->
+<div class="flex gap-sm overflow-x-auto pb-sm no-scrollbar mb-lg -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0">
+<a href="{% url 'catalog' %}" class="whitespace-nowrap px-md py-sm rounded-full {% if not request.GET.category %}bg-secondary text-on-secondary{% else %}bg-surface-variant text-on-surface-variant hover:bg-surface-dim{% endif %} font-label-md text-label-md shadow-sm transition-colors">
+    Barchasi
+</a>
+{% for cat in categories %}
+<a href="{% url 'catalog' %}?category={{ cat.id }}" class="whitespace-nowrap px-md py-sm rounded-full {% if request.GET.category == cat.id|stringformat:'s' %}bg-secondary text-on-secondary{% else %}bg-surface-variant text-on-surface-variant hover:bg-surface-dim{% endif %} font-label-md text-label-md transition-colors flex items-center gap-xs">
+    {{ cat.name }}
+</a>
+{% endfor %}
+</div>
+<!-- Product Grid -->
+<div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-md md:gap-lg">
+    {% for product in products %}
+    <a href="{% url 'product_detail' product.id %}" class="bg-surface-container-lowest rounded-2xl shadow-level-1 overflow-hidden hover:shadow-level-2 transition-shadow group flex flex-col border border-surface-variant/50 relative">
+        <div class="relative aspect-square overflow-hidden bg-surface-variant">
+            {% if product.image %}
+            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% endif %}
+        </div>
+        <div class="p-4 flex flex-col flex-1">
+            <h3 class="font-label-md text-label-md text-on-surface mb-1 line-clamp-2 min-h-[40px]">{{ product.name }}</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-3 line-clamp-2">{{ product.description|truncatewords:10 }}</p>
+            <div class="mt-auto flex justify-between items-end">
+                <div>
+                    <span class="block font-headline-sm text-headline-sm text-primary">{{ product.min_price_val }} UZS</span>
+                </div>
+                <button onclick="event.preventDefault(); addToCart('{{ product.variants.first.id }}', 1)" class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary transition-colors z-10 relative">
+                    <span class="material-symbols-outlined icon-fill">add_shopping_cart</span>
+                </button>
+            </div>
+        </div>
+    </a>
+    {% empty %}
+    <div class="col-span-full text-center py-8 text-on-surface-variant">Mahsulotlar topilmadi.</div>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}

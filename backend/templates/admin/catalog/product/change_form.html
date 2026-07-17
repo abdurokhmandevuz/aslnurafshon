@@ -1,0 +1,33 @@
+{% extends "admin/change_form.html" %}
+{% load i18n static %}
+
+{% block after_field_sets %}
+{{ block.super }}
+<div class="barcode-scanner-entry">
+    <button type="button" class="button default" id="barcode-scanner-open">
+        Shtrix kod skanerlash
+    </button>
+    <span>Mahsulot barcode’ini skanerlab formani avtomatik to‘ldirish.</span>
+</div>
+<div id="barcode-scanner-panel" class="barcode-scanner-panel hidden">
+    <div class="barcode-scanner-header">
+        <div>
+            <h2>Shtrix kod skaneri</h2>
+            <p>Barcode’ni kameraga katta qilib tuting. Skaner topgan ma’lumotlarni formaga tushiradi.</p>
+        </div>
+        <button type="button" class="button" id="barcode-scanner-close">Yopish</button>
+    </div>
+
+    <div class="barcode-scanner-reader-wrap">
+        <div id="barcode-scanner-reader"></div>
+        <div class="barcode-scanner-frame"></div>
+    </div>
+
+    <div id="barcode-scanner-result" class="barcode-scanner-result hidden">
+        <strong id="barcode-scanner-code"></strong>
+        <span id="barcode-scanner-message"></span>
+        <a id="barcode-scanner-existing" class="button hidden" href="#">Mavjud mahsulotni ochish</a>
+    </div>
+</div>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+{% endblock %}

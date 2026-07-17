@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+<!-- Left Column: Image Gallery (Span 6 on desktop) -->
+<div class="md:col-span-6 lg:col-span-7 flex flex-col gap-sm">
+<div class="aspect-square w-full rounded-xl overflow-hidden bg-surface-container-low relative ambient-shadow">
+{% if product.image %}
+<img id="product-image" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" data-alt="Product Image" src="{{ product.image.url }}"/>
+{% endif %}
+<!-- Favorite Button -->
+<button onclick="toggleFavorite(this, '{{ product.id }}')" class="absolute top-4 right-4 p-2 rounded-full bg-surface/80 hover:bg-surface text-on-surface-variant hover:text-error transition-all shadow-md z-10">
+    <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' {% if is_favorite %}1{% else %}0{% endif %}; color: {% if is_favorite %}#ef4444{% else %}inherit{% endif %};">favorite</span>
+</button>
+<!-- Decorative subtle overlay for premium feel -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
+</div>
+</div>
+<!-- Right Column: Details & Actions (Span 6 on desktop) -->
+<div class="md:col-span-6 lg:col-span-5 flex flex-col mt-md md:mt-0 relative h-full">
+<div class="flex-1">
+<!-- Meta Info -->
+<div class="mb-xs">
+<span id="product-category" class="font-label-sm text-label-sm text-secondary tracking-wider uppercase">{{ product.category.name }}</span>
+</div>
+<!-- Title -->
+<h2 id="product-name" class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mb-2 leading-tight">{{ product.name }}</h2>
+<!-- Price -->
+<div id="product-price" class="font-headline-md text-headline-md text-primary mb-lg">
+                    {{ product.variants.first.price }} UZS
+                </div>
+<hr class="border-outline-variant/50 mb-lg"/>
+<!-- Weight Selector (Chips) -->
+<div class="mb-lg">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-sm">{% trans "Variantlar" %}</h3>
+<div class="flex flex-wrap gap-sm" id="variant-selector">
+{% for variant in product.variants.all %}
+    {% if variant.stock_qty > 0 %}
+        <button onclick="selectVariant(this, '{{ variant.id }}', '{{ variant.price }}')" class="variant-btn px-5 py-2.5 rounded-full border {% if variant.is_default or forloop.first %}border-secondary text-on-secondary bg-secondary shadow-sm is-active-variant{% else %}border-outline-variant text-on-surface bg-surface-bright{% endif %} font-label-md text-label-md hover:opacity-80 transition-all" data-id="{{ variant.id }}">
+            {{ variant.label }}
+        </button>
+    {% else %}
+        <button disabled class="variant-btn px-5 py-2.5 rounded-full border border-outline-variant/30 text-on-surface/30 bg-surface-container-low font-label-md text-label-md cursor-not-allowed">
+            <span class="line-through">{{ variant.label }}</span> ({% trans "Tugagan" %})
+        </button>
+    {% endif %}
+{% empty %}
+    <span class="text-on-surface-variant text-label-md">{% trans "Variantlar mavjud emas" %}</span>
+{% endfor %}
+</div>
+</div>
+<!-- Description -->
+<div class="mb-xl">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-sm">{% trans "Mahsulot haqida" %}</h3>
+<p id="product-description" class="font-body-md text-body-md text-on-surface leading-relaxed whitespace-pre-line">
+                        {{ product.description }}
+                    </p>
+</div>
+</div>
+<!-- Desktop Action Bar (Sticky relative to column) -->
+<div class="hidden md:flex flex-col gap-md sticky bottom-lg pt-md bg-surface-bright border-t border-outline-variant/30">
+<div class="flex gap-md h-12">
+<!-- Quantity -->
+<div class="flex items-center bg-surface-container-low rounded-lg border border-outline-variant/50">
+<button onclick="changeQuantity(-1)" class="w-12 h-full flex items-center justify-center text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">remove</span></button>
+<span id="product-quantity" class="w-10 text-center font-label-md text-label-md text-on-surface">1</span>
+<button onclick="changeQuantity(1)" class="w-12 h-full flex items-center justify-center text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">add</span></button>
+</div>
+<!-- Add to Cart -->
+<button onclick="addSelectedToCart()" id="product-add-btn" class="flex-1 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-all interactive-shadow">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+                        {% trans "Savatga qo'shish" %}
+                    </button>
+</div>
+</div>
+
+<!-- Mobile action bar replacement -->
+<div class="md:hidden fixed bottom-14 left-0 w-full bg-surface-bright border-t border-outline-variant/30 p-4 z-40 pb-6 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+    <div class="flex items-center justify-between bg-surface-container-low rounded-lg border border-outline-variant/50 mb-3 h-10 w-32 mx-auto">
+        <button onclick="changeQuantity(-1)" class="w-10 h-full flex items-center justify-center text-on-surface"><span class="material-symbols-outlined text-[20px]">remove</span></button>
+        <span id="product-quantity-mobile" class="w-10 text-center font-label-md text-label-md text-on-surface">1</span>
+        <button onclick="changeQuantity(1)" class="w-10 h-full flex items-center justify-center text-on-surface"><span class="material-symbols-outlined text-[20px]">add</span></button>
+    </div>
+    <button onclick="addSelectedToCart()" class="w-full bg-primary text-on-primary rounded-lg font-label-md text-label-md py-3 flex items-center justify-center gap-2 hover:bg-primary-container transition-all">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+        {% trans "Savatga qo'shish" %}
+    </button>
+</div>
+</div>
+
+<hr class="border-outline-variant/30 my-lg col-span-full"/>
+
+<!-- Product Reviews Section -->
+<div class="col-span-full flex flex-col gap-lg mb-2xl">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-md border-b border-outline-variant/20 pb-sm">
+        <div>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">{% trans "Mijozlar fikrlari" %}</h3>
+            {% if product.average_rating %}
+            <div class="flex items-center gap-xs mt-1">
+                <div class="flex text-amber-500">
+                    <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="font-bold text-[14px] text-on-surface ml-0.5">{{ product.average_rating }} / 5</span>
+                </div>
+                <span class="text-xs text-on-surface-variant">({{ product.reviews_count }} {% trans "ta sharh" %})</span>
+            </div>
+            {% else %}
+            <p class="text-xs text-on-surface-variant mt-1">{% trans "Hozircha sharhlar yo'q. Birinchi bo'lib sharh qoldiring!" %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+        <!-- Reviews List -->
+        <div class="lg:col-span-2 flex flex-col gap-md">
+            {% for review in reviews %}
+            <div class="bg-surface-container-lowest p-md rounded-2xl border border-outline-variant/20 shadow-sm flex flex-col gap-xs transition-shadow hover:shadow-md">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-label-md text-label-md text-on-surface">{{ review.user.full_name }}</h4>
+                        <div class="flex text-amber-500 mt-0.5">
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                            <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                            {% else %}
+                            <span class="material-symbols-outlined text-[14px]">star</span>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-on-surface-variant font-mono">{{ review.created_at|date:"d.m.Y" }}</span>
+                </div>
+                {% if review.comment %}
+                <p class="text-[13px] text-on-surface-variant leading-relaxed mt-1">{{ review.comment }}</p>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="text-center py-8 text-on-surface-variant text-[13px] border border-dashed border-outline-variant/30 rounded-2xl w-full">
+                {% trans "Ushbu mahsulot uchun hali sharhlar yozilmagan." %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Add Review Form -->
+        <div class="flex flex-col">
+            {% if can_review %}
+            <div class="bg-gradient-to-br from-primary-container/20 to-surface-container/20 border border-primary/20 p-md rounded-2xl flex flex-col gap-sm">
+                <h4 class="font-label-md text-label-md text-on-surface">{% trans "Fikr bildirish" %}</h4>
+                <form id="review-form" onsubmit="submitReview(event)" class="flex flex-col gap-sm">
+                    <!-- Rating Stars -->
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[11px] text-on-surface-variant">{% trans "Baholang:" %}</span>
+                        <div class="flex gap-xs text-amber-500 cursor-pointer" id="rating-stars-input">
+                            <span onclick="setRating(1)" class="material-symbols-outlined star-input text-[24px]">star</span>
+                            <span onclick="setRating(2)" class="material-symbols-outlined star-input text-[24px]">star</span>
+                            <span onclick="setRating(3)" class="material-symbols-outlined star-input text-[24px]">star</span>
+                            <span onclick="setRating(4)" class="material-symbols-outlined star-input text-[24px]">star</span>
+                            <span onclick="setRating(5)" class="material-symbols-outlined star-input text-[24px]">star</span>
+                        </div>
+                        <input type="hidden" name="rating" id="review-rating-val" required value="">
+                    </div>
+                    <!-- Comment -->
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[11px] text-on-surface-variant">{% trans "Izohingiz (ixtiyoriy):" %}</span>
+                        <textarea name="comment" id="review-comment-val" rows="3" class="w-full bg-surface-container rounded-lg p-2.5 text-[12px] border border-outline-variant/30 focus:border-primary focus:ring-0 text-on-surface" placeholder="{% trans "Fikringizni yozing..." %}"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-primary text-on-primary font-label-md text-xs rounded-lg hover:bg-primary/90 active:scale-95 transition-all shadow-sm">
+                        {% trans "Yuborish" %}
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="bg-surface-container-low p-md rounded-2xl border border-outline-variant/10 text-center flex flex-col items-center justify-center gap-xs">
+                <span class="material-symbols-outlined text-outline text-[32px] opacity-40">rate_review</span>
+                <p class="text-xs text-on-surface-variant">{% trans "Faqat ushbu mahsulotni sotib olgan va yetkazib berilgan mijozlar sharh qoldirishlari mumkin." %}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="border-t border-outline-variant/20 pt-lg mt-lg flex flex-col gap-md">
+        <h3 class="font-headline-sm text-headline-sm text-on-surface">{% trans "O'xshash mahsulotlar" %}</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% for rp in related_products %}
+            <a href="{% url 'product_detail' rp.id %}" class="bg-surface rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] overflow-hidden hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 group flex flex-col border border-outline-variant/30 relative">
+                <div class="relative aspect-[4/3] bg-surface-variant/20 p-3 flex items-center justify-center overflow-hidden">
+                    {% if rp.image %}
+                    <img src="{{ rp.image.url }}" alt="{{ rp.name }}" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500 drop-shadow-sm">
+                    {% endif %}
+                    {% if rp.discount_percent %}
+                    <span class="absolute top-2 left-2 bg-error/90 backdrop-blur-md text-on-error text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">-{{ rp.discount_percent }}%</span>
+                    {% endif %}
+                </div>
+                <div class="p-3.5 flex flex-col flex-1 bg-gradient-to-b from-transparent to-surface-variant/10">
+                    <h4 class="font-medium text-[13px] leading-tight text-on-surface mb-1.5 line-clamp-2 min-h-[36px] group-hover:text-primary transition-colors">{{ rp.name }}</h4>
+                    <div class="mt-auto flex justify-between items-end">
+                        <span class="font-bold text-[14px] text-primary">{{ rp.min_price_val }} UZS</span>
+                        {% if rp.variants.exists %}
+                        <button onclick="event.preventDefault(); addToCart('{{ rp.variants.first.id }}', 1)" class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary hover:shadow-md transition-all z-10 relative">
+                            <span class="material-symbols-outlined text-[18px]">add</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let currentVariantId = null;
+let currentQuantity = 1;
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Find the initially active variant and set its properties
+    const activeVariant = document.querySelector('.is-active-variant');
+    if (activeVariant) {
+        currentVariantId = activeVariant.getAttribute('data-id');
+        // Extract price from the onclick attribute string to update initial display
+        const onclickAttr = activeVariant.getAttribute('onclick');
+        const priceMatch = onclickAttr.match(/'(\d+)'/g);
+        if (priceMatch && priceMatch.length > 1) {
+            const price = priceMatch[1].replace(/'/g, '');
+            document.getElementById('product-price').textContent = new Intl.NumberFormat('uz-UZ').format(price) + " so'm";
+        }
+    }
+});
+
+function selectVariant(btn, id, price) {
+    currentVariantId = id;
+    document.getElementById('product-price').textContent = new Intl.NumberFormat('uz-UZ').format(price) + " so'm";
+    
+    // Update active state of buttons
+    document.querySelectorAll('.variant-btn:not([disabled])').forEach(b => {
+        b.className = "variant-btn px-5 py-2.5 rounded-full border border-outline-variant text-on-surface bg-surface-bright font-label-md text-label-md hover:opacity-80 transition-all";
+        b.classList.remove('is-active-variant');
+    });
+    btn.className = "variant-btn px-5 py-2.5 rounded-full border border-secondary text-on-secondary bg-secondary shadow-sm font-label-md text-label-md hover:opacity-80 transition-all is-active-variant";
+}
+
+function changeQuantity(delta) {
+    currentQuantity += delta;
+    if(currentQuantity < 1) currentQuantity = 1;
+    const qtyEl = document.getElementById('product-quantity');
+    if (qtyEl) qtyEl.textContent = currentQuantity;
+    const qtyMobileEl = document.getElementById('product-quantity-mobile');
+    if (qtyMobileEl) qtyMobileEl.textContent = currentQuantity;
+}
+
+function addSelectedToCart() {
+    if (!currentVariantId) {
+        alert("{% trans "Iltimos, variantni tanlang." %}");
+        return;
+    }
+    addToCart(currentVariantId, currentQuantity);
+}
+
+async function toggleFavorite(btn, productId) {
+    try {
+        const response = await fetch(`/product/${productId}/favorite/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+        
+        if (response.status === 401) {
+            alert("{% trans "Iltimos, avval tizimga kiring." %}");
+            return;
+        }
+        
+        const data = await response.json();
+        if (response.ok && data.status === 'ok') {
+            const icon = btn.querySelector('span');
+            if (data.is_favorite) {
+                icon.style.fontVariationSettings = "'FILL' 1";
+                icon.style.color = "#ef4444";
+            } else {
+                icon.style.fontVariationSettings = "'FILL' 0";
+                icon.style.color = "inherit";
+            }
+        } else {
+            alert(data.message || "{% trans "Xatolik yuz berdi." %}");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("{% trans "Xatolik yuz berdi." %}");
+    }
+}
+
+let selectedReviewRating = 0;
+function setRating(rating) {
+    selectedReviewRating = rating;
+    document.getElementById('review-rating-val').value = rating;
+    const stars = document.querySelectorAll('#rating-stars-input .star-input');
+    stars.forEach((star, idx) => {
+        if (idx < rating) {
+            star.style.fontVariationSettings = "'FILL' 1";
+        } else {
+            star.style.fontVariationSettings = "'FILL' 0";
+        }
+    });
+}
+
+async function submitReview(event) {
+    event.preventDefault();
+    const rating = document.getElementById('review-rating-val').value;
+    const comment = document.getElementById('review-comment-val').value;
+    
+    if (!rating) {
+        alert("{% trans "Iltimos, mahsulotni baholang (yulduzchalarni tanlang)." %}");
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/product/{{ product.id }}/review/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                rating: parseInt(rating),
+                comment: comment
+            })
+        });
+        
+        const data = await response.json();
+        if (response.ok && data.status === 'ok') {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.message || "{% trans "Xatolik yuz berdi." %}");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("{% trans "Xatolik yuz berdi." %}");
+    }
+}
+</script>
+{% endblock %}

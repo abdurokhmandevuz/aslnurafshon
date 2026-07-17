@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-2">Buyurtmalar tarixi</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Barcha joriy va oldingi buyurtmalaringiz.</p>
+</div>
+<!-- Filters -->
+<div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 md:pb-0">
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">Barchasi</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-variant/50 transition-colors font-label-md text-label-md">Faol</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-variant/50 transition-colors font-label-md text-label-md">Tugallangan</button>
+</div>
+</div>
+<!-- Orders List -->
+<div id="orders-container" class="flex flex-col gap-md">
+    {% for order in orders %}
+    <div class="bg-surface-container-lowest rounded-xl p-md ambient-shadow border border-surface-container-low flex flex-col gap-sm">
+        <div class="flex justify-between items-start border-b border-surface-variant pb-2">
+            <div>
+                <h3 class="font-headline-sm text-headline-sm text-primary">Buyurtma #{{ order.id }}</h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">{{ order.created_at|date:"d.m.Y H:i" }}</p>
+            </div>
+            <span class="px-3 py-1 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-full">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+        <div class="flex flex-col gap-1 py-2">
+            {% for item in order.items.all %}
+            <div class="flex justify-between text-body-sm">
+                <span class="text-on-surface">{{ item.product_name_snapshot }} ({{ item.variant_weight_snapshot|default:"" }}) x {{ item.quantity }}</span>
+                <span class="text-on-surface-variant">{{ item.line_total }} UZS</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="flex justify-between items-center pt-2 border-t border-surface-variant">
+            <span class="font-label-md text-label-md text-on-surface">Umumiy summa:</span>
+            <span class="font-headline-sm text-headline-sm text-primary">{{ order.total }} UZS</span>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-8 text-on-surface-variant">Buyurtmalar topilmadi.</div>
+    {% endfor %}
+</div>
+{% endblock %}

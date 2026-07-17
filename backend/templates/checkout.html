@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+<!-- Map Dependencies -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Map Modal -->
+<div id="map-modal" class="hidden fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-surface rounded-xl shadow-lg w-full max-w-lg overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-surface-container flex justify-between items-center">
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">{% trans "Manzilni tanlang" %}</h3>
+            <button type="button" onclick="closeMapModal()" class="text-on-surface-variant hover:text-on-surface">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="map" class="h-[400px] w-full"></div>
+        <div class="p-4 border-t border-surface-container bg-surface">
+            <p id="map-address-text" class="text-sm text-on-surface-variant mb-3 h-10 overflow-hidden text-ellipsis line-clamp-2">{% trans "Manzil qidirilmoqda..." %}</p>
+            <button type="button" onclick="confirmMapLocation()" class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md">{% trans "Tasdiqlash" %}</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let map, marker;
+let selectedAddress = "";
+
+function openMapModal() {
+    document.getElementById('map-modal').classList.remove('hidden');
+    if (!map) {
+        map = L.map('map').setView([41.2995, 69.2401], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        marker = L.marker([41.2995, 69.2401], {draggable: true}).addTo(map);
+        
+        marker.on('dragend', function (e) {
+            updateAddressFromCoords(marker.getLatLng());
+        });
+
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateAddressFromCoords(e.latlng);
+        });
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                const latlng = {lat: pos.coords.latitude, lng: pos.coords.longitude};
+                map.setView(latlng, 15);
+                marker.setLatLng(latlng);
+                updateAddressFromCoords(latlng);
+            });
+        }
+    }
+    setTimeout(() => { map.invalidateSize(); }, 100);
+}
+
+function closeMapModal() {
+    document.getElementById('map-modal').classList.add('hidden');
+}
+
+function updateAddressFromCoords(latlng) {
+    document.getElementById('map-address-text').innerText = "{% trans "Manzil qidirilmoqda..." %}";
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data && data.display_name) {
+                selectedAddress = data.display_name;
+                document.getElementById('map-address-text').innerText = selectedAddress;
+            } else {
+                document.getElementById('map-address-text').innerText = "{% trans "Manzilni aniqlab bo'lmadi." %}";
+            }
+        })
+        .catch(() => {
+            document.getElementById('map-address-text').innerText = "{% trans "Xatolik yuz berdi." %}";
+        });
+}
+
+function confirmMapLocation() {
+    if(selectedAddress) {
+        document.getElementById('checkout-address').value = selectedAddress;
+    }
+    closeMapModal();
+}
+</script>
+
+<!-- Header / Progress indication -->
+<div class="py-xs">
+    <h2 class="font-headline-sm text-headline-sm text-on-surface">{% trans "Buyurtmani rasmiylashtirish" %}</h2>
+    <p class="font-body-sm text-[12px] text-on-surface-variant mt-xs">{% trans "Yetkazib berish ma'lumotlarini kiriting." %}</p>
+</div>
+
+<form method="POST" action="{% url 'checkout_submit' %}" class="flex flex-col gap-md mt-sm">
+    {% csrf_token %}
+    
+    <!-- Section: Delivery Time Slot -->
+    <section class="flex flex-col gap-xs">
+        <label class="font-label-sm text-label-sm text-primary">{% trans "Yetkazib berish vaqti" %}</label>
+        <div class="group relative flex items-center bg-inverse-on-surface rounded-lg p-2.5 transition-all border border-transparent focus-within:border-primary focus-within:bg-surface">
+            <span class="material-symbols-outlined text-outline mr-md" style="font-size: 20px;">schedule</span>
+            <select name="delivery_time_slot" required class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-[13px] text-on-surface">
+                <option value="" disabled selected>{% trans "Vaqt oralig'ini tanlang" %}</option>
+                {% for slot in time_slots %}
+                <option value="{{ slot.id }}">{{ slot.date|date:"d.m.Y" }} ({{ slot.label }})</option>
+                {% empty %}
+                <option value="" disabled>{% trans "Hozircha bo'sh vaqtlar mavjud emas" %}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </section>
+
+    {% if not user_phone %}
+    <!-- Section: Phone Input -->
+    <section class="flex flex-col gap-xs">
+        <label class="font-label-sm text-label-sm text-primary">{% trans "Aloqa uchun telefon raqam" %}</label>
+        <div class="group relative flex items-center bg-inverse-on-surface rounded-lg p-2.5 transition-colors border border-transparent focus-within:border-primary focus-within:bg-surface">
+            <span class="material-symbols-outlined text-outline mr-md" style="font-size: 20px;">phone</span>
+            <input id="checkout-phone" name="phone" required class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-[13px] text-on-surface placeholder-on-surface-variant/50" placeholder="+998 90 123 45 67" type="tel" value=""/>
+        </div>
+        <p id="checkout-phone-error" class="hidden text-error font-label-sm mt-1">{% trans "Iltimos, telefon raqamingizni kiriting." %}</p>
+    </section>
+    {% else %}
+    <input type="hidden" name="phone" value="{{ user_phone }}"/>
+    {% endif %}
+
+    <!-- Section: Address Input -->
+    <section class="flex flex-col gap-xs">
+        <label class="font-label-sm text-label-sm text-primary">{% trans "Yetkazib berish manzili" %}</label>
+        <div onclick="openMapModal()" class="cursor-pointer group relative flex items-center bg-inverse-on-surface rounded-lg p-2.5 transition-colors border border-transparent hover:border-primary hover:bg-surface-container-low">
+            <span class="material-symbols-outlined text-outline mr-md" style="font-size: 20px;">location_on</span>
+            <input class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-[13px] text-on-surface placeholder-on-surface-variant/50 cursor-pointer" readonly name="address" id="checkout-address" placeholder="{% trans "Manzilni xaritadan tanlang" %}" type="text" value="" required/>
+            <span class="material-symbols-outlined text-secondary ml-sm" style="font-size: 20px;">map</span>
+        </div>
+    </section>
+
+    <!-- Section: Payment Method -->
+    <section class="flex flex-col gap-xs">
+        <label class="font-label-sm text-label-sm text-primary">{% trans "To'lov usuli" %}</label>
+        <div class="grid grid-cols-3 gap-sm">
+            <!-- Active Option -->
+            <label class="relative cursor-pointer bg-primary-container/10 border-2 border-primary rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 transition-colors">
+                <input checked="" class="sr-only" name="payment" value="payme" type="radio"/>
+                <span class="material-symbols-outlined text-primary text-[24px]">account_balance_wallet</span>
+                <span class="font-label-sm text-[12px] text-primary">Payme</span>
+                <!-- Checkmark indicator -->
+                <div class="absolute top-1.5 right-1.5 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[10px] text-on-primary">check</span>
+                </div>
+            </label>
+            <!-- Inactive Option -->
+            <label class="relative cursor-pointer bg-surface border border-outline-variant hover:border-outline rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 transition-colors">
+                <input class="sr-only" name="payment" value="click" type="radio"/>
+                <span class="material-symbols-outlined text-outline text-[24px]">credit_card</span>
+                <span class="font-label-sm text-[12px] text-on-surface-variant">Click</span>
+            </label>
+            <!-- Inactive Option -->
+            <label class="relative cursor-pointer bg-surface border border-outline-variant hover:border-outline rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 transition-colors">
+                <input class="sr-only" name="payment" value="naqd" type="radio"/>
+                <span class="material-symbols-outlined text-outline text-[24px]">payments</span>
+                <span class="font-label-sm text-[12px] text-on-surface-variant">{% trans "Naqd" %}</span>
+            </label>
+        </div>
+    </section>
+
+    <!-- Section: Order Summary -->
+    <section class="bg-surface rounded-xl shadow-level-1 p-sm border border-surface-container-high mb-lg">
+        <h3 class="font-label-md text-label-md text-on-surface mb-sm">{% trans "Buyurtma tarkibi" %}</h3>
+        <div id="checkout-items" class="flex flex-col gap-sm">
+            {% for item in items %}
+            {% if item.type == 'bundle' %}
+            <div class="flex items-center gap-3 border-b border-surface-container-high pb-2">
+                <div class="w-12 h-12 rounded-lg bg-surface-container-low overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5">
+                    {% if item.bundle.image %}
+                    <img class="w-full h-full object-contain mix-blend-multiply" src="{{ item.bundle.image.url }}" alt="{{ item.bundle.name }}">
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[9px] font-bold text-secondary uppercase tracking-wider block mb-0.5">{% trans "Kombo to'plam" %}</span>
+                    <h4 class="font-label-sm text-label-sm text-on-surface truncate">{{ item.bundle.name }}</h4>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="font-label-md text-label-md text-primary">{{ item.line_total }} UZS</span>
+                        <span class="font-label-sm text-[11px] text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">x {{ item.quantity }}</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="flex items-center gap-3 border-b border-surface-container-high pb-2">
+                <div class="w-12 h-12 rounded-lg bg-surface-container-low overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5">
+                    {% if item.variant.product.image %}
+                    <img class="w-full h-full object-contain mix-blend-multiply" src="{{ item.variant.product.image.url }}" alt="{{ item.variant.product.name }}">
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-label-sm text-label-sm text-on-surface truncate">{{ item.variant.product.name }}</h4>
+                    <div class="text-[11px] text-on-surface-variant">{{ item.variant.label }}</div>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="font-label-md text-label-md text-primary">{{ item.line_total }} UZS</span>
+                        <span class="font-label-sm text-[11px] text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">x {{ item.quantity }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <!-- Totals -->
+        <div class="flex flex-col gap-1.5 mt-sm pt-2">
+            <div class="flex justify-between items-center text-on-surface-variant font-body-sm text-body-sm">
+                <span>{% trans "Mahsulotlar summasi" %}</span>
+                <span id="checkout-subtotal" class="font-label-sm">{{ subtotal }} UZS</span>
+            </div>
+            {% if discount > 0 %}
+            <div class="flex justify-between items-center text-secondary font-body-sm text-body-sm">
+                <span>{% trans "Chegirma" %}</span>
+                <span id="checkout-discount" class="font-label-sm">-{{ discount }} UZS</span>
+            </div>
+            {% endif %}
+            <div class="flex justify-between items-center text-on-surface-variant font-body-sm text-body-sm">
+                <span>{% trans "Yetkazib berish" %}</span>
+                <span id="checkout-delivery" class="font-label-sm">{{ delivery_fee }} UZS</span>
+            </div>
+            <div class="flex justify-between items-center font-headline-sm text-[16px] text-primary mt-xs pt-xs border-t border-surface-container-high">
+                <span>{% trans "Jami to'lov" %}</span>
+                <span id="checkout-total">{{ grand_total }} UZS</span>
+            </div>
+        </div>
+        <!-- Inline Checkout Button -->
+        <div class="mt-md">
+            {% if is_under_min %}
+            <div class="bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg p-sm text-xs text-center mb-sm font-semibold">
+                ⚠️ {% trans "Minimal buyurtma summasi" %} {{ min_order_sum }} UZS. {% trans "Iltimos, savatga yana mahsulot qo'shing." %}
+            </div>
+            <button type="button" disabled class="w-full bg-outline-variant text-outline rounded-lg font-label-md text-label-md py-3 flex items-center justify-center gap-2 cursor-not-allowed">
+                <span>{% trans "Tasdiqlash" %}</span>
+                <span class="material-symbols-outlined text-[18px]">check_circle</span>
+            </button>
+            {% else %}
+            <button type="submit" class="w-full bg-primary text-on-primary rounded-lg font-label-md text-label-md py-3 interactive-shadow hover:bg-primary-container transition-all flex items-center justify-center gap-2">
+                <span>{% trans "Tasdiqlash" %}</span>
+                <span class="material-symbols-outlined text-[18px]">check_circle</span>
+            </button>
+            {% endif %}
+        </div>
+
+    </section>
+</form>
+{% endblock %}

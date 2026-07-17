@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html class="light" lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bildirishnomalar - Asl Nurafshon</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#4d4637",
+                        "primary-container": "#4a2e1e",
+                        "surface-container-low": "#f3f3f3",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#241f12",
+                        "primary-fixed": "#ffdbca",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2f3131",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-variant": "#e2e2e2",
+                        "on-primary-fixed": "#2d1607",
+                        "on-secondary-fixed-variant": "#713608",
+                        "inverse-on-surface": "#f1f1f1",
+                        "background": "#f9f9f9",
+                        "surface": "#f9f9f9",
+                        "surface-tint": "#795744",
+                        "on-secondary-container": "#773b0d",
+                        "on-primary-fixed-variant": "#5e402f",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#3a3426",
+                        "on-background": "#1a1c1c",
+                        "secondary": "#8f4d1f",
+                        "primary-fixed-dim": "#e9bda6",
+                        "on-primary-container": "#bd957f",
+                        "outline-variant": "#d4c3bb",
+                        "tertiary-fixed": "#ede1cd",
+                        "inverse-primary": "#e9bda6",
+                        "surface-container-high": "#e8e8e8",
+                        "on-surface-variant": "#50443f",
+                        "on-tertiary-container": "#a69c8a",
+                        "primary": "#32190b",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#321300",
+                        "secondary-fixed-dim": "#ffb68a",
+                        "on-tertiary-fixed": "#201b0f",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-container": "#fda771",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeee",
+                        "surface-dim": "#dadada",
+                        "outline": "#82746e",
+                        "tertiary-fixed-dim": "#d0c5b2",
+                        "secondary-fixed": "#ffdbc8",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "container-max": "1280px",
+                        "2xl": "48px",
+                        "margin-mobile": "16px",
+                        "3xl": "64px",
+                        "unit": "4px",
+                        "lg": "24px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="app.js"></script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased md:max-w-md md:mx-auto md:shadow-2xl md:border-x md:border-surface-variant">
+<!-- TopAppBar (Transactional Context - No BottomNavBar) -->
+<header class="w-full sticky top-0 bg-surface z-50 px-margin-mobile h-16 flex items-center shadow-[0_4px_20px_0_rgba(74,46,30,0.04)]">
+<button aria-label="Back" class="text-primary hover:opacity-80 active:scale-95 transition-transform flex items-center justify-center p-2 -ml-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="ml-4 font-headline-sm text-headline-sm text-primary">Bildirishnomalar</h1>
+<button aria-label="Mark all as read" class="ml-auto text-on-surface-variant hover:opacity-80 active:scale-95 transition-transform flex items-center justify-center p-2 -mr-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20">
+<span class="material-symbols-outlined" data-icon="done_all">done_all</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-margin-mobile py-md flex flex-col gap-sm overflow-y-auto">
+<!-- Notification Item 1: Unread, Delivery -->
+<div class="bg-surface-container-lowest p-md rounded-xl flex gap-md items-start shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-variant/50 relative overflow-hidden transition-colors hover:bg-surface-container-low cursor-pointer">
+<!-- Unread Indicator -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary rounded-l-xl"></div>
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 text-secondary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined icon-fill" data-icon="local_shipping">local_shipping</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate pr-2">Buyurtmangiz yo'lga chiqdi</h2>
+<span class="font-label-sm text-label-sm text-secondary flex-shrink-0">10:45</span>
+</div>
+<p class="font-body-md text-[14px] leading-[20px] text-on-surface-variant line-clamp-2">
+                    #AN-8492 buyurtmangiz kuryerga topshirildi va manzil tomon yo'lga chiqdi. Taxminiy yetkazib berish vaqti: 30-40 daqiqa.
+                </p>
+</div>
+</div>
+<!-- Notification Item 2: Promotion -->
+<div class="bg-surface-container-lowest p-md rounded-xl flex gap-md items-start shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-variant/50 relative overflow-hidden transition-colors hover:bg-surface-container-low cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-error-container/30 text-error flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined icon-fill" data-icon="percent">percent</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate pr-2">Yangi chegirmalar!</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70 flex-shrink-0">Kecha</span>
+</div>
+<p class="font-body-md text-[14px] leading-[20px] text-on-surface-variant line-clamp-2">
+                    Barcha premium choy va qahvalarga hafta oxirigacha 20% gacha chegirma e'lon qilamiz. Hoziroq buyurtma bering!
+                </p>
+</div>
+</div>
+<!-- Notification Item 3: System/Profile -->
+<div class="bg-surface-container-lowest p-md rounded-xl flex gap-md items-start shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-variant/50 relative overflow-hidden transition-colors hover:bg-surface-container-low cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="manage_accounts">manage_accounts</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate pr-2">Profil ma'lumotlari yangilandi</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70 flex-shrink-0">12 May</span>
+</div>
+<p class="font-body-md text-[14px] leading-[20px] text-on-surface-variant line-clamp-2">
+                    Sizning yetkazib berish manzilingiz muvaffaqiyatli saqlandi. Keyingi xaridlarda undan foydalanishingiz mumkin.
+                </p>
+</div>
+</div>
+<!-- Older Date Header -->
+<div class="py-sm mt-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Avvalgi oylarda</span>
+</div>
+<!-- Notification Item 4: Generic Read -->
+<div class="bg-surface p-md rounded-xl flex gap-md items-start border border-transparent relative overflow-hidden transition-colors hover:bg-surface-container-lowest cursor-pointer opacity-80">
+<div class="w-12 h-12 rounded-full bg-surface-variant/50 text-on-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate pr-2">Buyurtma yetkazildi</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70 flex-shrink-0">28 Apr</span>
+</div>
+<p class="font-body-md text-[14px] leading-[20px] text-on-surface-variant line-clamp-1">
+                    Xaridingiz uchun rahmat. Ilovani baholashni unutmang.
+                </p>
+</div>
+</div>
+</main>
+<!-- No Bottom Navigation Rendered: Transactional/Sub-page context -->
+</body></html>

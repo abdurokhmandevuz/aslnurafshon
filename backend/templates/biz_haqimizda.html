@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Hero Image -->
+<section class="w-full flex justify-center">
+<div class="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] bg-surface-container-low border-4 border-surface">
+<img alt="Asl Nurafshon Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLt9sporZwXJ-e8ZiHM8e4475_Rn_530sQziCPfGhRYmA6IOsuZQiv_voD8T2PukuozTQVvX8E2F80G9IDL0oqY5acOmuxvwlB5E1rOnhCNpG4pAdTFQzFblWUjprfpPtrsZAwRXMIqSNcRgx8T50RmcGzTLKqS-ECPAwFH6vNABMeX9ulRK7Zz30PpNYcpLNwczi8kc3yp2gGx0o1u2pYIqJpHBfS2Bkposv5Y6B8tP_SQALg40YQQaLthD"/>
+</div>
+</section>
+<!-- About Text -->
+<section class="max-w-2xl mx-auto text-center space-y-md">
+<h2 class="font-headline-md text-headline-md text-primary">Biz Haqimizda</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                "Asl Nurafshon" - bu yuqori sifatli va yangi mahsulotlarni o'zida mujassam etgan zamonaviy oziq-ovqat do'koni. Biz har bir mijozimizga eng sara va mazali mahsulotlarni yetkazib berishni o'z oldimizga maqsad qilib qo'yganmiz. Tabiiylik va sifat - bizning asosiy qadriyatlarimizdir.
+            </p>
+</section>
+<!-- Contact Cards Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md max-w-4xl mx-auto">
+<!-- Address -->
+<div class="bg-surface rounded-xl p-md shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] flex items-start space-x-md">
+<div class="p-sm bg-surface-container-low rounded-lg text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-primary mb-xs">Manzil</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Toshkent shahri, Amir Temur ko'chasi, 15-uy</p>
+</div>
+</div>
+<!-- Working Hours -->
+<div class="bg-surface rounded-xl p-md shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] flex items-start space-x-md">
+<div class="p-sm bg-surface-container-low rounded-lg text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-primary mb-xs">Ish vaqti</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Dush - Yak: 08:00 - 22:00</p>
+</div>
+</div>
+<!-- Phone -->
+<div class="bg-surface rounded-xl p-md shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] flex items-start space-x-md md:col-span-2 justify-center text-center">
+<div class="flex flex-col items-center">
+<div class="p-sm bg-surface-container-low rounded-lg text-secondary mb-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+</div>
+<h3 class="font-label-md text-label-md text-primary mb-xs">Telefon</h3>
+<a class="font-headline-sm text-headline-sm text-secondary hover:opacity-80 transition-opacity" href="tel:+998901234567">
+                        +998 90 123 45 67
+                    </a>
+</div>
+</div>
+</section>
+<!-- Social Media -->
+<section class="flex flex-col items-center space-y-md pt-lg">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Ijtimoiy tarmoqlar</h3>
+<div class="flex space-x-md">
+<button class="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center text-primary hover:bg-surface-container transition-colors shadow-[0_4px_20px_0_rgba(74,46,30,0.04)]">
+<span class="material-symbols-outlined">send</span>
+</button>
+<button class="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center text-primary hover:bg-surface-container transition-colors shadow-[0_4px_20px_0_rgba(74,46,30,0.04)]">
+<span class="material-symbols-outlined">photo_camera</span>
+</button>
+</div>
+</section>
+{% endblock %}

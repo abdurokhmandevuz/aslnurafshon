@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Left Column: Image Gallery (Span 6 on desktop) -->
+<div class="md:col-span-6 lg:col-span-7 flex flex-col gap-sm">
+<div class="aspect-square w-full rounded-xl overflow-hidden bg-surface-container-low relative ambient-shadow">
+{% if product.image %}
+<img id="product-image" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" data-alt="Product Image" src="{{ product.image.url }}"/>
+{% endif %}
+<!-- Decorative subtle overlay for premium feel -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
+</div>
+</div>
+<!-- Right Column: Details & Actions (Span 6 on desktop) -->
+<div class="md:col-span-6 lg:col-span-5 flex flex-col mt-md md:mt-0 relative h-full">
+<div class="flex-1">
+<!-- Meta Info -->
+<div class="mb-xs">
+<span id="product-category" class="font-label-sm text-label-sm text-secondary tracking-wider uppercase">{{ product.category.name }}</span>
+</div>
+<!-- Title -->
+<h2 id="product-name" class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mb-2 leading-tight">{{ product.name }}</h2>
+<!-- Price -->
+<div id="product-price" class="font-headline-md text-headline-md text-primary mb-lg">
+                    {{ product.variants.first.price }} UZS
+                </div>
+<hr class="border-outline-variant/50 mb-lg"/>
+<!-- Weight Selector (Chips) -->
+<div class="mb-lg">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-sm">Variantlar</h3>
+<div class="flex flex-wrap gap-sm" id="variant-selector">
+{% for variant in product.variants.all %}
+    {% if variant.stock_qty > 0 %}
+        <button onclick="selectVariant(this, '{{ variant.id }}', '{{ variant.price }}')" class="variant-btn px-5 py-2.5 rounded-full border {% if variant.is_default or forloop.first %}border-secondary text-on-secondary bg-secondary shadow-sm is-active-variant{% else %}border-outline-variant text-on-surface bg-surface-bright{% endif %} font-label-md text-label-md hover:opacity-80 transition-all" data-id="{{ variant.id }}">
+            {{ variant.label }}
+        </button>
+    {% else %}
+        <button disabled class="variant-btn px-5 py-2.5 rounded-full border border-outline-variant/30 text-on-surface/30 bg-surface-container-low font-label-md text-label-md cursor-not-allowed">
+            <span class="line-through">{{ variant.label }}</span> (Tugagan)
+        </button>
+    {% endif %}
+{% empty %}
+    <span class="text-on-surface-variant text-label-md">Variantlar mavjud emas</span>
+{% endfor %}
+</div>
+</div>
+<!-- Description -->
+<div class="mb-xl">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-sm">Mahsulot haqida</h3>
+<p id="product-description" class="font-body-md text-body-md text-on-surface leading-relaxed whitespace-pre-line">
+                        {{ product.description }}
+                    </p>
+</div>
+</div>
+<!-- Desktop Action Bar (Sticky relative to column) -->
+<div class="hidden md:flex flex-col gap-md sticky bottom-lg pt-md bg-surface-bright border-t border-outline-variant/30">
+<div class="flex gap-md h-12">
+<!-- Quantity -->
+<div class="flex items-center bg-surface-container-low rounded-lg border border-outline-variant/50">
+<button onclick="changeQuantity(-1)" class="w-12 h-full flex items-center justify-center text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">remove</span></button>
+<span id="product-quantity" class="w-10 text-center font-label-md text-label-md text-on-surface">1</span>
+<button onclick="changeQuantity(1)" class="w-12 h-full flex items-center justify-center text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">add</span></button>
+</div>
+<!-- Add to Cart -->
+<button onclick="addSelectedToCart()" id="product-add-btn" class="flex-1 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-all interactive-shadow">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+                        Savatga qo'shish
+                    </button>
+</div>
+</div>
+
+<!-- Mobile action bar replacement -->
+<div class="md:hidden fixed bottom-14 left-0 w-full bg-surface-bright border-t border-outline-variant/30 p-4 z-40 pb-6 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+    <div class="flex items-center justify-between bg-surface-container-low rounded-lg border border-outline-variant/50 mb-3 h-10 w-32 mx-auto">
+        <button onclick="changeQuantity(-1)" class="w-10 h-full flex items-center justify-center text-on-surface"><span class="material-symbols-outlined text-[20px]">remove</span></button>
+        <span id="product-quantity-mobile" class="w-10 text-center font-label-md text-label-md text-on-surface">1</span>
+        <button onclick="changeQuantity(1)" class="w-10 h-full flex items-center justify-center text-on-surface"><span class="material-symbols-outlined text-[20px]">add</span></button>
+    </div>
+    <button onclick="addSelectedToCart()" class="w-full bg-primary text-on-primary rounded-lg font-label-md text-label-md py-3 flex items-center justify-center gap-2 hover:bg-primary-container transition-all">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+        Savatga qo'shish
+    </button>
+</div>
+</div>
+
+<script>
+let currentVariantId = null;
+let currentQuantity = 1;
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Find the initially active variant and set its properties
+    const activeVariant = document.querySelector('.is-active-variant');
+    if (activeVariant) {
+        currentVariantId = activeVariant.getAttribute('data-id');
+        // Extract price from the onclick attribute string to update initial display
+        const onclickAttr = activeVariant.getAttribute('onclick');
+        const priceMatch = onclickAttr.match(/'(\d+)'/g);
+        if (priceMatch && priceMatch.length > 1) {
+            const price = priceMatch[1].replace(/'/g, '');
+            document.getElementById('product-price').textContent = new Intl.NumberFormat('uz-UZ').format(price) + " so'm";
+        }
+    }
+});
+
+function selectVariant(btn, id, price) {
+    currentVariantId = id;
+    document.getElementById('product-price').textContent = new Intl.NumberFormat('uz-UZ').format(price) + " so'm";
+    
+    // Update active state of buttons
+    document.querySelectorAll('.variant-btn:not([disabled])').forEach(b => {
+        b.className = "variant-btn px-5 py-2.5 rounded-full border border-outline-variant text-on-surface bg-surface-bright font-label-md text-label-md hover:opacity-80 transition-all";
+        b.classList.remove('is-active-variant');
+    });
+    btn.className = "variant-btn px-5 py-2.5 rounded-full border border-secondary text-on-secondary bg-secondary shadow-sm font-label-md text-label-md hover:opacity-80 transition-all is-active-variant";
+}
+
+function changeQuantity(delta) {
+    currentQuantity += delta;
+    if(currentQuantity < 1) currentQuantity = 1;
+    const qtyEl = document.getElementById('product-quantity');
+    if (qtyEl) qtyEl.textContent = currentQuantity;
+    const qtyMobileEl = document.getElementById('product-quantity-mobile');
+    if (qtyMobileEl) qtyMobileEl.textContent = currentQuantity;
+}
+
+function addSelectedToCart() {
+    if (!currentVariantId) {
+        alert("Iltimos, variantni tanlang.");
+        return;
+    }
+    addToCart(currentVariantId, currentQuantity);
+}
+</script>
+{% endblock %}

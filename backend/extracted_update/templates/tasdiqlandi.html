@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Decorative subtle background element -->
+<div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary-fixed/20 to-transparent -z-10"></div>
+<!-- Logo (using provided image placeholder) -->
+<div class="mb-lg opacity-0 animate-slide-up">
+<img alt="Asl Nurafshon Logo" class="h-12 w-auto object-contain mix-blend-multiply" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+</div>
+<!-- Success Icon -->
+<div class="w-24 h-24 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center mb-md opacity-0 animate-slide-up delay-100">
+<span class="material-symbols-outlined text-[48px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Headline -->
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface text-center mb-xs opacity-0 animate-slide-up delay-100">
+            Buyurtma qabul qilindi!
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mb-xl opacity-0 animate-slide-up delay-100">
+            Sizning xaridingiz muvaffaqiyatli rasmiylashtirildi.
+        </p>
+<!-- Key Order Details Card -->
+<div class="w-full bg-surface-container-low rounded-xl p-md mb-lg border border-outline-variant/30 opacity-0 animate-slide-up delay-200">
+<div class="flex justify-between items-center pb-md border-b border-outline-variant/50">
+<span class="font-body-md text-body-md text-on-surface-variant">Buyurtma raqami:</span>
+<span class="font-headline-md text-headline-md text-primary tracking-tight">#{{ order.id }}</span>
+</div>
+<div class="flex justify-between items-center pt-md">
+<span class="font-body-md text-body-md text-on-surface-variant">Yetkazish vaqti:</span>
+<div class="flex items-center gap-xs bg-secondary-fixed px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-secondary text-[18px]">schedule</span>
+<span class="font-label-md text-label-md text-on-secondary-container">{{ order.delivery_time_slot|default:"Tez orada" }}</span>
+</div>
+</div>
+</div>
+<!-- Order Summary Minimal List -->
+<div class="w-full mb-xl opacity-0 animate-slide-up delay-200">
+<h2 class="font-label-md text-label-md text-outline mb-sm uppercase tracking-wider">Tafsilotlar</h2>
+<div class="flex flex-col gap-sm">
+{% for item in order.items.all %}
+<div class="flex justify-between items-start border-b border-outline-variant/30 pb-2">
+    <div>
+        <span class="font-body-md text-body-md text-on-surface block">{{ item.product_name_snapshot }}</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">{{ item.variant_weight_snapshot }}</span>
+    </div>
+<span class="font-label-md text-label-md text-on-surface whitespace-nowrap ml-sm">{{ item.quantity }} x {{ item.price_at_order }} UZS</span>
+</div>
+{% endfor %}
+<div class="flex justify-between items-start mt-2">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Yetkazib berish xizmati:</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">{{ order.delivery_fee }} UZS</span>
+</div>
+<div class="mt-sm pt-sm border-t border-outline-variant/30 flex justify-between items-center">
+<span class="font-headline-sm text-headline-sm text-on-surface-variant">Jami summasi:</span>
+<span class="font-headline-sm text-headline-sm text-primary">{{ order.total }} UZS</span>
+</div>
+</div>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container font-label-md text-label-md py-4 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm opacity-0 animate-slide-up delay-200 active:scale-[0.98]">
+            Bosh sahifaga qaytish
+        </button>
+{% endblock %}

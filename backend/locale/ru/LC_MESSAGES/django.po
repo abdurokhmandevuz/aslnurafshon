@@ -1,0 +1,358 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 21:41+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: config/settings/base.py:99
+msgid "Uzbek"
+msgstr "Узбекский"
+
+#: config/settings/base.py:100
+msgid "Russian"
+msgstr "Русский"
+
+#: templates/base.html:156 templates/base.html:161
+msgid "Bosh sahifa"
+msgstr "Главная"
+
+#: templates/base.html:169 templates/base.html:174
+msgid "Katalog"
+msgstr "Каталог"
+
+#: templates/base.html:183 templates/base.html:189
+msgid "Savat"
+msgstr "Корзина"
+
+#: templates/base.html:197 templates/base.html:202
+msgid "Buyurtmalarim"
+msgstr "Мои заказы"
+
+#: templates/base.html:210 templates/base.html:215
+msgid "Profil"
+msgstr "Профиль"
+
+#: templates/buyurtmalar.html:7 templates/profil.html:34
+msgid "Buyurtmalar tarixi"
+msgstr "История заказов"
+
+#: templates/buyurtmalar.html:8
+msgid "Barcha joriy va oldingi buyurtmalaringiz."
+msgstr "Все ваши текущие и предыдущие заказы."
+
+#: templates/buyurtmalar.html:12 templates/katalog.html:22
+msgid "Barchasi"
+msgstr "Все"
+
+#: templates/buyurtmalar.html:13 templates/courier/dashboard.html:14
+msgid "Faol"
+msgstr "Активные"
+
+#: templates/buyurtmalar.html:14
+msgid "Tugallangan"
+msgstr "Завершенные"
+
+#: templates/buyurtmalar.html:23 templates/courier/dashboard.html:24
+#: templates/courier/dashboard.html:90
+msgid "Buyurtma"
+msgstr "Заказ"
+
+#: templates/buyurtmalar.html:40
+msgid "Umumiy summa:"
+msgstr "Общая сумма:"
+
+#: templates/buyurtmalar.html:45
+msgid "Qayta buyurtma"
+msgstr "Повторить заказ"
+
+#: templates/buyurtmalar.html:50
+msgid "Buyurtmalar topilmadi."
+msgstr "Заказы не найдены."
+
+#: templates/checkout.html:13
+msgid "Manzilni tanlang"
+msgstr "Выберите адрес"
+
+#: templates/checkout.html:20 templates/checkout.html:66
+msgid "Manzil qidirilmoqda..."
+msgstr "Поиск адреса..."
+
+#: templates/checkout.html:21 templates/checkout.html:200
+msgid "Tasdiqlash"
+msgstr "Подтвердить"
+
+#: templates/checkout.html:74
+msgid "Manzilni aniqlab bo'lmadi."
+msgstr "Не удалось определить адрес."
+
+#: templates/checkout.html:78 templates/katalog.html:99
+#: templates/katalog.html:103 templates/mahsulot.html:165
+#: templates/mahsulot.html:169 templates/savat.html:136
+#: templates/savat.html:140
+msgid "Xatolik yuz berdi."
+msgstr "Произошла ошибка."
+
+#: templates/checkout.html:92 templates/savat.html:79
+msgid "Buyurtmani rasmiylashtirish"
+msgstr "Оформить заказ"
+
+#: templates/checkout.html:93
+msgid "Yetkazib berish ma'lumotlarini kiriting."
+msgstr "Введите информацию о доставке."
+
+#: templates/checkout.html:103
+msgid "Aloqa uchun telefon raqam"
+msgstr "Номер телефона для связи"
+
+#: templates/checkout.html:108
+msgid "Iltimos, telefon raqamingizni kiriting."
+msgstr "Пожалуйста, введите свой номер телефона."
+
+#: templates/checkout.html:116
+msgid "Yetkazib berish manzili"
+msgstr "Адрес доставки"
+
+#: templates/checkout.html:119
+#, fuzzy
+#| msgid "Manzilni kiriting yoki xaritadan tanlang"
+msgid "Manzilni xaritadan tanlang"
+msgstr "Введите адрес или выберите на карте"
+
+#: templates/checkout.html:126
+msgid "To'lov usuli"
+msgstr "Способ оплаты"
+
+#: templates/checkout.html:148
+msgid "Naqd"
+msgstr "Наличные"
+
+#: templates/checkout.html:155
+msgid "Buyurtma tarkibi"
+msgstr "Состав заказа"
+
+#: templates/checkout.html:178
+msgid "Mahsulotlar summasi"
+msgstr "Сумма продуктов"
+
+#: templates/checkout.html:183 templates/savat.html:70
+msgid "Chegirma"
+msgstr "Скидка"
+
+#: templates/checkout.html:188
+msgid "Yetkazib berish"
+msgstr "Доставка"
+
+#: templates/checkout.html:192 templates/courier/dashboard.html:59
+#: templates/courier/dashboard.html:105
+msgid "Jami to'lov"
+msgstr "Итого к оплате"
+
+#: templates/courier/dashboard.html:11
+msgid "Kuryer paneli"
+msgstr "Панель курьера"
+
+#: templates/courier/dashboard.html:18
+msgid "Mening buyurtmalarim"
+msgstr "Мои заказы"
+
+#: templates/courier/dashboard.html:67
+msgid "Yo'lga chiqish"
+msgstr "Выехать в путь"
+
+#: templates/courier/dashboard.html:72
+#, fuzzy
+#| msgid "Yetkazib berish"
+msgid "Yetkazildi"
+msgstr "Доставка"
+
+#: templates/courier/dashboard.html:79
+msgid "Sizda faol buyurtmalar yo'q."
+msgstr "У вас нет активных заказов."
+
+#: templates/courier/dashboard.html:84
+msgid "Yangi buyurtmalar (Kutish zalida)"
+msgstr "Новые заказы (Зал ожидания)"
+
+#: templates/courier/dashboard.html:111
+msgid "Qabul qilish"
+msgstr "Принять"
+
+#: templates/courier/dashboard.html:116
+msgid "Hozircha yangi buyurtmalar yo'q."
+msgstr "Новых заказов пока нет."
+
+#: templates/katalog.html:13
+msgid "Qidirish..."
+msgstr ""
+
+#: templates/katalog.html:65
+msgid "Mahsulotlar topilmadi."
+msgstr "Товары не найдены."
+
+#: templates/katalog.html:84 templates/mahsulot.html:150
+#, fuzzy
+#| msgid "Iltimos, bot orqali qayta kiring"
+msgid "Iltimos, avval tizimga kiring."
+msgstr "Пожалуйста, войдите снова через бот"
+
+#: templates/mahsulot.html:35
+msgid "Variantlar"
+msgstr "Варианты"
+
+#: templates/mahsulot.html:44
+msgid "Tugagan"
+msgstr "Закончился"
+
+#: templates/mahsulot.html:48
+msgid "Variantlar mavjud emas"
+msgstr "Варианты недоступны"
+
+#: templates/mahsulot.html:54
+msgid "Mahsulot haqida"
+msgstr "О товаре"
+
+#: templates/mahsulot.html:72 templates/mahsulot.html:86
+msgid "Savatga qo'shish"
+msgstr "Добавить в корзину"
+
+#: templates/mahsulot.html:133
+msgid "Iltimos, variantni tanlang."
+msgstr "Пожалуйста, выберите вариант."
+
+#: templates/profil.html:17
+msgid "Yuklanmoqda..."
+msgstr "Загрузка..."
+
+#: templates/profil.html:21 templates/savat.html:100
+msgid "Kuting..."
+msgstr "Подождите..."
+
+#: templates/profil.html:35
+msgid "ta buyurtma"
+msgstr "заказ(ов)"
+
+#: templates/profil.html:43
+msgid "Saqlangan manzillar"
+msgstr "Сохраненные адреса"
+
+#: templates/profil.html:44
+msgid "Uy, Ishxona"
+msgstr "Дом, Работа"
+
+#: templates/profil.html:53
+msgid "Sevimlilar"
+msgstr "Избранное"
+
+#: templates/profil.html:71
+msgid "Sevimli mahsulotlar yo'q."
+msgstr "Нет избранных товаров."
+
+#: templates/profil.html:81
+msgid "Sozlamalar"
+msgstr "Настройки"
+
+#: templates/profil.html:88
+msgid "Yordam va qo'llab-quvvatlash"
+msgstr "Помощь и поддержка"
+
+#: templates/profil.html:95
+msgid "Ilova haqida"
+msgstr "О приложении"
+
+#: templates/profil.html:105
+msgid "Tizimdan chiqish"
+msgstr "Выйти из системы"
+
+#: templates/profil.html:142
+msgid "Foydalanuvchi"
+msgstr "Пользователь"
+
+#: templates/profil.html:160
+msgid "Telefon raqam kiritilmagan"
+msgstr "Номер телефона не указан"
+
+#: templates/profil.html:164
+msgid "Foydalanuvchi topilmadi"
+msgstr "Пользователь не найден"
+
+#: templates/profil.html:165
+msgid "Iltimos, bot orqali qayta kiring"
+msgstr "Пожалуйста, войдите снова через бот"
+
+#: templates/savat.html:8
+msgid "Sizning savatingiz"
+msgstr "Ваша корзина"
+
+#: templates/savat.html:22 templates/savat.html:121 templates/savat.html:156
+msgid "O'chirish"
+msgstr "Удалить"
+
+#: templates/savat.html:46
+msgid "Promo-kodni kiriting"
+msgstr "Введите промокод"
+
+#: templates/savat.html:47 templates/savat.html:128
+msgid "Qo'llash"
+msgstr "Применить"
+
+#: templates/savat.html:52
+msgid "Savatingiz bo'sh"
+msgstr "Ваша корзина пуста"
+
+#: templates/savat.html:53
+msgid "Xaridni boshlash uchun mahsulotlarni katalogdan tanlang."
+msgstr "Выберите товары в каталоге, чтобы начать покупки."
+
+#: templates/savat.html:54
+msgid "Katalogga o'tish"
+msgstr "Перейти в каталог"
+
+#: templates/savat.html:63
+msgid "Buyurtma xulosasi"
+msgstr "Сводка заказа"
+
+#: templates/savat.html:66
+msgid "Mahsulotlar"
+msgstr "Товары"
+
+#: templates/savat.html:75
+msgid "Jami"
+msgstr "Итого"
+
+#: templates/savat.html:84
+msgid "Xavfsiz to'lov va tezkor yetkazib berish kafolatlangan."
+msgstr "Безопасная оплата и быстрая доставка гарантированы."
+
+#~ msgid "Do'kondan olib ketish"
+#~ msgstr "Самовывоз"
+
+#~ msgid "Xaritadan tanlash"
+#~ msgstr "Выбрать на карте"
+
+#~ msgid "Yetkazib berish vaqti"
+#~ msgstr "Время доставки"
+
+#~ msgid "Bugun"
+#~ msgstr "Сегодня"
+
+#~ msgid "Tez orada"
+#~ msgstr "Скоро"
+
+#~ msgid "Ertaga"
+#~ msgstr "Завтра"

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Savat - Asl Nurafshon</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e2e2e2",
+                        "on-primary-fixed": "#2d1607",
+                        "secondary-fixed-dim": "#ffb68a",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-bright": "#f9f9f9",
+                        "outline-variant": "#d4c3bb",
+                        "primary": "#32190b",
+                        "secondary-container": "#fda771",
+                        "on-surface-variant": "#50443f",
+                        "error": "#ba1a1a",
+                        "background": "#f9f9f9",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#1a1c1c",
+                        "surface": "#f9f9f9",
+                        "secondary-fixed": "#ffdbc8",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-tint": "#795744",
+                        "secondary": "#8f4d1f",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed": "#ede1cd",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-secondary-fixed-variant": "#713608",
+                        "on-tertiary-fixed": "#201b0f",
+                        "tertiary-container": "#3a3426",
+                        "surface-container-low": "#f3f3f3",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-fixed": "#321300",
+                        "surface-dim": "#dadada",
+                        "on-primary-fixed-variant": "#5e402f",
+                        "on-tertiary-fixed-variant": "#4d4637",
+                        "on-tertiary-container": "#a69c8a",
+                        "on-secondary-container": "#773b0d",
+                        "inverse-primary": "#e9bda6",
+                        "on-primary": "#ffffff",
+                        "outline": "#82746e",
+                        "primary-fixed": "#ffdbca",
+                        "tertiary": "#241f12",
+                        "on-primary-container": "#bd957f",
+                        "primary-container": "#4a2e1e",
+                        "primary-fixed-dim": "#e9bda6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#d0c5b2",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "20px",
+                        "xs": "4px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "3xl": "64px",
+                        "unit": "4px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F9F9F9; }
+        .ambient-shadow { box-shadow: 0 4px 20px rgba(74, 46, 30, 0.04); }
+        .interactive-shadow:hover { box-shadow: 0 8px 30px rgba(74, 46, 30, 0.08); transform: translateY(-2px); transition: all 0.2s ease; }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="app.js"></script>
+</head>
+<body class="bg-surface text-on-surface pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-surface dark:bg-background flex justify-between items-center px-margin-mobile h-14 w-full sticky z-50">
+<div class="flex items-center gap-4">
+<button class="text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-full p-2 active:scale-95 opacity-80 transition-all flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm-mobile font-bold text-primary dark:text-primary-fixed-dim tracking-tight">Asl Nurafshon</h1>
+</div>
+<div class="flex items-center">
+<button class="hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-full p-2 active:scale-95 transition-all">
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A small, circular avatar portrait of a modern user. Light-mode aesthetic, soft lighting, professional yet approachable vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7iS55cqm56_zoAcI2H4rBu8bRGnQwYEfAUUt0HbpLj5wIHiA-IsM7Iad55hc-vaUdWXU_Exqp90elva3uYkbF9TF3XYm3_G0E1A34H-WydqtmsPTllkVWexAoyRxoz-2IjEg_0oRKjPa49w4-Uet8H7817eNc6v1AYvAOCX7shwFpyqOoMP--ugAsvWBXMPkUk_uAFPnRhOz9TnnUmowweu5Ak1ua0XVvPwaHW5j08GIwHRXgynV64A"/>
+</div>
+</button>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-lg pt-6 md:grid md:grid-cols-12 md:gap-lg">
+<!-- Cart Items List (Left Side on Desktop) -->
+<div id="cart-wrapper">
+<h2 class="font-headline-md text-headline-md text-primary mb-2 hidden md:block">Sizning savatingiz</h2>
+<div id="cart-items-container" class="bg-surface-container-lowest rounded-xl p-md ambient-shadow border border-surface-container-low">
+<!-- JS loads cart items here -->
+</div>
+<!-- Promotional Input -->
+<div class="mt-4 bg-surface-container-lowest rounded-xl p-sm flex items-center gap-2 border border-outline-variant/30">
+<span class="material-symbols-outlined text-outline ml-2" data-icon="local_offer">local_offer</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline-variant" placeholder="Promo-kodni kiriting" type="text"/>
+<button class="px-4 py-2 bg-secondary text-on-secondary font-label-md text-label-md rounded-lg hover:bg-secondary/90 transition-colors">Qo'llash</button>
+</div>
+</div>
+<div id="cart-empty-state" style="display: none;" class="flex flex-col items-center justify-center p-10 bg-surface-container-lowest rounded-xl border border-surface-container-low text-center">
+    <span class="material-symbols-outlined text-[64px] text-outline-variant mb-4">shopping_cart</span>
+    <h3 class="font-headline-md text-primary mb-2">Savatingiz bo'sh</h3>
+    <p class="text-on-surface-variant mb-6">Xaridni boshlash uchun mahsulotlarni katalogdan tanlang.</p>
+    <a href="katalog.html" class="px-6 py-3 bg-primary text-on-primary rounded-lg font-label-md">Katalogga o'tish</a>
+</div>
+</div>
+<!-- Order Summary (Right Side on Desktop, Bottom on Mobile) -->
+<div class="md:col-span-4 mt-lg md:mt-0">
+<div class="bg-surface-container-lowest rounded-xl p-lg ambient-shadow border border-surface-container-low sticky top-24">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-6 border-b border-surface-variant pb-4">Buyurtma xulosasi</h3>
+<div class="flex flex-col gap-4 font-body-md text-body-md text-on-surface-variant">
+<div class="flex justify-between">
+<span>Mahsulotlar (3):</span>
+<span class="text-on-surface font-label-md">103,000 UZS</span>
+</div>
+<div class="flex justify-between">
+<span>Yetkazib berish:</span>
+<span class="text-on-surface font-label-md">15,000 UZS</span>
+</div>
+<div class="flex justify-between text-secondary hidden">
+<span>Chegirma:</span>
+<span class="font-label-md">-0 UZS</span>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-surface-variant flex justify-between items-end">
+<span class="font-headline-sm text-headline-sm text-on-surface">Jami:</span>
+<span class="font-headline-md text-headline-md text-primary" id="cart-total-price">0 UZS</span>
+</div>
+<button onclick="window.location.href='checkout.html'" class="w-full mt-8 bg-primary-container text-on-primary font-label-md text-label-md py-4 rounded-lg interactive-shadow hover:bg-primary transition-colors flex items-center justify-center gap-2">
+                    Buyurtmani rasmiylashtirish
+                    <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<div class="mt-4 flex items-start gap-2 text-outline-variant font-label-sm text-label-sm justify-center">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified_user">verified_user</span>
+<p>Xavfsiz to'lov va tezkor yetkazib berish kafolatlangan.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-2 bg-surface dark:bg-background rounded-t-xl border-t border-outline-variant dark:border-outline shadow-md pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-variant/20 p-2 rounded-lg transition-colors group" href="index.html">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm mt-1">Bosh sahifa</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-variant/20 p-2 rounded-lg transition-colors group" href="katalog.html">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform" data-icon="grid_view">grid_view</span>
+<span class="font-label-sm text-label-sm mt-1">Katalog</span>
+</a>
+<!-- Active Navigation: Savat -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim font-bold p-2 rounded-lg relative scale-110 transition-transform duration-150" href="savat.html">
+<div class="relative">
+<span class="material-symbols-outlined" data-icon="shopping_cart" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+<span class="absolute -top-1 -right-2 bg-error text-on-error text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-surface">3</span>
+</div>
+<span class="font-label-sm text-label-sm mt-1">Savat</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-variant/20 p-2 rounded-lg transition-colors group" href="buyurtmalar.html">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-sm text-label-sm mt-1">Buyurtmalarim</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-variant/20 p-2 rounded-lg transition-colors group" href="profil.html">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profil</span>
+</a>
+</nav>
+</body></html>

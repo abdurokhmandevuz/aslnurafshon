@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+<div class="py-sm flex flex-col gap-lg max-w-md mx-auto min-h-[80vh]">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="font-headline-sm text-headline-sm text-on-surface">{% trans "Korporativ hamkorlik" %}</h2>
+            <p class="font-body-sm text-[12px] text-on-surface-variant">{% trans "Ulgurji va korporativ buyurtmalar uchun so'rov qoldiring" %}</p>
+        </div>
+        <a href="{% url 'catalog' %}" class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </a>
+    </div>
+
+    <!-- Info Banner -->
+    <div class="bg-primary/5 border border-primary/20 rounded-2xl p-md flex gap-sm">
+        <span class="material-symbols-outlined text-primary text-[24px]">corporate_fare</span>
+        <p class="text-xs text-on-surface-variant leading-relaxed">
+            {% trans "Biz korxonalar va tashkilotlar uchun maxsus narxlar va qulay yetkazib berish xizmatlarini taklif qilamiz. Quyidagi so'rovnomani to'ldiring va menejerimiz tez orada siz bilan bog'lanadi." %}
+        </p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="flex flex-col gap-xs">
+        {% for message in messages %}
+        <div class="px-md py-sm rounded-xl text-xs font-label-md {% if message.tags == 'error' %}bg-error/10 text-error{% else %}bg-secondary/10 text-secondary{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Inquiry Form -->
+    <form method="POST" action="{% url 'corporate_inquiry' %}" class="flex flex-col gap-md bg-surface-container-low rounded-3xl p-md border border-outline-variant/30 shadow-sm">
+        {% csrf_token %}
+
+        <!-- Company Name -->
+        <div class="flex flex-col gap-xs">
+            <label class="font-label-md text-[13px] text-on-surface-variant">{% trans "Tashkilot / Kompaniya nomi" %} *</label>
+            <div class="relative flex items-center bg-inverse-on-surface rounded-xl border border-outline-variant/30 focus-within:border-primary transition-all">
+                <span class="material-symbols-outlined text-outline ml-4">business</span>
+                <input type="text" name="company_name" required value="{{ company_name|default:'' }}" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md py-3 pl-2 pr-4 rounded-xl text-on-surface placeholder:text-outline-variant" placeholder="{% trans "Masalan: Asl Media MChJ" %}">
+            </div>
+        </div>
+
+        <!-- Contact Person -->
+        <div class="flex flex-col gap-xs">
+            <label class="font-label-md text-[13px] text-on-surface-variant">{% trans "Aloqachi shaxs" %} *</label>
+            <div class="relative flex items-center bg-inverse-on-surface rounded-xl border border-outline-variant/30 focus-within:border-primary transition-all">
+                <span class="material-symbols-outlined text-outline ml-4">person</span>
+                <input type="text" name="contact_person" required value="{{ contact_person|default:'' }}" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md py-3 pl-2 pr-4 rounded-xl text-on-surface placeholder:text-outline-variant" placeholder="{% trans "Ism va familiyangiz" %}">
+            </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="flex flex-col gap-xs">
+            <label class="font-label-md text-[13px] text-on-surface-variant">{% trans "Telefon raqami" %} *</label>
+            <div class="relative flex items-center bg-inverse-on-surface rounded-xl border border-outline-variant/30 focus-within:border-primary transition-all">
+                <span class="material-symbols-outlined text-outline ml-4">phone</span>
+                <input type="text" name="phone" required value="{{ phone|default:'' }}" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md py-3 pl-2 pr-4 rounded-xl text-on-surface placeholder:text-outline-variant" placeholder="{% trans "Masalan: +998901234567" %}">
+            </div>
+        </div>
+
+        <!-- Estimated Quantity -->
+        <div class="flex flex-col gap-xs">
+            <label class="font-label-md text-[13px] text-on-surface-variant">{% trans "Taxminiy buyurtma hajmi (dona)" %}</label>
+            <div class="relative flex items-center bg-inverse-on-surface rounded-xl border border-outline-variant/30 focus-within:border-primary transition-all">
+                <span class="material-symbols-outlined text-outline ml-4">inventory_2</span>
+                <input type="number" name="estimated_quantity" min="1" value="{{ estimated_quantity|default:'100' }}" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md py-3 pl-2 pr-4 rounded-xl text-on-surface placeholder:text-outline-variant">
+            </div>
+        </div>
+
+        <!-- Comment / Question -->
+        <div class="flex flex-col gap-xs">
+            <label class="font-label-md text-[13px] text-on-surface-variant">{% trans "Izoh yoki maxsus talablar" %}</label>
+            <div class="relative flex items-start bg-inverse-on-surface rounded-xl border border-outline-variant/30 focus-within:border-primary transition-all p-3">
+                <span class="material-symbols-outlined text-outline mr-2 mt-0.5">comment</span>
+                <textarea name="comment" rows="4" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md p-0 rounded-xl text-on-surface placeholder:text-outline-variant" placeholder="{% trans "Qo'shimcha savollar yoki tafsilotlarni yozing..." %}">{{ comment|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-label-md hover:bg-primary/95 active:scale-[0.98] transition-all flex items-center justify-center gap-sm shadow-md mt-sm">
+            <span class="material-symbols-outlined text-[20px]">send</span>
+            <span>{% trans "So'rovni yuborish" %}</span>
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- User Info Card -->
+<section class="bg-surface-container-lowest rounded-2xl shadow-level-1 p-lg mb-lg border border-surface-variant/50">
+    <div class="flex items-center gap-md">
+        <!-- Avatar -->
+        <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center shrink-0 overflow-hidden">
+            <img id="tg-profile-photo" src="" class="hidden w-full h-full object-cover rounded-full" alt="Profile" />
+            <span id="tg-profile-initial" class="text-2xl font-bold text-primary">?</span>
+        </div>
+        <!-- Name & Phone -->
+        <div>
+            <h2 id="tg-profile-name" class="font-headline-md text-headline-md text-on-surface mb-xs">
+                Yuklanmoqda...
+            </h2>
+            <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-sm">
+                <span class="material-symbols-outlined text-[18px]">phone_iphone</span>
+                <span id="tg-profile-phone">Kuting...</span>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions -->
+<div class="grid grid-cols-2 gap-md mb-lg">
+    <a class="bg-surface-container-lowest rounded-2xl shadow-level-1 p-md flex flex-col items-start gap-md hover:shadow-level-2 transition-shadow border border-surface-variant/50" href="{% url 'orders' %}">
+        <div class="w-10 h-10 rounded-full bg-secondary-container/20 text-secondary flex items-center justify-center">
+            <span class="material-symbols-outlined icon-fill">receipt_long</span>
+        </div>
+        <div>
+            <h3 class="font-label-md text-label-md text-on-surface">Buyurtmalar tarixi</h3>
+            <p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">{{ orders_count }} ta buyurtma</p>
+        </div>
+    </a>
+    <a class="bg-surface-container-lowest rounded-2xl shadow-level-1 p-md flex flex-col items-start gap-md hover:shadow-level-2 transition-shadow border border-surface-variant/50" href="#">
+        <div class="w-10 h-10 rounded-full bg-tertiary-container/20 text-tertiary flex items-center justify-center">
+            <span class="material-symbols-outlined icon-fill">location_on</span>
+        </div>
+        <div>
+            <h3 class="font-label-md text-label-md text-on-surface">Saqlangan manzillar</h3>
+            <p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Uy, Ishxona</p>
+        </div>
+    </a>
+</div>
+
+<!-- Settings -->
+<section class="bg-surface-container-lowest rounded-2xl shadow-level-1 mb-xl border border-surface-variant/50 overflow-hidden">
+    <a class="flex items-center justify-between p-md border-b border-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+        <div class="flex items-center gap-md text-on-surface">
+            <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+            <span class="font-label-md text-label-md">Sozlamalar</span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+    </a>
+    <a class="flex items-center justify-between p-md border-b border-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+        <div class="flex items-center gap-md text-on-surface">
+            <span class="material-symbols-outlined text-on-surface-variant">help_outline</span>
+            <span class="font-label-md text-label-md">Yordam va qo'llab-quvvatlash</span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+    </a>
+    <a class="flex items-center justify-between p-md hover:bg-surface-container-low transition-colors" href="#">
+        <div class="flex items-center gap-md text-on-surface">
+            <span class="material-symbols-outlined text-on-surface-variant">info</span>
+            <span class="font-label-md text-label-md">Ilova haqida</span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+    </a>
+</section>
+
+<!-- Logout -->
+<div class="pb-xl">
+    <button class="w-full flex items-center justify-center gap-sm bg-error-container text-on-error-container font-label-md text-label-md py-3 rounded-lg hover:bg-error hover:text-on-error transition-colors shadow-sm">
+        <span class="material-symbols-outlined">logout</span>
+        Tizimdan chiqish
+    </button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Telegram Android/Desktop da initDataUnsafe paydo bo'lishini kutish uchun loop
+    let attempts = 0;
+    
+    const checkInterval = setInterval(() => {
+        attempts++;
+        let userData = null;
+        
+        try {
+            // 1. Splash screenda saqlangan tg_user ni qidiramiz
+            const storedStr = localStorage.getItem('tg_user');
+            if (storedStr) {
+                userData = JSON.parse(storedStr);
+            }
+        } catch (e) {
+            console.error("localStorage o'qishda xatolik:", e);
+        }
+        
+        // 2. Agar localStorage da yo'q bo'lsa, Telegram ob'ektidan to'g'ridan-to'g'ri izlaymiz
+        if (!userData && window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
+            userData = window.Telegram.WebApp.initDataUnsafe.user;
+        }
+
+        // Agar ma'lumot topilsa yoki 2 soniya o'tsa (20 urunish), tsiklni to'xtatamiz
+        if (userData || attempts > 20) {
+            clearInterval(checkInterval);
+            
+            if (userData) {
+                // Ism formatlash
+                const name = userData.full_name || 
+                             (userData.first_name ? userData.first_name + (userData.last_name ? ' ' + userData.last_name : '') : '') || 
+                             userData.username || 
+                             'Foydalanuvchi';
+                             
+                document.getElementById('tg-profile-name').textContent = name;
+                
+                // Initsialni qo'yish
+                const initial = name.charAt(0).toUpperCase();
+                document.getElementById('tg-profile-initial').textContent = initial;
+                
+                if (userData.photo_url) {
+                    document.getElementById('tg-profile-photo').src = userData.photo_url;
+                    document.getElementById('tg-profile-photo').classList.remove('hidden');
+                    document.getElementById('tg-profile-initial').classList.add('hidden');
+                } else {
+                    document.getElementById('tg-profile-initial').classList.remove('hidden');
+                    document.getElementById('tg-profile-photo').classList.add('hidden');
+                }
+                
+                // Telefon / Username
+                const phone = userData.phone ? userData.phone : (userData.username ? '@' + userData.username : 'Telefon raqam kiritilmagan');
+                document.getElementById('tg-profile-phone').textContent = phone;
+            } else {
+                // Ma'lumot umuman topilmadi
+                document.getElementById('tg-profile-name').textContent = 'Foydalanuvchi topilmadi';
+                document.getElementById('tg-profile-phone').textContent = 'Iltimos, bot orqali qayta kiring';
+            }
+        }
+    }, 100); // Har 100ms da tekshiramiz
+});
+</script>
+{% endblock %}

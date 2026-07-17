@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Confirmation - Asl Nurafshon</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e2e2e2",
+                        "on-primary-fixed": "#2d1607",
+                        "secondary-fixed-dim": "#ffb68a",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-bright": "#f9f9f9",
+                        "outline-variant": "#d4c3bb",
+                        "primary": "#32190b",
+                        "secondary-container": "#fda771",
+                        "on-surface-variant": "#50443f",
+                        "error": "#ba1a1a",
+                        "background": "#f9f9f9",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#1a1c1c",
+                        "surface": "#f9f9f9",
+                        "secondary-fixed": "#ffdbc8",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-tint": "#795744",
+                        "secondary": "#8f4d1f",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed": "#ede1cd",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-secondary-fixed-variant": "#713608",
+                        "on-tertiary-fixed": "#201b0f",
+                        "tertiary-container": "#3a3426",
+                        "surface-container-low": "#f3f3f3",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-fixed": "#321300",
+                        "surface-dim": "#dadada",
+                        "on-primary-fixed-variant": "#5e402f",
+                        "on-tertiary-fixed-variant": "#4d4637",
+                        "on-tertiary-container": "#a69c8a",
+                        "on-secondary-container": "#773b0d",
+                        "inverse-primary": "#e9bda6",
+                        "on-primary": "#ffffff",
+                        "outline": "#82746e",
+                        "primary-fixed": "#ffdbca",
+                        "tertiary": "#241f12",
+                        "on-primary-container": "#bd957f",
+                        "primary-container": "#4a2e1e",
+                        "primary-fixed-dim": "#e9bda6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#d0c5b2",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "20px",
+                        "xs": "4px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "3xl": "64px",
+                        "unit": "4px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom subtle animations */
+        @keyframes scaleIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slideUpFade {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-scale-in { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-slide-up { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        
+        /* Subtle ambient shadow for main card */
+        .ambient-shadow {
+            box-shadow: 0 4px 20px 4px rgba(74, 46, 30, 0.04);
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="app.js"></script>
+</head>
+<body class="bg-surface-bright min-h-screen flex flex-col items-center justify-center p-md md:p-lg antialiased">
+<!-- Main Content Container -->
+<main class="w-full max-w-[480px] bg-surface-container-lowest rounded-[24px] ambient-shadow p-lg md:p-xl flex flex-col items-center relative overflow-hidden animate-scale-in">
+<!-- Decorative subtle background element -->
+<div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary-fixed/20 to-transparent -z-10"></div>
+<!-- Logo (using provided image placeholder) -->
+<div class="mb-lg opacity-0 animate-slide-up">
+<img alt="Asl Nurafshon Logo" class="h-12 w-auto object-contain mix-blend-multiply" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+</div>
+<!-- Success Icon -->
+<div class="w-24 h-24 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center mb-md opacity-0 animate-slide-up delay-100">
+<span class="material-symbols-outlined text-[48px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Headline -->
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface text-center mb-xs opacity-0 animate-slide-up delay-100">
+            Buyurtma qabul qilindi!
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mb-xl opacity-0 animate-slide-up delay-100">
+            Sizning xaridingiz muvaffaqiyatli rasmiylashtirildi.
+        </p>
+<!-- Key Order Details Card -->
+<div class="w-full bg-surface-container-low rounded-xl p-md mb-lg border border-outline-variant/30 opacity-0 animate-slide-up delay-200">
+<div class="flex justify-between items-center pb-md border-b border-outline-variant/50">
+<span class="font-body-md text-body-md text-on-surface-variant">Buyurtma raqami:</span>
+<span class="font-headline-md text-headline-md text-primary tracking-tight">#8421</span>
+</div>
+<div class="flex justify-between items-center pt-md">
+<span class="font-body-md text-body-md text-on-surface-variant">Yetkazish vaqti:</span>
+<div class="flex items-center gap-xs bg-secondary-fixed px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-secondary text-[18px]">schedule</span>
+<span class="font-label-md text-label-md text-on-secondary-container">30-45 min</span>
+</div>
+</div>
+</div>
+<!-- Order Summary Minimal List -->
+<div class="w-full mb-xl opacity-0 animate-slide-up delay-200">
+<h2 class="font-label-md text-label-md text-outline mb-sm uppercase tracking-wider">Tafsilotlar</h2>
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-body-md text-body-md text-on-surface">Asl Qora Choy (Oliy nav)</span>
+<span class="font-label-md text-label-md text-on-surface whitespace-nowrap ml-sm">1 x 45,000 UZS</span>
+</div>
+<div class="flex justify-between items-start">
+<span class="font-body-md text-body-md text-on-surface">Arabica Qahva loviyalari</span>
+<span class="font-label-md text-label-md text-on-surface whitespace-nowrap ml-sm">1 x 120,000 UZS</span>
+</div>
+<div class="mt-sm pt-sm border-t border-outline-variant/30 flex justify-between items-center">
+<span class="font-headline-sm text-headline-sm text-on-surface-variant">Jami summasi:</span>
+<span class="font-headline-sm text-headline-sm text-primary">165,000 UZS</span>
+</div>
+</div>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container font-label-md text-label-md py-4 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm opacity-0 animate-slide-up delay-200 active:scale-[0.98]">
+            Bosh sahifaga qaytish
+        </button>
+</main>
+</body></html>

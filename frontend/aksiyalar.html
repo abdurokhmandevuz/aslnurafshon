@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asl Nurafshon - Aksiyalar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#4d4637",
+                        "primary-container": "#4a2e1e",
+                        "surface-container-low": "#f3f3f3",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#241f12",
+                        "primary-fixed": "#ffdbca",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2f3131",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-variant": "#e2e2e2",
+                        "on-primary-fixed": "#2d1607",
+                        "on-secondary-fixed-variant": "#713608",
+                        "inverse-on-surface": "#f1f1f1",
+                        "background": "#f9f9f9",
+                        "surface": "#f9f9f9",
+                        "surface-tint": "#795744",
+                        "on-secondary-container": "#773b0d",
+                        "on-primary-fixed-variant": "#5e402f",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#3a3426",
+                        "on-background": "#1a1c1c",
+                        "secondary": "#8f4d1f",
+                        "primary-fixed-dim": "#e9bda6",
+                        "on-primary-container": "#bd957f",
+                        "outline-variant": "#d4c3bb",
+                        "tertiary-fixed": "#ede1cd",
+                        "inverse-primary": "#e9bda6",
+                        "surface-container-high": "#e8e8e8",
+                        "on-surface-variant": "#50443f",
+                        "on-tertiary-container": "#a69c8a",
+                        "primary": "#32190b",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#321300",
+                        "secondary-fixed-dim": "#ffb68a",
+                        "on-tertiary-fixed": "#201b0f",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-container": "#fda771",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeee",
+                        "surface-dim": "#dadada",
+                        "outline": "#82746e",
+                        "tertiary-fixed-dim": "#d0c5b2",
+                        "secondary-fixed": "#ffdbc8",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "container-max": "1280px",
+                        "2xl": "48px",
+                        "margin-mobile": "16px",
+                        "3xl": "64px",
+                        "unit": "4px",
+                        "lg": "24px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="app.js"></script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24 font-body-md">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 bg-surface shadow-sm z-50 flex items-center px-margin-mobile h-16">
+<button aria-label="Back" class="mr-md text-on-surface-variant hover:opacity-80 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm-mobile text-primary flex-1 font-bold tracking-tight">Asl Nurafshon</h1>
+<button aria-label="Search" class="text-on-surface-variant hover:opacity-80 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">search</span>
+</button>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-lg pt-lg pb-3xl">
+<!-- Page Title -->
+<div class="mb-lg">
+<h2 class="font-headline-md text-headline-md text-on-background mb-sm">Aksiyalar va Maxsus takliflar</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Eng so'nggi chegirmalar va yangiliklardan xabardor bo'ling.</p>
+</div>
+<!-- Filter Chips -->
+<div class="flex overflow-x-auto hide-scrollbar gap-sm mb-xl py-sm">
+<button class="px-md py-sm rounded-full bg-secondary text-on-secondary font-label-md text-label-md whitespace-nowrap active:scale-95 transition-transform shadow-[0_4px_12px_rgba(74,46,30,0.1)]">Barchasi</button>
+<button class="px-md py-sm rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container active:scale-95 transition-colors">Yangi yil takliflari</button>
+<button class="px-md py-sm rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container active:scale-95 transition-colors">Hafta mahsulotlari</button>
+<button class="px-md py-sm rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container active:scale-95 transition-colors">Go'sht va pishloqlar</button>
+</div>
+<!-- Big Promo Cards List -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-2xl">
+<!-- Promo Card 1 -->
+<div class="relative bg-surface rounded-xl overflow-hidden shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] group cursor-pointer hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="h-48 md:h-64 w-full bg-surface-variant relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A beautifully styled composition of fresh artisanal cheeses, premium charcuterie, and fresh grapes on a rustic wooden board. The lighting is soft and natural, creating a warm and inviting gourmet atmosphere. The background is slightly blurred to focus on the textures of the premium grocery items, fitting a high-end minimalist grocery aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAdFZCUI3AlPJtv7qZyJOH7UOMLsU7Z2g3YPOqipxpQXX1tg-7udAUN6kTEiFZlGpQsHaoddPy6869_yMldZORC09wjxTwVYq4FgbkYjqINvIi6Xp9J8WQt-UXTiLcR-Qs8E34qi-ZHb0BuVOQotPg53MH7WyjAW5xlU0kjDG5zqpHxQXSAH4ft-8T73P5G0lFVXm2e-A14fi81saDTgxZDDh_pkurXODGnJPDchlQtO-bYk8nYu1V9Q"/>
+<div class="absolute top-md left-md bg-error text-on-error px-md py-sm rounded-full font-label-md text-label-md font-bold shadow-md">
+                        -20%
+                    </div>
+</div>
+<div class="p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Premium Pishloqlar To'plami</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md line-clamp-2">Eng sara xorijiy va mahalliy pishloqlar tanlanmasiga maxsus chegirma.</p>
+<div class="flex justify-between items-end">
+<div class="flex items-center text-error font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-xs">schedule</span>
+                            2 kundan so'ng tugaydi
+                        </div>
+<button class="bg-primary-container text-on-primary w-10 h-10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Promo Card 2 -->
+<div class="relative bg-surface rounded-xl overflow-hidden shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] group cursor-pointer hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="h-48 md:h-64 w-full bg-surface-variant relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Freshly roasted specialty coffee beans pouring out of a rustic burlap sack onto a clean, white marble countertop. Beside it, a beautifully crafted ceramic cup of steaming espresso. The lighting is moody and premium, emphasizing the rich brown tones of the coffee against a light, minimalist background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI-tJFdDDFC56RaKjm1siAmBKkMAIpqshPXIF-uIFtxw6LDFaIs8uHxfQnA1CLynLI_vog2MvSsaeSQPm19dbiAUgio7C_WOSCIGrtvjHBdRAA3RUdDaoRSu08NInrZ1jr4SV5vPxj_oFCdHTS7mC5VoqQ4MWphn6v5yumj-s4h-P1YpCgf47Ca_zrFSczncfHJuWTB-n29kyLNNz3xW940HHMhFS3JBfVSztkPw8qHgNXCQnaI98cpw"/>
+<div class="absolute top-md left-md bg-secondary text-on-secondary px-md py-sm rounded-full font-label-md text-label-md font-bold shadow-md">
+                        1+1 Aksiyasi
+                    </div>
+</div>
+<div class="p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Ertalabki Qahva Quvonchi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md line-clamp-2">Tanlangan qahva donalarini xarid qiling va ikkinchisini sovg'a sifatida oling.</p>
+<div class="flex justify-between items-end">
+<div class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-xs">schedule</span>
+                            Yil oxirigacha
+                        </div>
+<button class="bg-primary-container text-on-primary w-10 h-10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Promo Card 3 -->
+<div class="relative bg-surface rounded-xl overflow-hidden shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] group cursor-pointer hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="h-48 md:h-64 w-full bg-surface-variant relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A vibrant arrangement of fresh, exotic fruits including mangoes, dragon fruit, and passion fruit, displayed elegantly in a minimalist woven basket. The setting is clean and bright, with soft daylight casting gentle shadows, highlighting the freshness and premium quality of the produce." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUajC9Y7rCbH4X68FSjOSxyDtFuYUH_U1T7fUELjkVhm_pDmCaXxKe0AOynQVXdU5Ovyjb3J9NmrO2pI1z-ZqF_pEmqjU4sqTwymmpl1HZPNH6KhkuKDKChMMvl1itXX5VSNdcNmYlptQngSHKdJsfDCeb5kg_BIIMbNle_KJq1hGt8svXhdbQCaiIM_0biguP_ADERqMdE-G6hNVAbuJp4z_IsOZ7JoO8mtnaKVGflKYzcwafa1DXqw"/>
+<div class="absolute top-md left-md bg-tertiary text-on-tertiary px-md py-sm rounded-full font-label-md text-label-md font-bold shadow-md">
+                        -15%
+                    </div>
+</div>
+<div class="p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Ekzotik Mevalar To'plami</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md line-clamp-2">Tropik mevalardan bahramand bo'ling, endi yanada qulay narxda.</p>
+<div class="flex justify-between items-end">
+<div class="flex items-center text-error font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-xs">schedule</span>
+                            Faqat bugun
+                        </div>
+<button class="bg-primary-container text-on-primary w-10 h-10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- "Faqat siz uchun" Section -->
+<div class="mb-xl">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-md">Faqat siz uchun</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<!-- Product Card 1 -->
+<div class="bg-surface rounded-xl p-sm shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] hover:shadow-md transition-shadow relative">
+<div class="absolute top-2 left-2 bg-error text-on-error text-[10px] px-2 py-1 rounded-full font-bold z-10">-10%</div>
+<div class="aspect-square bg-surface-variant rounded-lg overflow-hidden mb-sm">
+<img class="w-full h-full object-cover" data-alt="A bottle of premium cold-pressed olive oil next to some fresh rosemary sprigs on a clean white surface. High-key lighting, minimalist and modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD26FlqIgffFrhpipAEACJchltmSIMn7zhzYpc59jzDfyCkTYhvfhDL9cRVmduH9UdZJ0blCXerdAS3HlqhaKo3eWCHtdo1mHS5bswqNQnB9PthMVp1iIMcKfQSDyp6cmmOcaFD3lxK0svsTIl02K0lrl4uEXmoA1v_knLB8bZmNxTfoq6i553CyiQ3T10JmlWLtRtkq_PJJVGq9JiXvcXaJmsHosJxacPrWUeMft5ioxHUr1kBFrBWgQ"/>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-xs truncate">Zaytun yog'i Extra Virgin</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-sm">500 ml</p>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant line-through text-[10px]">120 000 UZS</p>
+<p class="font-headline-sm text-headline-sm text-on-surface text-[14px]">108 000 UZS</p>
+</div>
+<button class="w-8 h-8 bg-secondary text-on-secondary rounded-full flex items-center justify-center hover:bg-opacity-90 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface rounded-xl p-sm shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] hover:shadow-md transition-shadow relative">
+<div class="absolute top-2 left-2 bg-error text-on-error text-[10px] px-2 py-1 rounded-full font-bold z-10">-25%</div>
+<div class="aspect-square bg-surface-variant rounded-lg overflow-hidden mb-sm">
+<img class="w-full h-full object-cover" data-alt="A beautifully packaged box of artisanal dark chocolate truffles, slightly opened to reveal the rich chocolates inside. Placed on a minimalist light grey background with soft diffused lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZGrd3hdfyogEn8C_fr9JuC-bMzQtoCKgX-I_Rgrn3DPhT9Sy4ir5TTzju_GjhFAnqL3hl2m8caUdoRyb4vG60oZ1klIvFAFJHIdFt97_QBEBR2O8SAU1HSIMOZUAKrAvQARzD2fBZjWvh2hAgSKtkGMbOI4b_O82IClN4A34rEio7e6axhnjb4dsklws0AqeX4dvya8sl4ytAr1f2zjB8qLw6rkCziOCbYZ8FPuSKxVV6XXYAdZm44g"/>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-xs truncate">Qora Shokoladli Trufellar</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-sm">200 g</p>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant line-through text-[10px]">85 000 UZS</p>
+<p class="font-headline-sm text-headline-sm text-on-surface text-[14px]">63 750 UZS</p>
+</div>
+<button class="w-8 h-8 bg-secondary text-on-secondary rounded-full flex items-center justify-center hover:bg-opacity-90 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full flex justify-around items-center px-2 py-3 bg-surface shadow-[0_-4px_20px_0_rgba(74,46,30,0.04)] border-t border-outline-variant/20 z-50 md:hidden rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-colors duration-200 hover:bg-surface-container-low rounded-lg p-2 active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary transition-colors duration-200 hover:bg-surface-container-low rounded-lg p-2 active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<span class="font-label-sm text-label-sm">Catalog</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-colors duration-200 hover:bg-surface-container-low rounded-lg p-2 active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">shopping_cart</span>
+<span class="font-label-sm text-label-sm">Cart</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-colors duration-200 hover:bg-surface-container-low rounded-lg p-2 active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">receipt_long</span>
+<span class="font-label-sm text-label-sm">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-colors duration-200 hover:bg-surface-container-low rounded-lg p-2 active:scale-90" href="profil.html">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

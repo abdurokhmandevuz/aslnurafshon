@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="flex flex-col items-center justify-center h-full min-h-[50vh]">
+    <div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+    <h2 class="font-headline-md text-primary">Tizimga kirilmoqda...</h2>
+    <p class="font-body-md text-on-surface-variant mt-2">Iltimos, kuting.</p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        
+        let attempts = 0;
+        const checkInterval = setInterval(() => {
+            const initData = tg.initData;
+            attempts++;
+            
+            if (initData || attempts > 20) { // 2 soniya kutamiz (20 * 100ms)
+                clearInterval(checkInterval);
+                
+                // initDataUnsafe dan user ma'lumotlarini olamiz (agar bo'lsa)
+                const tgUser = tg.initDataUnsafe && tg.initDataUnsafe.user;
+                if (tgUser && tgUser.id) {
+                    localStorage.setItem('tg_user', JSON.stringify({
+                        first_name: tgUser.first_name || '',
+                        last_name: tgUser.last_name || '',
+                        username: tgUser.username || '',
+                        photo_url: tgUser.photo_url || '',
+                        id: tgUser.id || 0
+                    }));
+                }
+
+                if (initData) {
+                    fetch('/auth/telegram/', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ initData: initData })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'ok') {
+                            if (data.user && data.user.full_name) {
+                                const stored = JSON.parse(localStorage.getItem('tg_user') || '{}');
+                                localStorage.setItem('tg_user', JSON.stringify({
+                                    first_name: data.user.full_name.split(' ')[0] || stored.first_name || '',
+                                    last_name: data.user.full_name.split(' ').slice(1).join(' ') || stored.last_name || '',
+                                    username: data.user.username || stored.username || '',
+                                    photo_url: stored.photo_url || '',
+                                    id: data.user.telegram_id || stored.id || 0,
+                                    phone: data.user.phone || stored.phone || '',
+                                    full_name: data.user.full_name || ''
+                                }));
+                            }
+                            window.location.href = '/catalog/';
+                        } else {
+                            // Auth fail bo'lsa ham katalogga kiritamiz
+                            window.location.href = '/catalog/';
+                        }
+                    })
+                    .catch(e => {
+                        console.error('Auth error:', e);
+                        window.location.href = '/catalog/';
+                    });
+                } else {
+                    // initData 2 soniyadan keyin ham yo'q bo'lsa
+                    window.location.href = '/catalog/';
+                }
+            }
+        }, 100); // Har 100ms da tekshiramiz
+    } else {
+        // Telegram WebApp mavjud emas
+        window.location.href = '/catalog/';
+    }
+});
+</script>
+{% endblock %}

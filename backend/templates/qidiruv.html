@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<p class="font-body-md text-on-surface-variant mb-6">"Choy" uchun 24 ta natija topildi</p>
+<!-- Product Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-gutter">
+<!-- Product Card 1 -->
+<div class="bg-surface rounded-xl p-3 shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] flex flex-col group hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-3 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A premium box of loose leaf black tea, elegantly packaged. The box is predominantly dark brown with gold foil accents, sitting on a clean, bright minimalist surface. Soft, high-key lighting illuminates the fine textures of the packaging, highlighting its luxurious and fresh quality. A few loose tea leaves are scattered artfully nearby." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9AfHzxJwBBrwEvEoPvUmqcbwhBgadSnTRuP0VMlqBdYSqff3W-S3oUVk3_tR85qrTuNclVp6DY7GGwjPuCLubFoj-D0nKjQlk8BfNIm1_Ox0tk-SQXXKYOACvAhTiTrWij2hk1zJbEsCSD7fzJZSsC1LZKKaiKHe5X8frwcBlQu_nUjcSkZxfNWCsMELAjnNbfIf5AwKvZYjlSF_vulAHQuK8KkOzI1EMjPEDAMLZDin7yCaarsfWAg"/>
+<button class="absolute top-2 right-2 text-on-surface-variant bg-surface/80 p-1.5 rounded-full backdrop-blur-sm hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<div class="flex-grow flex flex-col">
+<h3 class="font-label-md text-on-surface line-clamp-2 mb-1">Premium Qora Choy "Asl Nurafshon" Maxsus Uzumzor</h3>
+<p class="font-label-sm text-on-surface-variant mb-2">100g • Qadoqlangan</p>
+<div class="mt-auto flex items-end justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-primary">24 000 so'm</span>
+</div>
+<button class="bg-secondary text-on-primary w-8 h-8 rounded-lg flex items-center justify-center hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface rounded-xl p-3 shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] flex flex-col group hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-3 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A delicate glass jar filled with green tea leaves and dried jasmine flowers. The jar is placed on a pristine white marble countertop. Natural, soft daylight streams in, creating a clean, airy, and refreshing mood. The focus is on the vibrant green and subtle white hues of the tea mixture, emphasizing organic freshness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqEPgmvAT2Ix5oEej0Bbg67pMsmzfOTSNp4FxDqKiIEhlcbtN-Val41RUOV1FxVh-Uc2HkcuP0AOw4_ZE835SCxTTpH6ryPBVl84ZxJ5X6u9g66c-ynfyeiR3aP0-7ZoyE7tGTonOgLL4JmmTcIBamkbURqXQS-ye-Eswcoj42hpilpgKbdxmvr9lAcVKOFgrnFjdTH3uwJbGNpUnqF1wOBjaxaY2uKX0kJMiEUJ_AjQgBayFwUt5oIQ"/>
+<div class="absolute top-2 left-2 bg-error text-on-error px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">-15%</div>
+<button class="absolute top-2 right-2 text-on-surface-variant bg-surface/80 p-1.5 rounded-full backdrop-blur-sm hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<div class="flex-grow flex flex-col">
+<h3 class="font-label-md text-on-surface line-clamp-2 mb-1">Ko'k Choy Jasmina Guli Bilan Tabiiy</h3>
+<p class="font-label-sm text-on-surface-variant mb-2">50g • Shisha idish</p>
+<div class="mt-auto flex items-end justify-between">
+<div class="flex flex-col">
+<span class="text-[12px] text-on-surface-variant line-through">18 000 so'm</span>
+<span class="font-headline-sm text-error">15 300 so'm</span>
+</div>
+<button class="bg-secondary text-on-primary w-8 h-8 rounded-lg flex items-center justify-center hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-surface rounded-xl p-3 shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] flex flex-col group hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-3 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A rustic, eco-friendly kraft paper bag containing herbal fruit tea mix. Vibrant dried berry pieces and herbs spill slightly out of the bag onto a clean, light-colored wooden table. The lighting is bright and inviting, casting soft shadows and highlighting the rich, natural colors of the fruit ingredients. The aesthetic is wholesome and premium." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkuaqG5vvs7j80_v032fYYyEB156ytLF_oldM3N0JPspovyN_z5NwAIq4LCP9FRB3JjGIA-c2RS1dYXRcqAjW5JEUZvirCqqt-kN1ALsGFvU-gES-TRY5ufytERESo5loUtCzb6vGcGE2H4h0ujejQp3pqbiotSrGgjZwgoJnkBhgnHrT-z7SuDkRQ7Vq1Z9z7W0xmwYxFIJ6GxGSGwgtXJW-zRCaHicuxJfz0nN9ho9oN8ti1OSa95A"/>
+<button class="absolute top-2 right-2 text-on-surface-variant bg-surface/80 p-1.5 rounded-full backdrop-blur-sm hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<div class="flex-grow flex flex-col">
+<h3 class="font-label-md text-on-surface line-clamp-2 mb-1">Meva va Giyohlar Aralashmasi "Tog' Havosi"</h3>
+<p class="font-label-sm text-on-surface-variant mb-2">150g • Kraft qadoq</p>
+<div class="mt-auto flex items-end justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-primary">32 000 so'm</span>
+</div>
+<button class="bg-secondary text-on-primary w-8 h-8 rounded-lg flex items-center justify-center hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-surface rounded-xl p-3 shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] flex flex-col group hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-3 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A sleek, modern tin canister of matcha green tea powder. The tin is a smooth, matte olive green, sitting on a stark white pedestal against a minimalist light gray background. A traditional bamboo whisk rests next to it. The lighting is crisp and studio-quality, creating a high-end, contemporary presentation of the product." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWq6PzPPcDhmIK46pj7JSFitGrPOInaoXB-u2NegTCgwOV4G2VWCuBh3qLTNhWxm5OdlXNOrtxi0eVRNLaCZWxb_UmIMVyLEGD8jV15swlZAzum74zYObs32Fkck00ljvzfgr2TOEdw-aTd73T06iQT5Sl4351Nvf4eByeCAbLCSdBqlpvL4lGoP8ym6b-dlfWeye6aTdHe3lZXrEbjl_Pj82Y8PMdq7iFW-7sRUpeHzMLTYXObLqi5g"/>
+<div class="absolute top-2 left-2 bg-secondary text-on-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Yangi</div>
+<button class="absolute top-2 right-2 text-primary bg-surface/80 p-1.5 rounded-full backdrop-blur-sm hover:text-primary transition-colors">
+<span class="material-symbols-outlined filled-icon text-[20px]">favorite</span>
+</button>
+</div>
+<div class="flex-grow flex flex-col">
+<h3 class="font-label-md text-on-surface line-clamp-2 mb-1">Matcha Yapon Ko'k Choyi Kukuni Premium</h3>
+<p class="font-label-sm text-on-surface-variant mb-2">30g • Temir quti</p>
+<div class="mt-auto flex items-end justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-primary">85 000 so'm</span>
+</div>
+<button class="bg-secondary text-on-primary w-8 h-8 rounded-lg flex items-center justify-center hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More -->
+<div class="w-full flex justify-center mt-8">
+<button class="px-6 py-3 border border-outline text-primary font-label-md rounded-lg hover:bg-surface-container-low transition-colors">
+                Yana ko'rsatish
+            </button>
+</div>
+{% endblock %}

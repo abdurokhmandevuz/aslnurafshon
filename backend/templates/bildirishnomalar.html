@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Notification Item 1: Unread, Delivery -->
+<div class="bg-surface-container-lowest p-md rounded-xl flex gap-md items-start shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-variant/50 relative overflow-hidden transition-colors hover:bg-surface-container-low cursor-pointer">
+<!-- Unread Indicator -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary rounded-l-xl"></div>
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 text-secondary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined icon-fill" data-icon="local_shipping">local_shipping</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate pr-2">Buyurtmangiz yo'lga chiqdi</h2>
+<span class="font-label-sm text-label-sm text-secondary flex-shrink-0">10:45</span>
+</div>
+<p class="font-body-md text-[14px] leading-[20px] text-on-surface-variant line-clamp-2">
+                    #AN-8492 buyurtmangiz kuryerga topshirildi va manzil tomon yo'lga chiqdi. Taxminiy yetkazib berish vaqti: 30-40 daqiqa.
+                </p>
+</div>
+</div>
+<!-- Notification Item 2: Promotion -->
+<div class="bg-surface-container-lowest p-md rounded-xl flex gap-md items-start shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-variant/50 relative overflow-hidden transition-colors hover:bg-surface-container-low cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-error-container/30 text-error flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined icon-fill" data-icon="percent">percent</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate pr-2">Yangi chegirmalar!</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70 flex-shrink-0">Kecha</span>
+</div>
+<p class="font-body-md text-[14px] leading-[20px] text-on-surface-variant line-clamp-2">
+                    Barcha premium choy va qahvalarga hafta oxirigacha 20% gacha chegirma e'lon qilamiz. Hoziroq buyurtma bering!
+                </p>
+</div>
+</div>
+<!-- Notification Item 3: System/Profile -->
+<div class="bg-surface-container-lowest p-md rounded-xl flex gap-md items-start shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-variant/50 relative overflow-hidden transition-colors hover:bg-surface-container-low cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="manage_accounts">manage_accounts</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate pr-2">Profil ma'lumotlari yangilandi</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70 flex-shrink-0">12 May</span>
+</div>
+<p class="font-body-md text-[14px] leading-[20px] text-on-surface-variant line-clamp-2">
+                    Sizning yetkazib berish manzilingiz muvaffaqiyatli saqlandi. Keyingi xaridlarda undan foydalanishingiz mumkin.
+                </p>
+</div>
+</div>
+<!-- Older Date Header -->
+<div class="py-sm mt-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Avvalgi oylarda</span>
+</div>
+<!-- Notification Item 4: Generic Read -->
+<div class="bg-surface p-md rounded-xl flex gap-md items-start border border-transparent relative overflow-hidden transition-colors hover:bg-surface-container-lowest cursor-pointer opacity-80">
+<div class="w-12 h-12 rounded-full bg-surface-variant/50 text-on-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h2 class="font-label-md text-label-md text-on-surface truncate pr-2">Buyurtma yetkazildi</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70 flex-shrink-0">28 Apr</span>
+</div>
+<p class="font-body-md text-[14px] leading-[20px] text-on-surface-variant line-clamp-1">
+                    Xaridingiz uchun rahmat. Ilovani baholashni unutmang.
+                </p>
+</div>
+</div>
+{% endblock %}

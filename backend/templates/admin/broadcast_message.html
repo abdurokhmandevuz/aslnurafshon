@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n %}
+{% block content %}
+<div style="max-width: 600px; margin: 20px auto; font-family: sans-serif; background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+    <h2 style="margin-top:0; color:#333;">📢 Tanlangan foydalanuvchilarga xabar yuborish</h2>
+    <p style="color:#666; font-size: 14px;">Quyida tanlangan <strong>{{ users.count }} ta</strong> foydalanuvchiga Telegram bot orqali xabar yuboriladi. Xabarda HTML teglardan foydalanishingiz mumkin.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Keep selected users context -->
+        {% for obj in users %}
+        <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk }}" />
+        {% endfor %}
+        <input type="hidden" name="action" value="broadcast_message" />
+        <input type="hidden" name="apply" value="yes" />
+
+        <div style="margin-bottom: 20px;">
+            <label for="message_text" style="display:block; font-weight:bold; margin-bottom:8px; font-size:14px; color:#444;">Xabar matni:</label>
+            <textarea name="message_text" id="message_text" rows="8" style="width:100%; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; padding:12px; font-size:14px; font-family:inherit; resize:vertical; outline:none;" placeholder="Masalan: ☕ Bugun barcha mahsulotlarimizga 10% chegirma! \nBatafsil buyurtma berish: /start" required></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <a href="." style="display:inline-block; padding:10px 20px; background:#f0f0f0; color:#333; text-decoration:none; border-radius:8px; font-weight:bold; font-size:14px;">Orqaga qaytish</a>
+            <button type="submit" style="padding:10px 20px; background:#32190b; color:#fff; border:none; border-radius:8px; font-weight:bold; font-size:14px; cursor:pointer;">Xabarni yuborish</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

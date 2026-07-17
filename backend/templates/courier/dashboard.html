@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+<div class="mb-lg">
+    <!-- Courier Info Card -->
+    <div class="flex items-center justify-between bg-primary/10 p-md rounded-2xl border border-primary/20 mb-lg">
+        <div class="flex items-center gap-sm">
+            <span class="material-symbols-outlined text-primary text-[28px]">local_shipping</span>
+            <div>
+                <h2 class="font-headline-sm text-headline-sm text-primary">{{ courier.full_name }}</h2>
+                <p class="text-[11px] text-on-surface-variant">{% trans "Kuryer paneli" %}</p>
+            </div>
+        </div>
+        <span class="px-2.5 py-1 bg-green-500/10 text-green-500 font-bold text-xs rounded-full border border-green-500/20">{% trans "Faol" %}</span>
+    </div>
+
+    <!-- Active Deliveries (My Orders) -->
+    <h3 class="font-headline-sm text-[16px] text-on-surface mb-md">🚚 {% trans "Mening buyurtmalarim" %} ({{ my_active_orders|length }})</h3>
+    <div class="flex flex-col gap-md mb-xl">
+        {% for order in my_active_orders %}
+        <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-md shadow-sm hover:shadow-md transition-all flex flex-col gap-sm">
+            <div class="flex justify-between items-start border-b border-surface-container pb-sm">
+                <div>
+                    <h4 class="font-label-md text-label-md text-primary">{% trans "Buyurtma" %} #{{ order.id }}</h4>
+                    <p class="text-[11px] text-on-surface-variant">{{ order.created_at|date:"d.m.Y H:i" }}</p>
+                </div>
+                <span class="px-2.5 py-0.5 bg-primary/10 text-primary font-bold text-[10px] rounded-full uppercase">{{ order.get_status_display }}</span>
+            </div>
+            
+            <div class="text-sm flex flex-col gap-xs py-xs text-on-surface-variant">
+                <div class="flex items-start gap-xs">
+                    <span class="material-symbols-outlined text-[16px] text-outline mt-0.5">person</span>
+                    <span><b>{{ order.user.full_name }}</b> ({{ order.user.phone }})</span>
+                </div>
+                <div class="flex items-start gap-xs">
+                    <span class="material-symbols-outlined text-[16px] text-outline mt-0.5">location_on</span>
+                    <span>{{ order.address.address_text|default:"Manzil tanlanmagan" }}</span>
+                </div>
+                {% if order.comment %}
+                <div class="flex items-start gap-xs">
+                    <span class="material-symbols-outlined text-[16px] text-outline mt-0.5">chat_bubble</span>
+                    <span class="italic">"{{ order.comment }}"</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Items -->
+            <div class="bg-surface-container-low rounded-xl p-sm text-xs flex flex-col gap-xs">
+                {% for item in order.items.all %}
+                <div class="flex justify-between">
+                    <span>{{ item.product_name_snapshot }} x {{ item.quantity }}</span>
+                    <span class="font-bold">{{ item.line_total }} UZS</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="flex justify-between items-center border-t border-surface-container pt-sm mt-xs">
+                <div>
+                    <span class="text-[11px] text-on-surface-variant">{% trans "Jami to'lov" %}:</span>
+                    <p class="font-headline-sm text-headline-sm text-primary">{{ order.total }} UZS</p>
+                </div>
+                
+                <div class="flex gap-sm">
+                    {% if order.status == 'yangi' or order.status == 'tayyorlanmoqda' %}
+                    <a href="{% url 'courier_order_action' order.id 'start' %}" class="px-4 py-2 bg-primary text-on-primary font-label-sm text-[12px] rounded-lg transition-colors flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-[16px]">directions_bike</span>
+                        {% trans "Yo'lga chiqish" %}
+                    </a>
+                    {% elif order.status == 'yolda' %}
+                    <a href="{% url 'courier_order_action' order.id 'deliver' %}" class="px-4 py-2 bg-green-500 text-white font-label-sm text-[12px] rounded-lg hover:bg-green-600 transition-colors flex items-center gap-xs">
+                        <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                        {% trans "Yetkazildi" %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center py-6 text-on-surface-variant bg-surface-container-low rounded-2xl text-sm">{% trans "Sizda faol buyurtmalar yo'q." %}</p>
+        {% endfor %}
+    </div>
+
+    <!-- Available Orders (Unassigned) -->
+    <h3 class="font-headline-sm text-[16px] text-on-surface mb-md">📦 {% trans "Yangi buyurtmalar (Kutish zalida)" %} ({{ new_orders|length }})</h3>
+    <div class="flex flex-col gap-md mb-xl">
+        {% for order in new_orders %}
+        <div class="bg-surface rounded-2xl border border-outline-variant/50 p-md flex flex-col gap-sm">
+            <div class="flex justify-between items-start border-b border-surface-container pb-sm">
+                <div>
+                    <h4 class="font-label-md text-label-md text-primary">{% trans "Buyurtma" %} #{{ order.id }}</h4>
+                    <p class="text-[11px] text-on-surface-variant">{{ order.created_at|date:"d.m.Y H:i" }}</p>
+                </div>
+                <span class="px-2.5 py-0.5 bg-yellow-500/10 text-yellow-600 font-bold text-[10px] rounded-full uppercase">{{ order.get_status_display }}</span>
+            </div>
+
+            <div class="text-sm flex flex-col gap-xs py-xs text-on-surface-variant">
+                <div class="flex items-start gap-xs">
+                    <span class="material-symbols-outlined text-[16px] text-outline mt-0.5">location_on</span>
+                    <span>{{ order.address.address_text|default:"Manzil tanlanmagan" }}</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center border-t border-surface-container pt-sm mt-xs">
+                <div>
+                    <span class="text-[11px] text-on-surface-variant">{% trans "Jami to'lov" %}:</span>
+                    <p class="font-headline-sm text-headline-sm text-primary">{{ order.total }} UZS</p>
+                </div>
+                
+                <a href="{% url 'courier_order_action' order.id 'take' %}" class="px-4 py-2 bg-secondary text-on-secondary font-label-sm text-[12px] rounded-lg transition-colors flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-[16px]">hail</span>
+                    {% trans "Qabul qilish" %}
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center py-6 text-on-surface-variant bg-surface-container-low rounded-2xl text-sm">{% trans "Hozircha yangi buyurtmalar yo'q." %}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

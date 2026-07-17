@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Yordam va FAQ - Asl Nurafshon</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#4d4637",
+                        "primary-container": "#4a2e1e",
+                        "surface-container-low": "#f3f3f3",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#241f12",
+                        "primary-fixed": "#ffdbca",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2f3131",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-variant": "#e2e2e2",
+                        "on-primary-fixed": "#2d1607",
+                        "on-secondary-fixed-variant": "#713608",
+                        "inverse-on-surface": "#f1f1f1",
+                        "background": "#f9f9f9",
+                        "surface": "#f9f9f9",
+                        "surface-tint": "#795744",
+                        "on-secondary-container": "#773b0d",
+                        "on-primary-fixed-variant": "#5e402f",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#3a3426",
+                        "on-background": "#1a1c1c",
+                        "secondary": "#8f4d1f",
+                        "primary-fixed-dim": "#e9bda6",
+                        "on-primary-container": "#bd957f",
+                        "outline-variant": "#d4c3bb",
+                        "tertiary-fixed": "#ede1cd",
+                        "inverse-primary": "#e9bda6",
+                        "surface-container-high": "#e8e8e8",
+                        "on-surface-variant": "#50443f",
+                        "on-tertiary-container": "#a69c8a",
+                        "primary": "#32190b",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#321300",
+                        "secondary-fixed-dim": "#ffb68a",
+                        "on-tertiary-fixed": "#201b0f",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-container": "#fda771",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeee",
+                        "surface-dim": "#dadada",
+                        "outline": "#82746e",
+                        "tertiary-fixed-dim": "#d0c5b2",
+                        "secondary-fixed": "#ffdbc8",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "container-max": "1280px",
+                        "2xl": "48px",
+                        "margin-mobile": "16px",
+                        "3xl": "64px",
+                        "unit": "4px",
+                        "lg": "24px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .accordion-content {
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .accordion-content.open {
+            max-height: 500px;
+            padding-bottom: 16px;
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        .open .accordion-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="app.js"></script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface w-full sticky top-0 z-50 flex items-center px-margin-mobile h-16 w-full z-50 md:px-lg">
+<button aria-label="Go back" class="mr-4 text-primary hover:opacity-80 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm-mobile md:text-headline-sm text-primary flex-1 text-center font-extrabold tracking-tight">Asl Nurafshon</h1>
+<div class="w-6"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-xl pb-3xl">
+<!-- Header Section -->
+<div class="text-center mb-xl">
+<h2 class="font-display-lg-mobile md:font-display-lg text-primary mb-sm">Yordam markazi</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">Biz sizga yordam berishdan xursandmiz. Ko'p beriladigan savollarga javoblarni quyida topishingiz mumkin.</p>
+</div>
+<!-- Contact Options Bento Grid (Web) / Stack (Mobile) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md mb-2xl">
+<!-- Chat Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-container flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300">
+<div class="w-12 h-12 bg-primary-container text-on-primary rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</div>
+<h3 class="font-headline-sm text-on-surface mb-xs">Jonli chat</h3>
+<p class="font-body-md text-on-surface-variant mb-md">Operatorlarimiz sizga darhol javob berishadi.</p>
+<button class="bg-primary-container text-on-primary font-label-md px-md py-sm rounded-lg hover:bg-on-primary-fixed-variant transition-colors mt-auto w-full">Chatni boshlash</button>
+</div>
+<!-- Email Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-container flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300">
+<div class="w-12 h-12 bg-surface-container-high text-primary rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<h3 class="font-headline-sm text-on-surface mb-xs">Elektron pochta</h3>
+<p class="font-body-md text-on-surface-variant mb-md">Bizga xat yozing, tez orada javob qaytaramiz.</p>
+<a class="text-secondary font-label-md mt-auto hover:underline" href="mailto:support@aslnurafshon.uz">support@aslnurafshon.uz</a>
+</div>
+<!-- Phone Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] border border-surface-container flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300">
+<div class="w-12 h-12 bg-surface-container-high text-primary rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+</div>
+<h3 class="font-headline-sm text-on-surface mb-xs">Telefon orqali</h3>
+<p class="font-body-md text-on-surface-variant mb-md">Ish vaqti: 09:00 - 18:00 (Dush-Jum)</p>
+<a class="text-secondary font-label-md mt-auto hover:underline" href="tel:+998711234567">+998 71 123 45 67</a>
+</div>
+</div>
+<!-- FAQ Section -->
+<div class="max-w-3xl mx-auto">
+<h3 class="font-headline-md text-primary mb-lg border-b border-surface-container pb-sm">Ko'p beriladigan savollar (FAQ)</h3>
+<div class="space-y-sm">
+<!-- Accordion Item 1 -->
+<div class="bg-surface-container-lowest border border-surface-container rounded-lg shadow-[0_4px_20px_0_rgba(74,46,30,0.02)] overflow-hidden">
+<button class="w-full text-left px-md py-md flex justify-between items-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors duration-200 focus:outline-none" onclick="toggleAccordion(this)">
+<span class="font-headline-sm text-on-surface">Yetkazib berish qancha vaqt oladi?</span>
+<span class="material-symbols-outlined text-primary accordion-icon" data-icon="expand_more">expand_more</span>
+</button>
+<div class="accordion-content px-md text-on-surface-variant font-body-md bg-surface-container-lowest">
+                        Toshkent shahri ichida yetkazib berish odatda buyurtma tasdiqlanganidan so'ng 2-4 soat ichida amalga oshiriladi. Boshqa viloyatlarga yetkazib berish 1-3 ish kunini tashkil qilishi mumkin.
+                    </div>
+</div>
+<!-- Accordion Item 2 -->
+<div class="bg-surface-container-lowest border border-surface-container rounded-lg shadow-[0_4px_20px_0_rgba(74,46,30,0.02)] overflow-hidden">
+<button class="w-full text-left px-md py-md flex justify-between items-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors duration-200 focus:outline-none" onclick="toggleAccordion(this)">
+<span class="font-headline-sm text-on-surface">To'lov usullari qanday?</span>
+<span class="material-symbols-outlined text-primary accordion-icon" data-icon="expand_more">expand_more</span>
+</button>
+<div class="accordion-content px-md text-on-surface-variant font-body-md bg-surface-container-lowest">
+                        Biz naqd pul, plastik kartalar (Uzcard, Humo), shuningdek, onlayn to'lov tizimlari (Payme, Click) orqali to'lovlarni qabul qilamiz.
+                    </div>
+</div>
+<!-- Accordion Item 3 -->
+<div class="bg-surface-container-lowest border border-surface-container rounded-lg shadow-[0_4px_20px_0_rgba(74,46,30,0.02)] overflow-hidden">
+<button class="w-full text-left px-md py-md flex justify-between items-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors duration-200 focus:outline-none" onclick="toggleAccordion(this)">
+<span class="font-headline-sm text-on-surface">Qanday qilib buyurtmani qaytarish mumkin?</span>
+<span class="material-symbols-outlined text-primary accordion-icon" data-icon="expand_more">expand_more</span>
+</button>
+<div class="accordion-content px-md text-on-surface-variant font-body-md bg-surface-container-lowest">
+                        Agar mahsulot sifati sizni qoniqtirmasa, yetkazib berilgan vaqtdan boshlab 24 soat ichida qo'llab-quvvatlash xizmatiga murojaat qilishingiz mumkin. Mahsulot o'zining asl holatida saqlangan bo'lishi kerak.
+                    </div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Visible only on mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full flex justify-around items-center px-2 py-3 bg-surface border-t border-outline-variant/20 shadow-lg rounded-t-xl z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low rounded-lg p-2 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low rounded-lg p-2 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-sm text-label-sm mt-1">Catalog</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low rounded-lg p-2 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-label-sm text-label-sm mt-1">Cart</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low rounded-lg p-2 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-sm text-label-sm mt-1">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary transition-colors duration-200 p-2 active:scale-90 transition-all duration-150" href="profil.html">
+<span class="material-symbols-outlined font-variation-settings: 'FILL' 1;" data-icon="person" data-weight="fill">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        function toggleAccordion(button) {
+            const content = button.nextElementSibling;
+            const isOpen = content.classList.contains('open');
+            
+            // Close all accordions
+            document.querySelectorAll('.accordion-content').forEach(el => {
+                el.classList.remove('open');
+                el.parentElement.classList.remove('open');
+            });
+
+            // Open clicked if it was closed
+            if (!isOpen) {
+                content.classList.add('open');
+                button.parentElement.classList.add('open');
+            }
+        }
+    </script>
+</body></html>

@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asl Nurafshon - Bosh sahifa</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e2e2e2",
+                        "on-primary-fixed": "#2d1607",
+                        "secondary-fixed-dim": "#ffb68a",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-bright": "#f9f9f9",
+                        "outline-variant": "#d4c3bb",
+                        "primary": "#32190b",
+                        "secondary-container": "#fda771",
+                        "on-surface-variant": "#50443f",
+                        "error": "#ba1a1a",
+                        "background": "#f9f9f9",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#1a1c1c",
+                        "surface": "#f9f9f9",
+                        "secondary-fixed": "#ffdbc8",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-tint": "#795744",
+                        "secondary": "#8f4d1f",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed": "#ede1cd",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-secondary-fixed-variant": "#713608",
+                        "on-tertiary-fixed": "#201b0f",
+                        "tertiary-container": "#3a3426",
+                        "surface-container-low": "#f3f3f3",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-fixed": "#321300",
+                        "surface-dim": "#dadada",
+                        "on-primary-fixed-variant": "#5e402f",
+                        "on-tertiary-fixed-variant": "#4d4637",
+                        "on-tertiary-container": "#a69c8a",
+                        "on-secondary-container": "#773b0d",
+                        "inverse-primary": "#e9bda6",
+                        "on-primary": "#ffffff",
+                        "outline": "#82746e",
+                        "primary-fixed": "#ffdbca",
+                        "tertiary": "#241f12",
+                        "on-primary-container": "#bd957f",
+                        "primary-container": "#4a2e1e",
+                        "primary-fixed-dim": "#e9bda6",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#d0c5b2",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "20px",
+                        "xs": "4px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "3xl": "64px",
+                        "unit": "4px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="{% static 'app.js' %}?v=20260710b"></script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-[80px] md:pb-0">
+<!-- TopAppBar (From JSON) -->
+<header class="flex justify-between items-center px-margin-mobile h-14 w-full bg-surface docked full-width top-0 sticky z-40">
+<button class="text-on-surface-variant p-sm rounded-full hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex items-center gap-sm">
+<img alt="Asl Nurafshon Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiWXHYmMB1XfMHAiYfbOwbGJSvZcX4glaFhRk1VQZLwQFft7cigCkvqjs6eiW79p0jAbivTP-JtlLDLAQGKDsZZgLeodEF0b4XLnVm11naH2Mu6C7jT4oM_oUSKae4QML3ZXjusH4sDHyXPRzAoORLD_5htnO-YDCEa7yBgr0cUXJe58J7ZPtM-aPA-X0dN9yv0GL0KK5RjscppnguA3whlOLP99Iz3k00p8wwf0cxLuf7j4X-ZcpwgQ"/>
+<h1 class="font-headline-sm text-headline-sm-mobile font-bold text-primary">Asl Nurafshon</h1>
+</div>
+<button class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant hover:bg-surface-container-low transition-all border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A professional, brightly lit portrait of a young Uzbek user, smiling subtly. The lighting is soft and studio-quality, conveying a sense of premium service and trust. High resolution, light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB57TYekEyInIq_Q2Q7Gc46hbEXT2oaKuM4BuV0ue98XT-I95WghO0yFXPqdkerGy8y0w5Iq-VqBfArwMqDxzMaeP_SM1rcLur2op-F3aXm-x3oZf6RmXCMXzbjG1_1NJJ-Lz4942ZPSCpNkjjBr5eGdT1yEgSBQ10e0kZdWYhIIiycCuj1cIw1vJNPHTu_fdE_MCgIFC08BplmAAVcA5X3vI8JoLTATUdf5e0HtxWmb_BCr_aerg0h4A"/>
+</button>
+</header>
+<!-- Page Content -->
+<main class="px-margin-mobile py-lg w-full max-w-container-max mx-auto">
+{% block content %}{% endblock %}
+</main>
+<!-- BottomNavBar (From JSON) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-2 bg-surface rounded-t-xl border-t border-outline-variant shadow-md md:hidden">
+<!-- Active Tab: Bosh sahifa -->
+<button onclick="window.location.href='{% url 'catalog' %}'" class="flex flex-col items-center justify-center text-secondary font-bold scale-110 transition-transform duration-150 p-2 hover:bg-surface-variant/20 rounded-lg group">
+<span class="material-symbols-outlined text-secondary" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Bosh sahifa</span>
+</button>
+<!-- Inactive Tabs -->
+<button onclick="window.location.href='{% url 'catalog' %}'" class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant/20 rounded-lg transition-colors group">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="grid_view">grid_view</span>
+<span class="font-label-sm text-label-sm mt-1 group-hover:text-primary transition-colors">Katalog</span>
+</button>
+<button onclick="window.location.href='{% url 'cart' %}'" class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant/20 rounded-lg transition-colors group relative">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="shopping_cart">shopping_cart</span>
+<span class="cart-count-badge absolute top-1 right-3 bg-error text-on-error text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold {% if not cart_count %}hidden{% endif %}">{{ cart_count }}</span>
+<span class="font-label-sm text-label-sm mt-1 group-hover:text-primary transition-colors">Savat</span>
+</button>
+<button onclick="window.location.href='{% url 'orders' %}'" class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant/20 rounded-lg transition-colors group">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-sm text-label-sm mt-1 group-hover:text-primary transition-colors">Buyurtmalarim</span>
+</button>
+<button onclick="window.location.href='{% url 'profile' %}'" class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant/20 rounded-lg transition-colors group">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1 group-hover:text-primary transition-colors">Profil</span>
+</button>
+</nav>
+</body></html>

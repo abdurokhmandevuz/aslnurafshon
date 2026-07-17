@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Page Title -->
+<div class="mb-lg">
+<h2 class="font-headline-md text-headline-md text-on-background mb-sm">Aksiyalar va Maxsus takliflar</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Eng so'nggi chegirmalar va yangiliklardan xabardor bo'ling.</p>
+</div>
+<!-- Filter Chips -->
+<div class="flex overflow-x-auto hide-scrollbar gap-sm mb-xl py-sm">
+<button class="px-md py-sm rounded-full bg-secondary text-on-secondary font-label-md text-label-md whitespace-nowrap active:scale-95 transition-transform shadow-[0_4px_12px_rgba(74,46,30,0.1)]">Barchasi</button>
+<button class="px-md py-sm rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container active:scale-95 transition-colors">Yangi yil takliflari</button>
+<button class="px-md py-sm rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container active:scale-95 transition-colors">Hafta mahsulotlari</button>
+<button class="px-md py-sm rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container active:scale-95 transition-colors">Go'sht va pishloqlar</button>
+</div>
+<!-- Big Promo Cards List -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-2xl">
+<!-- Promo Card 1 -->
+<div class="relative bg-surface rounded-xl overflow-hidden shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] group cursor-pointer hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="h-48 md:h-64 w-full bg-surface-variant relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A beautifully styled composition of fresh artisanal cheeses, premium charcuterie, and fresh grapes on a rustic wooden board. The lighting is soft and natural, creating a warm and inviting gourmet atmosphere. The background is slightly blurred to focus on the textures of the premium grocery items, fitting a high-end minimalist grocery aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAdFZCUI3AlPJtv7qZyJOH7UOMLsU7Z2g3YPOqipxpQXX1tg-7udAUN6kTEiFZlGpQsHaoddPy6869_yMldZORC09wjxTwVYq4FgbkYjqINvIi6Xp9J8WQt-UXTiLcR-Qs8E34qi-ZHb0BuVOQotPg53MH7WyjAW5xlU0kjDG5zqpHxQXSAH4ft-8T73P5G0lFVXm2e-A14fi81saDTgxZDDh_pkurXODGnJPDchlQtO-bYk8nYu1V9Q"/>
+<div class="absolute top-md left-md bg-error text-on-error px-md py-sm rounded-full font-label-md text-label-md font-bold shadow-md">
+                        -20%
+                    </div>
+</div>
+<div class="p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Premium Pishloqlar To'plami</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md line-clamp-2">Eng sara xorijiy va mahalliy pishloqlar tanlanmasiga maxsus chegirma.</p>
+<div class="flex justify-between items-end">
+<div class="flex items-center text-error font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-xs">schedule</span>
+                            2 kundan so'ng tugaydi
+                        </div>
+<button class="bg-primary-container text-on-primary w-10 h-10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Promo Card 2 -->
+<div class="relative bg-surface rounded-xl overflow-hidden shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] group cursor-pointer hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="h-48 md:h-64 w-full bg-surface-variant relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Freshly roasted specialty coffee beans pouring out of a rustic burlap sack onto a clean, white marble countertop. Beside it, a beautifully crafted ceramic cup of steaming espresso. The lighting is moody and premium, emphasizing the rich brown tones of the coffee against a light, minimalist background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI-tJFdDDFC56RaKjm1siAmBKkMAIpqshPXIF-uIFtxw6LDFaIs8uHxfQnA1CLynLI_vog2MvSsaeSQPm19dbiAUgio7C_WOSCIGrtvjHBdRAA3RUdDaoRSu08NInrZ1jr4SV5vPxj_oFCdHTS7mC5VoqQ4MWphn6v5yumj-s4h-P1YpCgf47Ca_zrFSczncfHJuWTB-n29kyLNNz3xW940HHMhFS3JBfVSztkPw8qHgNXCQnaI98cpw"/>
+<div class="absolute top-md left-md bg-secondary text-on-secondary px-md py-sm rounded-full font-label-md text-label-md font-bold shadow-md">
+                        1+1 Aksiyasi
+                    </div>
+</div>
+<div class="p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Ertalabki Qahva Quvonchi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md line-clamp-2">Tanlangan qahva donalarini xarid qiling va ikkinchisini sovg'a sifatida oling.</p>
+<div class="flex justify-between items-end">
+<div class="flex items-center text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-xs">schedule</span>
+                            Yil oxirigacha
+                        </div>
+<button class="bg-primary-container text-on-primary w-10 h-10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Promo Card 3 -->
+<div class="relative bg-surface rounded-xl overflow-hidden shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] group cursor-pointer hover:shadow-[0_8px_30px_0_rgba(74,46,30,0.08)] transition-shadow">
+<div class="h-48 md:h-64 w-full bg-surface-variant relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A vibrant arrangement of fresh, exotic fruits including mangoes, dragon fruit, and passion fruit, displayed elegantly in a minimalist woven basket. The setting is clean and bright, with soft daylight casting gentle shadows, highlighting the freshness and premium quality of the produce." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUajC9Y7rCbH4X68FSjOSxyDtFuYUH_U1T7fUELjkVhm_pDmCaXxKe0AOynQVXdU5Ovyjb3J9NmrO2pI1z-ZqF_pEmqjU4sqTwymmpl1HZPNH6KhkuKDKChMMvl1itXX5VSNdcNmYlptQngSHKdJsfDCeb5kg_BIIMbNle_KJq1hGt8svXhdbQCaiIM_0biguP_ADERqMdE-G6hNVAbuJp4z_IsOZ7JoO8mtnaKVGflKYzcwafa1DXqw"/>
+<div class="absolute top-md left-md bg-tertiary text-on-tertiary px-md py-sm rounded-full font-label-md text-label-md font-bold shadow-md">
+                        -15%
+                    </div>
+</div>
+<div class="p-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Ekzotik Mevalar To'plami</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md line-clamp-2">Tropik mevalardan bahramand bo'ling, endi yanada qulay narxda.</p>
+<div class="flex justify-between items-end">
+<div class="flex items-center text-error font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] mr-xs">schedule</span>
+                            Faqat bugun
+                        </div>
+<button class="bg-primary-container text-on-primary w-10 h-10 rounded-lg flex items-center justify-center hover:bg-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- "Faqat siz uchun" Section -->
+<div class="mb-xl">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-md">Faqat siz uchun</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<!-- Product Card 1 -->
+<div class="bg-surface rounded-xl p-sm shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] hover:shadow-md transition-shadow relative">
+<div class="absolute top-2 left-2 bg-error text-on-error text-[10px] px-2 py-1 rounded-full font-bold z-10">-10%</div>
+<div class="aspect-square bg-surface-variant rounded-lg overflow-hidden mb-sm">
+<img class="w-full h-full object-cover" data-alt="A bottle of premium cold-pressed olive oil next to some fresh rosemary sprigs on a clean white surface. High-key lighting, minimalist and modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD26FlqIgffFrhpipAEACJchltmSIMn7zhzYpc59jzDfyCkTYhvfhDL9cRVmduH9UdZJ0blCXerdAS3HlqhaKo3eWCHtdo1mHS5bswqNQnB9PthMVp1iIMcKfQSDyp6cmmOcaFD3lxK0svsTIl02K0lrl4uEXmoA1v_knLB8bZmNxTfoq6i553CyiQ3T10JmlWLtRtkq_PJJVGq9JiXvcXaJmsHosJxacPrWUeMft5ioxHUr1kBFrBWgQ"/>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-xs truncate">Zaytun yog'i Extra Virgin</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-sm">500 ml</p>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant line-through text-[10px]">120 000 UZS</p>
+<p class="font-headline-sm text-headline-sm text-on-surface text-[14px]">108 000 UZS</p>
+</div>
+<button class="w-8 h-8 bg-secondary text-on-secondary rounded-full flex items-center justify-center hover:bg-opacity-90 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface rounded-xl p-sm shadow-[0_4px_20px_0_rgba(74,46,30,0.04)] hover:shadow-md transition-shadow relative">
+<div class="absolute top-2 left-2 bg-error text-on-error text-[10px] px-2 py-1 rounded-full font-bold z-10">-25%</div>
+<div class="aspect-square bg-surface-variant rounded-lg overflow-hidden mb-sm">
+<img class="w-full h-full object-cover" data-alt="A beautifully packaged box of artisanal dark chocolate truffles, slightly opened to reveal the rich chocolates inside. Placed on a minimalist light grey background with soft diffused lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZGrd3hdfyogEn8C_fr9JuC-bMzQtoCKgX-I_Rgrn3DPhT9Sy4ir5TTzju_GjhFAnqL3hl2m8caUdoRyb4vG60oZ1klIvFAFJHIdFt97_QBEBR2O8SAU1HSIMOZUAKrAvQARzD2fBZjWvh2hAgSKtkGMbOI4b_O82IClN4A34rEio7e6axhnjb4dsklws0AqeX4dvya8sl4ytAr1f2zjB8qLw6rkCziOCbYZ8FPuSKxVV6XXYAdZm44g"/>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-xs truncate">Qora Shokoladli Trufellar</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-sm">200 g</p>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant line-through text-[10px]">85 000 UZS</p>
+<p class="font-headline-sm text-headline-sm text-on-surface text-[14px]">63 750 UZS</p>
+</div>
+<button class="w-8 h-8 bg-secondary text-on-secondary rounded-full flex items-center justify-center hover:bg-opacity-90 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
