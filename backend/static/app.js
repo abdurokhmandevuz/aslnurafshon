@@ -1,5 +1,5 @@
 // Asl Nurafshon - Frontend App Script
-const API_BASE_URL = 'https://aslnurafshon.duckdns.org/api';
+const API_BASE_URL = '/api';
 
 // Telegram Web App Initialization
 let tg = window.Telegram ? window.Telegram.WebApp : null;

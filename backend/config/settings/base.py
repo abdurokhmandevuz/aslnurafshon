@@ -6,6 +6,8 @@ from pathlib import Path
 
 from decouple import config, Csv
 
+RAILWAY_APP_URL = 'https://aslnurafshon.up.railway.app'
+
 # ─── Paths ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -148,12 +150,12 @@ REST_FRAMEWORK = {
 # ─── CORS ────────────────────────────────────────────────────────────────────
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='https://nurafshon.vercel.app',
+    default=RAILWAY_APP_URL,
     cast=Csv(),
 )
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    default='https://aslnurafshon.duckdns.org',
+    default=RAILWAY_APP_URL,
     cast=Csv(),
 )
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -180,7 +182,7 @@ BOT_TOKEN = config('BOT_TOKEN', default='')
 BOT_WEBHOOK_URL = config('BOT_WEBHOOK_URL', default='')
 ADMIN_GROUP_ID = config('ADMIN_GROUP_ID', default='', cast=lambda x: int(x) if x else None)
 CLICK_PROVIDER_TOKEN = config('CLICK_PROVIDER_TOKEN', default='')
-FRONTEND_URL = config('FRONTEND_URL', default='https://nurafshon.vercel.app')
+FRONTEND_URL = config('FRONTEND_URL', default=RAILWAY_APP_URL)
 
 # ─── Payments ─────────────────────────────────────────────────────────────────
 PAYMENTS_MOCK_MODE = config('PAYMENTS_MOCK_MODE', default=True, cast=bool)
