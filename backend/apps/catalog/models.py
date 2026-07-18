@@ -6,6 +6,7 @@ Product       — tea/coffee products with discount, featured flags
 ProductVariant — weight/size variants with individual prices and stock
 """
 from django.db import models
+from django.core.validators import MaxValueValidator
 from django.utils.text import slugify
 from django.utils import timezone
 from django.db.models.signals import post_save
@@ -87,7 +88,7 @@ class Product(models.Model):
     is_new = models.BooleanField(default=False, verbose_name='Yangi')
     is_popular = models.BooleanField(default=False, verbose_name='Mashhur')
     discount_percent = models.PositiveSmallIntegerField(
-        default=0, verbose_name='Chegirma (%)'
+        default=0, validators=[MaxValueValidator(99)], verbose_name='Chegirma (%)'
     )
     is_active = models.BooleanField(default=True, verbose_name='Faol')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -204,7 +205,9 @@ class DailyDeal(models.Model):
     """Daily deal configuration (one active variant per day)."""
 
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, verbose_name="Mahsulot varianti")
-    discount_percent = models.PositiveSmallIntegerField(default=0, verbose_name="Chegirma (%)")
+    discount_percent = models.PositiveSmallIntegerField(
+        default=0, validators=[MaxValueValidator(99)], verbose_name="Chegirma (%)"
+    )
     date = models.DateField(unique=True, verbose_name="Sana")
     is_active = models.BooleanField(default=True, verbose_name="Faol")
 
@@ -249,7 +252,9 @@ class ProductBundle(models.Model):
     slug = models.SlugField(unique=True, verbose_name="Slug")
     description = models.TextField(blank=True, verbose_name="Tavsifi")
     image = models.ImageField(upload_to='bundles/', verbose_name="To'plam rasmi")
-    discount_percent = models.PositiveSmallIntegerField(default=0, verbose_name="Chegirma foizi")
+    discount_percent = models.PositiveSmallIntegerField(
+        default=0, validators=[MaxValueValidator(99)], verbose_name="Chegirma foizi"
+    )
     is_active = models.BooleanField(default=True, verbose_name="Faol")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqt")
 

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Count, Min, Q
+from django.db.models import Count, Min, Prefetch, Q
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.utils import timezone
@@ -17,23 +17,21 @@ from .models import (
 from apps.orders.views_ssr import get_or_auth_user
 
 def catalog_view(request):
-    now = timezone.now()
-    banners = Banner.objects.filter(
-        is_active=True
-    ).filter(
-        Q(starts_at__isnull=True) | Q(starts_at__lte=now)
-    ).filter(
-        Q(ends_at__isnull=True) | Q(ends_at__gte=now)
-    ).order_by('order', '-id')
-    
     categories = Category.objects.filter(is_active=True).annotate(
         product_count=Count('products', filter=Q(products__is_active=True))
     ).order_by('order', 'name')
-    
-    base_products = Product.objects.filter(is_active=True).select_related('category').prefetch_related('variants').annotate(min_price_val=Min('variants__price'))
-    
-    popular_products = base_products.filter(is_popular=True)[:10]
-    new_products = base_products.filter(is_new=True)[:10]
+
+    available_variants = Prefetch(
+        'variants',
+        queryset=ProductVariant.objects.filter(is_available=True).order_by('order', 'price'),
+        to_attr='available_variants',
+    )
+    base_products = (
+        Product.objects.filter(is_active=True)
+        .select_related('category')
+        .prefetch_related(available_variants)
+        .annotate(min_price_val=Min('variants__price'))
+    )
 
     category_id = request.GET.get('category')
     is_bundle_category = False
@@ -41,7 +39,11 @@ def catalog_view(request):
     
     if category_id:
         try:
-            category = Category.objects.get(id=category_id)
+            category = (
+                Category.objects.get(id=category_id)
+                if category_id.isdigit()
+                else Category.objects.get(slug=category_id)
+            )
             if category.slug == 'toplamlar' or category.name == "To'plamlar":
                 is_bundle_category = True
                 bundles = ProductBundle.objects.filter(is_active=True).prefetch_related('items__variant__product')
@@ -62,26 +64,41 @@ def catalog_view(request):
                 Q(name__icontains=query) | Q(description__icontains=query)
             )
 
+    if not is_bundle_category:
+        products = list(products)
+        for product in products:
+            product.quick_variant = product.available_variants[0] if product.available_variants else None
+            product.display_discount = product.discount_percent if product.discount_percent < 100 else 0
+            product.display_price = product.min_price_val
+            if product.display_discount and product.min_price_val:
+                product.display_price = int(product.min_price_val * (100 - product.display_discount) / 100)
+
     # Load favorites
     user = get_or_auth_user(request)
     favorite_product_ids = []
     if user:
         favorite_product_ids = list(user.favorites.values_list('product_id', flat=True))
 
-    # Today's deal
     today = timezone.localdate()
-    daily_deal = DailyDeal.objects.filter(is_active=True, date=today).select_related('variant__product').first()
+    daily_deal = DailyDeal.objects.filter(
+        is_active=True,
+        date=today,
+        discount_percent__lt=100,
+    ).select_related('variant__product').first()
+    featured_bundles = list(
+        ProductBundle.objects.filter(is_active=True)
+        .prefetch_related('items__variant__product')
+        .order_by('-discount_percent', '-created_at')[:4]
+    )
 
     context = {
-        'banners': banners,
         'categories': categories,
         'products': products,
         'bundles': bundles,
         'is_bundle_category': is_bundle_category,
-        'popular_products': popular_products,
-        'new_products': new_products,
         'favorite_product_ids': favorite_product_ids,
         'daily_deal': daily_deal,
+        'featured_bundles': featured_bundles,
     }
     return render(request, 'katalog.html', context)
 
@@ -98,17 +115,17 @@ def promotions_view(request):
     ).order_by('order', '-id')
 
     discount_products = (
-        Product.objects.filter(is_active=True, discount_percent__gt=0)
+        Product.objects.filter(is_active=True, discount_percent__gt=0, discount_percent__lt=100)
         .prefetch_related('variants')
         .order_by('-discount_percent', '-created_at')
     )
     bundles = (
-        ProductBundle.objects.filter(is_active=True, discount_percent__gt=0)
+        ProductBundle.objects.filter(is_active=True, discount_percent__gt=0, discount_percent__lt=100)
         .prefetch_related('items__variant__product')
         .order_by('-discount_percent', '-created_at')
     )
     daily_deal = (
-        DailyDeal.objects.filter(is_active=True, date=timezone.localdate())
+        DailyDeal.objects.filter(is_active=True, date=timezone.localdate(), discount_percent__lt=100)
         .select_related('variant__product')
         .first()
     )

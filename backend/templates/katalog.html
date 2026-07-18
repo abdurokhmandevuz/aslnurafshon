@@ -1,288 +1,114 @@
 {% extends 'base.html' %}
-{% load static %}
 {% load i18n %}
 {% block content %}
-<div class="py-sm">
-    <!-- Search Bar -->
-    <div class="mb-md">
-        <form method="GET" action="{% url 'catalog' %}" class="relative w-full flex items-center bg-surface-container-low rounded-xl border border-outline-variant/30 focus-within:border-primary transition-all duration-300">
-            {% if request.GET.category %}
-            <input type="hidden" name="category" value="{{ request.GET.category }}">
-            {% endif %}
-            <span class="material-symbols-outlined text-outline ml-4">search</span>
-            <input name="q" value="{{ request.GET.q|default:'' }}" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md py-3 pl-2 pr-4 rounded-xl text-on-surface placeholder:text-outline-variant" placeholder="{% trans "Qidirish..." %}" type="text"/>
-            {% if request.GET.q %}
-            <a href="{% url 'catalog' %}{% if request.GET.category %}?category={{ request.GET.category }}{% endif %}" class="material-symbols-outlined text-outline mr-4 hover:text-error transition-colors">close</a>
-            {% endif %}
-        </form>
-    </div>
+<div class="py-1">
+    <form method="GET" action="{% url 'catalog' %}" class="relative flex items-center rounded-lg border border-outline-variant/50 bg-surface-container-low mb-md">
+        {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+        <span class="material-symbols-outlined ml-3 text-on-surface-variant">search</span>
+        <input name="q" value="{{ request.GET.q|default:'' }}" class="w-full border-0 bg-transparent py-3 pl-2 pr-10 text-sm focus:ring-0" placeholder="{% trans 'Mahsulot qidirish' %}" type="search">
+        {% if request.GET.q %}<a href="{% url 'catalog' %}" class="absolute right-3 material-symbols-outlined text-on-surface-variant">close</a>{% endif %}
+    </form>
 
-    <div class="grid grid-cols-2 gap-sm mb-lg">
-        <a href="{% url 'promotions' %}" class="flex items-center gap-sm p-3 rounded-lg bg-secondary-container/20 border border-secondary/20 text-on-surface">
-            <span class="material-symbols-outlined text-secondary">local_offer</span>
-            <span class="text-sm font-bold">{% trans "Aksiyalar" %}</span>
-        </a>
-        <a href="{% url 'corporate_inquiry' %}" class="flex items-center gap-sm p-3 rounded-lg bg-tertiary-fixed/50 border border-outline-variant/30 text-on-surface">
-            <span class="material-symbols-outlined text-tertiary">inventory_2</span>
-            <span class="text-sm font-bold">{% trans "Ulgurji buyurtma" %}</span>
-        </a>
-    </div>
+    <nav class="flex gap-2 overflow-x-auto pb-3 mb-md no-scrollbar" aria-label="{% trans 'Kategoriyalar' %}">
+        <a href="{% url 'catalog' %}" class="shrink-0 rounded-full px-4 py-2 text-sm font-semibold {% if not request.GET.category %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface{% endif %}">{% trans "Barchasi" %}</a>
+        {% for cat in categories %}
+        <a href="{% url 'catalog' %}?category={{ cat.id }}" class="shrink-0 rounded-full px-4 py-2 text-sm font-semibold {% if request.GET.category == cat.id|stringformat:'s' %}bg-primary text-on-primary{% else %}bg-surface-container text-on-surface{% endif %}">{{ cat.name }}</a>
+        {% endfor %}
+    </nav>
 
-    <!-- Banners Slider & Daily Deal -->
-    {% if banners or daily_deal %}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-md mb-lg">
-        <!-- Banners Slider -->
-        {% if banners %}
-        <div class="lg:col-span-2 relative overflow-hidden rounded-2xl aspect-[21/9] lg:aspect-auto lg:h-[280px] bg-surface-container shadow-sm group">
-            <div id="banner-slider" class="w-full h-full flex transition-transform duration-500 ease-out">
-                {% for banner in banners %}
-                <div class="w-full h-full flex-shrink-0 relative">
-                    {% if banner.image %}
-                    <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="absolute inset-0 w-full h-full object-cover">
-                    {% endif %}
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-md lg:p-lg text-white">
-                        <span class="text-xs font-bold uppercase tracking-wider text-primary-fixed mb-1">{{ banner.subtitle }}</span>
-                        <h3 class="text-lg lg:text-2xl font-bold mb-2 leading-tight">{{ banner.title }}</h3>
-                        {% if banner.link_url %}
-                        <a href="{{ banner.link_url }}" class="self-start px-md py-sm bg-primary text-on-primary text-xs font-bold rounded-lg hover:bg-primary-container transition-all active:scale-95 shadow-sm">
-                            {{ banner.button_text }}
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
+    {% if daily_deal and not request.GET.category and not request.GET.q %}
+    <section class="mb-xl" aria-labelledby="daily-deal-title">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <p class="text-xs font-bold text-error">{% trans "FAQAT BUGUN" %}</p>
+                <h2 id="daily-deal-title" class="text-lg font-bold text-primary">{% trans "Kunlik taklif" %}</h2>
             </div>
-            <!-- Slider Controls -->
-            {% if banners|length > 1 %}
-            <button onclick="prevBanner()" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                <span class="material-symbols-outlined text-[18px]">chevron_left</span>
-            </button>
-            <button onclick="nextBanner()" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-            {% endif %}
+            <span class="rounded-full bg-error-container px-3 py-1 text-xs font-bold text-on-error-container">-{{ daily_deal.discount_percent }}%</span>
         </div>
-        {% endif %}
-
-        <!-- Daily Deal Card -->
-        {% if daily_deal %}
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-container/30 to-tertiary-container/30 border border-primary/20 p-md flex flex-col justify-between shadow-sm min-h-[240px] lg:min-h-0">
-            <div class="flex justify-between items-start mb-sm">
-                <span class="inline-flex items-center gap-xs px-2.5 py-1 rounded-full bg-error text-on-error text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                    <span class="material-symbols-outlined text-[12px] animate-pulse">local_fire_department</span>
-                    {% trans "Kunlik taklif" %}
-                </span>
-                <span class="bg-error/10 text-error text-[10px] font-bold px-2 py-1 rounded-lg">-{{ daily_deal.discount_percent }}%</span>
+        <article class="flex items-center gap-3 rounded-lg border border-outline-variant/50 bg-surface-container-lowest p-3 shadow-sm">
+            <a href="{% url 'product_detail' daily_deal.variant.product.id %}" class="h-24 w-24 shrink-0 rounded-lg bg-surface-container-low p-2">
+                {% if daily_deal.variant.product.image %}<img src="{{ daily_deal.variant.product.image.url }}" alt="{{ daily_deal.variant.product.name }}" class="h-full w-full object-contain">{% else %}<span class="material-symbols-outlined flex h-full items-center justify-center text-outline">image</span>{% endif %}
+            </a>
+            <div class="min-w-0 flex-1">
+                <a href="{% url 'product_detail' daily_deal.variant.product.id %}" class="block font-bold leading-tight text-on-surface">{{ daily_deal.variant.product.name }}</a>
+                <p class="mt-1 text-sm text-on-surface-variant">{{ daily_deal.variant.label }}</p>
+                <p class="mt-2 text-sm"><span class="text-on-surface-variant line-through">{{ daily_deal.variant.price }} UZS</span> <b class="text-primary">{{ daily_deal.deal_price }} UZS</b></p>
+                <button onclick="addToCart('{{ daily_deal.variant.id }}', 1)" class="mt-3 inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-on-primary"><span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>{% trans "Savatga qo'shish" %}</button>
             </div>
-            
-            <div class="flex gap-sm items-center my-xs">
-                {% if daily_deal.variant.product.image %}
-                <img src="{{ daily_deal.variant.product.image.url }}" alt="{{ daily_deal.variant.product.name }}" class="w-16 h-16 object-cover rounded-xl mix-blend-multiply drop-shadow-sm">
-                {% endif %}
-                <div class="flex-1">
-                    <h4 class="font-bold text-[13px] text-on-surface line-clamp-1">{{ daily_deal.variant.product.name }}</h4>
-                    <p class="text-[11px] text-on-surface-variant line-clamp-1">{{ daily_deal.variant.label }}</p>
-                    <div class="flex items-center gap-xs mt-1">
-                        <span class="text-[11px] text-on-surface-variant line-through">{{ daily_deal.variant.price }} UZS</span>
-                        <span class="font-bold text-[13px] text-primary">{{ daily_deal.deal_price }} UZS</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Countdown Timer & CTA -->
-            <div class="mt-sm pt-sm border-t border-outline-variant/20 flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] text-on-surface-variant block mb-1">{% trans "Tugashiga qoldi:" %}</span>
-                    <div id="deal-timer" class="font-mono font-bold text-[13px] text-error flex gap-0.5">
-                        <span id="deal-hours">00</span>:<span id="deal-minutes">00</span>:<span id="deal-seconds">00</span>
-                    </div>
-                </div>
-                <button onclick="addToCart('{{ daily_deal.variant.id }}', 1)" class="px-md py-2 bg-primary text-on-primary text-xs font-bold rounded-lg hover:bg-primary/95 transition-all active:scale-95 shadow-sm flex items-center gap-xs">
-                    <span class="material-symbols-outlined text-[16px]">shopping_cart</span>
-                    {% trans "Savatga" %}
-                </button>
-            </div>
-        </div>
-        {% endif %}
-    </div>
+        </article>
+    </section>
     {% endif %}
 
-    <!-- Filter & Sort Bar -->
-    <div class="flex gap-sm overflow-x-auto pb-sm no-scrollbar mb-lg -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0">
-        <a href="{% url 'catalog' %}" class="whitespace-nowrap px-md py-sm rounded-full {% if not request.GET.category %}bg-secondary text-on-secondary{% else %}bg-surface-variant text-on-surface-variant hover:bg-surface-dim{% endif %} font-label-md text-label-md shadow-sm transition-colors">
-            {% trans "Barchasi" %}
-        </a>
-        {% for cat in categories %}
-        <a href="{% url 'catalog' %}?category={{ cat.id }}" class="whitespace-nowrap px-md py-sm rounded-full {% if request.GET.category == cat.id|stringformat:'s' %}bg-secondary text-on-secondary{% else %}bg-surface-variant text-on-surface-variant hover:bg-surface-dim{% endif %} font-label-md text-label-md transition-colors flex items-center gap-xs">
-            {{ cat.name }}
-        </a>
-        {% endfor %}
-    </div>
+    {% if featured_bundles and not request.GET.category and not request.GET.q %}
+    <section class="mb-xl" aria-labelledby="bundles-title">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <h2 id="bundles-title" class="text-lg font-bold text-primary">{% trans "Tayyor to'plamlar" %}</h2>
+                <p class="text-xs text-on-surface-variant">{% trans "Bir nechta mahsulot bitta narxda" %}</p>
+            </div>
+            <a href="{% url 'catalog' %}?category=toplamlar" class="text-sm font-bold text-secondary">{% trans "Barchasi" %}</a>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            {% for bundle in featured_bundles %}
+            <article class="overflow-hidden rounded-lg border border-outline-variant/50 bg-surface-container-lowest">
+                <a href="{% url 'bundle_detail' bundle.id %}" class="block aspect-[4/3] bg-surface-container-low p-2">
+                    {% if bundle.image %}<img src="{{ bundle.image.url }}" alt="{{ bundle.name }}" loading="lazy" class="h-full w-full object-contain">{% endif %}
+                </a>
+                <div class="p-3">
+                    {% if bundle.discount_percent %}<p class="mb-1 text-xs font-bold text-error">{% trans "Tejash" %}: {{ bundle.discount_percent }}%</p>{% endif %}
+                    <a href="{% url 'bundle_detail' bundle.id %}" class="block min-h-10 text-sm font-bold leading-tight text-on-surface">{{ bundle.name }}</a>
+                    <p class="mt-2 font-bold text-primary">{{ bundle.price }} UZS</p>
+                    <button onclick="addBundleToCart('{{ bundle.id }}')" class="mt-3 w-full rounded-lg border border-primary py-2 text-sm font-bold text-primary">{% trans "To'plamni olish" %}</button>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
 
-    <!-- Product/Bundle Grid -->
-    <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-        {% if is_bundle_category %}
-            {% for bundle in bundles %}
-            <a href="{% url 'bundle_detail' bundle.id %}" class="bg-surface rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] overflow-hidden hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 group flex flex-col border border-outline-variant/30 relative">
-                <div class="relative aspect-[4/3] bg-surface-variant/20 p-3 flex items-center justify-center overflow-hidden">
-                    {% if bundle.image %}
-                    <img src="{{ bundle.image.url }}" alt="{{ bundle.name }}" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500 drop-shadow-sm">
-                    {% endif %}
-                    {% if bundle.discount_percent %}
-                    <span class="absolute top-2 left-2 bg-error/90 backdrop-blur-md text-on-error text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">-{{ bundle.discount_percent }}%</span>
-                    {% endif %}
-                </div>
-                <div class="p-3.5 flex flex-col flex-1 bg-gradient-to-b from-transparent to-surface-variant/10">
-                    <span class="text-[10px] font-bold text-secondary uppercase tracking-wider mb-1">{% trans "Kombo to'plam" %}</span>
-                    <h3 class="font-medium text-[13px] leading-tight text-on-surface mb-1.5 line-clamp-2 min-h-[36px] group-hover:text-primary transition-colors">{{ bundle.name }}</h3>
-                    <div class="mt-auto flex justify-between items-end">
-                        <div class="flex flex-col">
-                            {% if bundle.discount_percent %}
-                            <span class="text-[10px] text-on-surface-variant line-through mb-0.5">{{ bundle.original_price }} UZS</span>
-                            {% endif %}
-                            <span class="font-bold text-[14px] text-primary">{{ bundle.price }} UZS</span>
-                        </div>
-                        <button onclick="event.preventDefault(); addBundleToCart('{{ bundle.id }}')" class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary hover:shadow-md transition-all z-10 relative">
-                            <span class="material-symbols-outlined text-[18px]">shopping_cart</span>
-                        </button>
+    <section aria-labelledby="products-title">
+        <div class="flex items-end justify-between mb-3">
+            <div>
+                <h2 id="products-title" class="text-lg font-bold text-primary">{% if is_bundle_category %}{% trans "Barcha to'plamlar" %}{% else %}{% trans "Mahsulotlar" %}{% endif %}</h2>
+                {% if request.GET.q %}<p class="text-xs text-on-surface-variant">{% trans "Qidiruv natijalari" %}</p>{% endif %}
+            </div>
+            {% if not is_bundle_category %}<a href="{% url 'promotions' %}" class="text-sm font-bold text-secondary">{% trans "Aksiyalar" %}</a>{% endif %}
+        </div>
+        <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+            {% if is_bundle_category %}
+                {% for bundle in bundles %}
+                <article class="overflow-hidden rounded-lg border border-outline-variant/50 bg-surface-container-lowest">
+                    <a href="{% url 'bundle_detail' bundle.id %}" class="block aspect-[4/3] bg-surface-container-low p-2">{% if bundle.image %}<img src="{{ bundle.image.url }}" alt="{{ bundle.name }}" loading="lazy" class="h-full w-full object-contain">{% endif %}</a>
+                    <div class="p-3"><a href="{% url 'bundle_detail' bundle.id %}" class="block min-h-10 text-sm font-bold">{{ bundle.name }}</a><p class="mt-2 font-bold text-primary">{{ bundle.price }} UZS</p><button onclick="addBundleToCart('{{ bundle.id }}')" class="mt-3 w-full rounded-lg border border-primary py-2 text-sm font-bold text-primary">{% trans "Savatga" %}</button></div>
+                </article>
+                {% empty %}<p class="col-span-full py-8 text-center text-sm text-on-surface-variant">{% trans "To'plamlar topilmadi." %}</p>{% endfor %}
+            {% else %}
+                {% for product in products %}
+                <article class="relative overflow-hidden rounded-lg border border-outline-variant/50 bg-surface-container-lowest">
+                    {% if product.display_discount %}<span class="absolute left-2 top-2 z-10 rounded bg-error px-2 py-1 text-xs font-bold text-on-error">-{{ product.display_discount }}%</span>{% endif %}
+                    <button onclick="toggleFavorite(this, '{{ product.id }}')" aria-label="{% trans 'Sevimliga qo'shish' %}" class="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface text-on-surface-variant shadow-sm"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' {% if product.id in favorite_product_ids %}1{% else %}0{% endif %};">favorite</span></button>
+                    <a href="{% url 'product_detail' product.id %}" class="block aspect-[4/3] bg-surface-container-low p-2">{% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy" class="h-full w-full object-contain">{% else %}<span class="material-symbols-outlined flex h-full items-center justify-center text-outline">image</span>{% endif %}</a>
+                    <div class="p-3">
+                        <a href="{% url 'product_detail' product.id %}" class="block min-h-10 text-sm font-bold leading-tight text-on-surface">{{ product.name }}</a>
+                        {% if product.display_discount %}<p class="mt-2 text-xs text-on-surface-variant line-through">{{ product.min_price_val }} UZS</p>{% endif %}
+                        <p class="mt-1 font-bold text-primary">{{ product.display_price }} UZS</p>
+                        {% if product.quick_variant %}<button onclick="addToCart('{{ product.quick_variant.id }}', 1)" class="mt-3 w-full rounded-lg bg-primary py-2 text-sm font-bold text-on-primary">{% trans "Savatga qo'shish" %}</button>{% else %}<span class="mt-3 block text-xs text-error">{% trans "Hozircha mavjud emas" %}</span>{% endif %}
                     </div>
-                </div>
-            </a>
-            {% empty %}
-            <div class="col-span-full text-center py-8 text-on-surface-variant">{% trans "Hozircha to'plamlar mavjud emas." %}</div>
-            {% endfor %}
-        {% else %}
-            {% for product in products %}
-            <a href="{% url 'product_detail' product.id %}" class="bg-surface rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)] overflow-hidden hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 group flex flex-col border border-outline-variant/30 relative">
-                <div class="relative aspect-[4/3] bg-surface-variant/20 p-3 flex items-center justify-center overflow-hidden">
-                    {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500 drop-shadow-sm">
-                    {% endif %}
-                    {% if product.discount_percent %}
-                    <span class="absolute top-2 left-2 bg-error/90 backdrop-blur-md text-on-error text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">-{{ product.discount_percent }}%</span>
-                    {% endif %}
-                    <button onclick="event.preventDefault(); toggleFavorite(this, '{{ product.id }}')" class="absolute top-2 right-2 p-1.5 rounded-full bg-surface/80 hover:bg-surface text-on-surface-variant hover:text-error transition-all shadow-sm z-10">
-                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' {% if product.id in favorite_product_ids %}1{% else %}0{% endif %}; color: {% if product.id in favorite_product_ids %}#ef4444{% else %}inherit{% endif %};">favorite</span>
-                    </button>
-                </div>
-                <div class="p-3.5 flex flex-col flex-1 bg-gradient-to-b from-transparent to-surface-variant/10">
-                    <h3 class="font-medium text-[13px] leading-tight text-on-surface mb-1.5 line-clamp-2 min-h-[36px] group-hover:text-primary transition-colors">{{ product.name }}</h3>
-                    <div class="mt-auto flex justify-between items-end">
-                        <div class="flex flex-col">
-                            {% if product.discount_percent %}
-                            <span class="text-[10px] text-on-surface-variant line-through mb-0.5">{{ product.min_price }} UZS</span>
-                            {% endif %}
-                            <span class="font-bold text-[14px] text-primary">{{ product.min_price_val }} UZS</span>
-                        </div>
-                        {% if product.variants.exists %}
-                        <button onclick="event.preventDefault(); addToCart('{{ product.variants.first.id }}', 1)" class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-on-primary hover:shadow-md transition-all z-10 relative">
-                            <span class="material-symbols-outlined text-[18px]">add</span>
-                        </button>
-                        {% endif %}
-                    </div>
-                </div>
-            </a>
-            {% empty %}
-            <div class="col-span-full text-center py-8 text-on-surface-variant">{% trans "Mahsulotlar topilmadi." %}</div>
-            {% endfor %}
-        {% endif %}
-    </div>
+                </article>
+                {% empty %}<p class="col-span-full py-8 text-center text-sm text-on-surface-variant">{% trans "Mahsulotlar topilmadi." %}</p>{% endfor %}
+            {% endif %}
+        </div>
+    </section>
 </div>
 {% endblock %}
-
 {% block extra_js %}
 <script>
-// Banners Slider
-let currentBannerIdx = 0;
-const bannerSlider = document.getElementById('banner-slider');
-const bannerCount = bannerSlider ? bannerSlider.children.length : 0;
-
-function showBanner(idx) {
-    if (!bannerSlider) return;
-    if (idx >= bannerCount) currentBannerIdx = 0;
-    else if (idx < 0) currentBannerIdx = bannerCount - 1;
-    else currentBannerIdx = idx;
-    
-    bannerSlider.style.transform = `translateX(-${currentBannerIdx * 100}%)`;
-}
-
-function nextBanner() {
-    showBanner(currentBannerIdx + 1);
-}
-
-function prevBanner() {
-    showBanner(currentBannerIdx - 1);
-}
-
-if (bannerCount > 1) {
-    setInterval(nextBanner, 6000); // Auto scroll every 6s
-}
-
-// Daily Deal Countdown Timer
-function startDealTimer() {
-    const hoursEl = document.getElementById('deal-hours');
-    const minutesEl = document.getElementById('deal-minutes');
-    const secondsEl = document.getElementById('deal-seconds');
-    if (!hoursEl) return;
-
-    function updateTimer() {
-        const now = new Date();
-        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-        const diffMs = tomorrow - now;
-
-        if (diffMs <= 0) {
-            hoursEl.innerText = "00";
-            minutesEl.innerText = "00";
-            secondsEl.innerText = "00";
-            return;
-        }
-
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-        hoursEl.innerText = String(hours).padStart(2, '0');
-        minutesEl.innerText = String(minutes).padStart(2, '0');
-        secondsEl.innerText = String(seconds).padStart(2, '0');
-    }
-
-    updateTimer();
-    setInterval(updateTimer, 1000);
-}
-document.addEventListener('DOMContentLoaded', startDealTimer);
-
-async function toggleFavorite(btn, productId) {
-    try {
-        const response = await fetch(`/product/${productId}/favorite/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        });
-        
-        if (response.status === 401) {
-            alert("{% trans "Iltimos, avval tizimga kiring." %}");
-            return;
-        }
-        
-        const data = await response.json();
-        if (response.ok && data.status === 'ok') {
-            const icon = btn.querySelector('span');
-            if (data.is_favorite) {
-                icon.style.fontVariationSettings = "'FILL' 1";
-                icon.style.color = "#ef4444";
-            } else {
-                icon.style.fontVariationSettings = "'FILL' 0";
-                icon.style.color = "inherit";
-            }
-        } else {
-            alert(data.message || "{% trans "Xatolik yuz berdi." %}");
-        }
-    } catch (e) {
-        console.error(e);
-        alert("{% trans "Xatolik yuz berdi." %}");
-    }
+async function toggleFavorite(button, productId) {
+    const response = await fetch(`/product/${productId}/favorite/`, {method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}'}});
+    if (!response.ok) return;
+    const data = await response.json();
+    const icon = button.querySelector('span');
+    icon.style.fontVariationSettings = data.is_favorite ? "'FILL' 1" : "'FILL' 0";
 }
 </script>
 {% endblock %}
