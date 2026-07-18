@@ -18,41 +18,47 @@
 
     {% if is_home %}
     <section class="mb-7" aria-label="{% trans 'Aksiyalar' %}">
-        <div class="-mx-margin-mobile flex gap-3 overflow-x-auto px-margin-mobile no-scrollbar">
+        <div class="relative -mx-margin-mobile overflow-hidden px-margin-mobile">
+        <div id="promo-slider" class="flex transition-transform duration-300 ease-out">
             {% if daily_deal %}
-            <article class="relative flex min-h-40 w-[88%] shrink-0 overflow-hidden rounded-xl bg-secondary-container p-4 text-on-secondary-container">
-                <div class="flex min-w-0 flex-1 flex-col justify-between pr-2">
+            <article class="relative flex h-48 w-full shrink-0 overflow-hidden rounded-xl bg-secondary-container p-5 text-on-secondary-container">
+                <div class="z-10 flex min-w-0 w-[58%] flex-col justify-between">
                     <div>
-                        <p class="text-xs font-bold uppercase">{% trans "Kunlik aksiya" %}</p>
-                        <h2 class="mt-1 line-clamp-2 text-lg font-bold">{{ daily_deal.variant.product.name }}</h2>
-                        <p class="mt-1 text-sm">{{ daily_deal.variant.label }}</p>
-                        <p class="mt-2 text-sm"><span class="line-through opacity-70">{{ daily_deal.variant.price }} UZS</span> <b>{{ daily_deal.deal_price }} UZS</b></p>
+                        <p class="text-xs font-bold uppercase tracking-wide">{% trans "Kunlik aksiya" %}</p>
+                        <h2 class="mt-1 line-clamp-2 text-xl font-bold">{{ daily_deal.variant.product.name }}</h2>
+                        <p class="mt-2 text-sm"><span class="line-through opacity-70">{{ daily_deal.variant.price }} UZS</span><br><b class="text-base">{{ daily_deal.deal_price }} UZS</b></p>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="daily-timer" data-expires-at="{{ daily_deal_expires_at|date:'c' }}" class="rounded-md bg-surface-container-lowest/70 px-2 py-1 text-xs font-bold">24:00:00</span>
-                        <button onclick="addToCart('{{ daily_deal.variant.id }}', 1)" class="rounded-lg bg-primary px-3 py-2 text-sm font-bold text-on-primary">{% trans "Savatga" %}</button>
+                        <button onclick="addToCart('{{ daily_deal.variant.id }}', 1)" class="rounded-lg bg-primary px-3 py-2 text-sm font-bold text-on-primary">{% trans "Olish" %}</button>
                     </div>
                 </div>
-                <a href="{% url 'product_detail' daily_deal.variant.product.id %}" class="flex w-32 shrink-0 items-center justify-center rounded-lg bg-surface-container-lowest p-2">
+                <a href="{% url 'product_detail' daily_deal.variant.product.id %}" class="absolute right-0 top-0 flex h-full w-[48%] items-center justify-center bg-surface-container-lowest/40 p-3">
                     {% if daily_deal.variant.product.image %}<img src="{{ daily_deal.variant.product.image.url }}" alt="{{ daily_deal.variant.product.name }}" class="h-full w-full object-contain">{% else %}<span class="material-symbols-outlined text-4xl text-outline">image</span>{% endif %}
                 </a>
             </article>
             {% endif %}
             {% for bundle in featured_bundles %}
-            <article class="relative flex min-h-40 w-[88%] shrink-0 overflow-hidden rounded-xl bg-tertiary-fixed p-4 text-on-tertiary-fixed">
-                <div class="flex min-w-0 flex-1 flex-col justify-between pr-2">
+            <article class="relative flex h-48 w-full shrink-0 overflow-hidden rounded-xl bg-tertiary-fixed p-5 text-on-tertiary-fixed">
+                <div class="z-10 flex min-w-0 w-[58%] flex-col justify-between">
                     <div>
-                        <p class="text-xs font-bold uppercase">{% trans "Combo taklif" %}{% if bundle.discount_percent %} -{{ bundle.discount_percent }}%{% endif %}</p>
-                        <h2 class="mt-1 line-clamp-2 text-lg font-bold">{{ bundle.name }}</h2>
-                        <p class="mt-2 text-base font-bold">{{ bundle.price }} UZS</p>
+                        <p class="text-xs font-bold uppercase tracking-wide">{% trans "Combo taklif" %}{% if bundle.discount_percent %} -{{ bundle.discount_percent }}%{% endif %}</p>
+                        <h2 class="mt-1 line-clamp-2 text-xl font-bold">{{ bundle.name }}</h2>
+                        <p class="mt-3 text-base font-bold">{{ bundle.price }} UZS</p>
                     </div>
                     <button onclick="addBundleToCart('{{ bundle.id }}')" class="w-fit rounded-lg bg-primary px-3 py-2 text-sm font-bold text-on-primary">{% trans "Olish" %}</button>
                 </div>
-                <a href="{% url 'bundle_detail' bundle.id %}" class="flex w-32 shrink-0 items-center justify-center rounded-lg bg-surface-container-lowest p-2">
+                <a href="{% url 'bundle_detail' bundle.id %}" class="absolute right-0 top-0 flex h-full w-[48%] items-center justify-center bg-surface-container-lowest/45 p-3">
                     {% if bundle.image %}<img src="{{ bundle.image.url }}" alt="{{ bundle.name }}" loading="lazy" class="h-full w-full object-contain">{% endif %}
                 </a>
             </article>
             {% endfor %}
+        </div>
+        {% if daily_deal or featured_bundles %}
+        <button onclick="movePromo(-1)" class="absolute left-5 top-1/2 -translate-y-1/2 rounded-full bg-surface-container-lowest/80 p-1 text-primary"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+        <button onclick="movePromo(1)" class="absolute right-5 top-1/2 -translate-y-1/2 rounded-full bg-surface-container-lowest/80 p-1 text-primary"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+        <div id="promo-dots" class="mt-2 flex justify-center gap-1.5"></div>
+        {% endif %}
         </div>
     </section>
 
@@ -124,5 +130,32 @@ function updateDailyTimer() {
 }
 updateDailyTimer();
 setInterval(updateDailyTimer, 1000);
+
+const promoSlider = document.getElementById('promo-slider');
+const promoCount = promoSlider ? promoSlider.children.length : 0;
+let promoIndex = 0;
+function renderPromo() {
+    if (!promoSlider) return;
+    promoSlider.style.transform = `translateX(-${promoIndex * 100}%)`;
+    document.querySelectorAll('#promo-dots button').forEach((dot, index) => {
+        dot.className = index === promoIndex ? 'h-1.5 w-4 rounded-full bg-primary' : 'h-1.5 w-1.5 rounded-full bg-outline-variant';
+    });
+}
+function movePromo(step) {
+    if (promoCount < 2) return;
+    promoIndex = (promoIndex + step + promoCount) % promoCount;
+    renderPromo();
+}
+if (promoCount > 1) {
+    const dots = document.getElementById('promo-dots');
+    for (let index = 0; index < promoCount; index += 1) {
+        const dot = document.createElement('button');
+        dot.setAttribute('aria-label', `Banner ${index + 1}`);
+        dot.onclick = () => { promoIndex = index; renderPromo(); };
+        dots.appendChild(dot);
+    }
+    renderPromo();
+    setInterval(() => movePromo(1), 6000);
+}
 </script>
 {% endblock %}
