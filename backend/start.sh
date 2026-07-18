@@ -2,6 +2,7 @@
 set -euo pipefail
 
 echo "Running migrations..."
+mkdir -p "${MEDIA_ROOT:-/app/backend/media}"
 python manage.py migrate --noinput
 python manage.py ensure_admin
 

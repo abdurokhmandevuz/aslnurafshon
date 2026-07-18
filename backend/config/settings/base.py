@@ -129,7 +129,7 @@ SESSION_COOKIE_AGE = 2592000  # 30 days
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = Path(clean_env_value(config('MEDIA_ROOT', default=BASE_DIR / 'media')))
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
