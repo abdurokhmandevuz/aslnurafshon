@@ -27,6 +27,7 @@ from django.conf import settings
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.types import BotCommand
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
 
@@ -42,6 +43,15 @@ WEBHOOK_PATH = '/bot/webhook'
 
 
 async def on_startup(bot: Bot):
+    await bot.set_my_commands([
+        BotCommand(command='start', description='Bosh menu'),
+        BotCommand(command='shop', description="Do'konni ochish"),
+        BotCommand(command='orders', description='Buyurtmalarim'),
+        BotCommand(command='promo', description='Aksiyalar'),
+        BotCommand(command='contact', description='Aloqa'),
+        BotCommand(command='chek', description='Oxirgi chek'),
+        BotCommand(command='help', description='Yordam'),
+    ])
     webhook_url = settings.BOT_WEBHOOK_URL
     if webhook_url:
         full_url = webhook_url.rstrip('/') + WEBHOOK_PATH

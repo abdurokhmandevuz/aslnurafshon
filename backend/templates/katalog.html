@@ -17,6 +17,17 @@
         </form>
     </div>
 
+    <div class="grid grid-cols-2 gap-sm mb-lg">
+        <a href="{% url 'promotions' %}" class="flex items-center gap-sm p-3 rounded-lg bg-secondary-container/20 border border-secondary/20 text-on-surface">
+            <span class="material-symbols-outlined text-secondary">local_offer</span>
+            <span class="text-sm font-bold">{% trans "Aksiyalar" %}</span>
+        </a>
+        <a href="{% url 'corporate_inquiry' %}" class="flex items-center gap-sm p-3 rounded-lg bg-tertiary-fixed/50 border border-outline-variant/30 text-on-surface">
+            <span class="material-symbols-outlined text-tertiary">inventory_2</span>
+            <span class="text-sm font-bold">{% trans "Ulgurji buyurtma" %}</span>
+        </a>
+    </div>
+
     <!-- Banners Slider & Daily Deal -->
     {% if banners or daily_deal %}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-md mb-lg">

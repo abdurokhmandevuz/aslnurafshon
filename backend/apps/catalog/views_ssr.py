@@ -85,6 +85,40 @@ def catalog_view(request):
     }
     return render(request, 'katalog.html', context)
 
+
+def promotions_view(request):
+    """Show only active, admin-managed promotional content."""
+    now = timezone.now()
+    banners = Banner.objects.filter(
+        is_active=True
+    ).filter(
+        Q(starts_at__isnull=True) | Q(starts_at__lte=now)
+    ).filter(
+        Q(ends_at__isnull=True) | Q(ends_at__gte=now)
+    ).order_by('order', '-id')
+
+    discount_products = (
+        Product.objects.filter(is_active=True, discount_percent__gt=0)
+        .prefetch_related('variants')
+        .order_by('-discount_percent', '-created_at')
+    )
+    bundles = (
+        ProductBundle.objects.filter(is_active=True, discount_percent__gt=0)
+        .prefetch_related('items__variant__product')
+        .order_by('-discount_percent', '-created_at')
+    )
+    daily_deal = (
+        DailyDeal.objects.filter(is_active=True, date=timezone.localdate())
+        .select_related('variant__product')
+        .first()
+    )
+    return render(request, 'aksiyalar.html', {
+        'banners': banners,
+        'discount_products': discount_products,
+        'bundles': bundles,
+        'daily_deal': daily_deal,
+    })
+
 def product_detail_view(request, pk):
     base_products = Product.objects.filter(is_active=True).select_related('category').prefetch_related('variants').annotate(min_price_val=Min('variants__price'))
     product = get_object_or_404(base_products, pk=pk)

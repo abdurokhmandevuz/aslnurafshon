@@ -2,8 +2,9 @@
 Telegram bot handlers for Nurafshon.
 
 Handles:
-  - /start command  →  main menu with WebApp button
-  - web_app_data    →  data sent by the Mini App via Telegram.WebApp.sendData()
+  - /start, /shop, /orders, /contact, /help, /promo commands
+  - Reply keyboard text handlers
+  - web_app_data — data sent by the Mini App via Telegram.WebApp.sendData()
   - Callback queries from admin group inline buttons (order status changes)
 """
 import logging
@@ -21,12 +22,109 @@ from aiogram.types import CallbackQuery, Message, WebAppData, PreCheckoutQuery
 
 from bot.keyboards import (
     main_menu_keyboard,
+    main_reply_keyboard,
+    shop_keyboard,
+    orders_keyboard,
+    promo_keyboard,
     order_admin_keyboard,
     order_delivered_keyboard,
+    web_app_button,
 )
 
 logger = logging.getLogger(__name__)
 router = Router()
+
+
+# ─── Texts ───────────────────────────────────────────────────────────────────
+
+def welcome_text(first_name: str) -> str:
+    return (
+        f"Assalomu alaykum, <b>{first_name}</b>! 👋\n\n"
+        "☕ <b>Asl Nurafshon</b>\n"
+        "<i>Sifatli choy va kofe do'koni</i>\n\n"
+        "Quyidagi tugmalar orqali xarid qiling 👇"
+    )
+
+
+CONTACT_TEXT = (
+    "📞 <b>Aloqa ma'lumotlari</b>\n\n"
+    "📍 Yetkazib berish: <b>Nurafshon va yaqin hududlar</b>\n\n"
+    "Savol yoki taklifingiz bo'lsa, shu chatga yozing. "
+    "Operatorlarimiz javob beradi."
+)
+
+
+HELP_TEXT = (
+    "🤖 <b>Bot buyruqlari</b>\n\n"
+    "/start — 🏠 Bosh menu\n"
+    "/shop — 🛍 Do'konni ochish\n"
+    "/orders — 📦 Buyurtmalarim\n"
+    "/promo — 🔥 Aksiyalar\n"
+    "/contact — 📞 Aloqa\n"
+    "/chek — 🧾 Oxirgi chek\n"
+    "/help — ❓ Yordam\n\n"
+    "Mini app ichida:\n"
+    "• Mahsulotni tanlang → Savatga qo'shing\n"
+    "• Checkout sahifasida manzil va to'lovni kiriting\n"
+    "• Buyurtma tasdiqlangach SMS keladi ✅"
+)
+
+
+STATUS_EMOJI = {
+    'yangi': '🆕',
+    'tayyorlanmoqda': '👨‍🍳',
+    'yolda': '🚚',
+    'yetkazildi': '✅',
+    'bekor_qilindi': '❌',
+}
+
+STATUS_LABEL = {
+    'yangi': 'Yangi',
+    'tayyorlanmoqda': 'Tayyorlanmoqda',
+    'yolda': 'Yo\'lda',
+    'yetkazildi': 'Yetkazildi',
+    'bekor_qilindi': 'Bekor qilindi',
+}
+
+
+async def send_recent_orders(message: Message, telegram_id: int):
+    """Send a short summary of the user's five latest orders."""
+    from asgiref.sync import sync_to_async
+    from apps.orders.models import Order
+
+    @sync_to_async
+    def get_orders():
+        return list(
+            Order.objects.filter(user__telegram_id=telegram_id)
+            .order_by('-created_at')[:5]
+        )
+
+    orders = await get_orders()
+    if not orders:
+        await message.answer(
+            "<b>Buyurtmalaringiz hozircha yo'q.</b>\n\n"
+            "Do'kondan mahsulot tanlab, birinchi buyurtmangizni bering.",
+            parse_mode='HTML',
+            reply_markup=shop_keyboard(settings.FRONTEND_URL),
+        )
+        return
+
+    text = "<b>Oxirgi buyurtmalaringiz</b>\n\n"
+    for order in orders:
+        emoji = STATUS_EMOJI.get(order.status, '•')
+        label = STATUS_LABEL.get(order.status, order.status)
+        total = f"{order.total_amount:,.0f}".replace(',', ' ')
+        text += (
+            f"{emoji} <b>#{order.id}</b> - {label}\n"
+            f"{total} UZS | {order.created_at.strftime('%d.%m.%Y')}\n\n"
+        )
+
+    await message.answer(
+        text,
+        parse_mode='HTML',
+        reply_markup=orders_keyboard(settings.FRONTEND_URL),
+    )
+
 
 # ─── /start ──────────────────────────────────────────────────────────────────
 
@@ -34,7 +132,6 @@ router = Router()
 async def cmd_start(message: Message):
     user = message.from_user
 
-    # DB ga saqlash — keyinchalik saytda ishlatamiz
     from asgiref.sync import sync_to_async
     from apps.accounts.models import TelegramUser
 
@@ -55,11 +152,69 @@ async def cmd_start(message: Message):
     logger.info('User saved to DB: %s (%s)', full_name, user.id)
 
     await message.answer(
-        f'Assalomu alaykum, <b>{user.first_name}</b>! 👋\n\n'
-        f'☕ <b>Nurafshon</b> — sifatli choy va kofe do\'koniga xush kelibsiz!\n\n'
-        f"Quydagi tugmani bosib do'konni oching 👇",
+        welcome_text(user.first_name),
+        parse_mode='HTML',
+        reply_markup=main_reply_keyboard(),
+    )
+    await message.answer(
+        "Do'konni ochish uchun quyidagi tugmani bosing 👇",
         parse_mode='HTML',
         reply_markup=main_menu_keyboard(settings.FRONTEND_URL),
+    )
+
+
+# ─── /shop ───────────────────────────────────────────────────────────────────
+
+@router.message(Command("shop"))
+@router.message(F.text == "🛍 Do'konni ochish")
+async def cmd_shop(message: Message):
+    await message.answer(
+        "🛍 <b>Asl Nurafshon Do'koni</b>\n\n"
+        "Choy, kofe va shirinliklarimizni ko'ring! 👇",
+        parse_mode='HTML',
+        reply_markup=shop_keyboard(settings.FRONTEND_URL),
+    )
+
+
+# ─── /promo ──────────────────────────────────────────────────────────────────
+
+@router.message(Command("promo"))
+@router.message(F.text == "🔥 Aksiyalar")
+async def cmd_promo(message: Message):
+    await message.answer(
+        "🔥 <b>Bugungi aksiyalar va chegirmalar</b>\n\n"
+        "Maxsus takliflarni ko'rish uchun bosing 👇",
+        parse_mode='HTML',
+        reply_markup=promo_keyboard(settings.FRONTEND_URL),
+    )
+
+
+# ─── /orders ─────────────────────────────────────────────────────────────────
+
+@router.message(Command("orders"))
+@router.message(F.text == "📦 Buyurtmalarim")
+async def cmd_orders(message: Message):
+    await send_recent_orders(message, message.from_user.id)
+
+
+# ─── /contact ────────────────────────────────────────────────────────────────
+
+@router.message(Command("contact"))
+@router.message(F.text == "📞 Aloqa")
+async def cmd_contact(message: Message):
+    await message.answer(
+        CONTACT_TEXT,
+        parse_mode='HTML',
+    )
+
+
+# ─── /help ───────────────────────────────────────────────────────────────────
+
+@router.message(Command("help"))
+async def cmd_help(message: Message):
+    await message.answer(
+        HELP_TEXT,
+        parse_mode='HTML',
     )
 
 
@@ -69,22 +224,44 @@ async def cmd_start(message: Message):
 async def handle_web_app_data(message: Message):
     """
     Receives data sent by the Mini App via Telegram.WebApp.sendData().
-    The Mini App can send JSON payload (e.g., order confirmation).
     """
     data: WebAppData = message.web_app_data
     logger.info('WebApp data from %s: %s', message.from_user.id, data.data)
-    # Currently informational — order creation is done via REST API directly.
     await message.answer("✅ Ma'lumot qabul qilindi!")
 
 
-# ─── "Buyurtmalarim" button ───────────────────────────────────────────────────
+# ─── Callback queries ─────────────────────────────────────────────────────────
+
+@router.callback_query(F.data == 'main_menu')
+async def cb_main_menu(callback: CallbackQuery):
+    await callback.message.answer(
+        welcome_text(callback.from_user.first_name),
+        parse_mode='HTML',
+        reply_markup=main_reply_keyboard(),
+    )
+    await callback.message.answer(
+        "Do'konni ochish uchun quyidagi tugmani bosing 👇",
+        parse_mode='HTML',
+        reply_markup=main_menu_keyboard(settings.FRONTEND_URL),
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data == 'contact')
+async def cb_contact(callback: CallbackQuery):
+    await callback.message.answer(CONTACT_TEXT, parse_mode='HTML')
+    await callback.answer()
+
+
+@router.callback_query(F.data == 'help')
+async def cb_help(callback: CallbackQuery):
+    await callback.message.answer(HELP_TEXT, parse_mode='HTML')
+    await callback.answer()
+
 
 @router.callback_query(F.data == 'my_orders')
 async def cmd_my_orders(callback: CallbackQuery):
-    await callback.message.answer(
-        "📦 Buyurtmalaringizni ko'rish uchun do'konni oching:",
-        reply_markup=main_menu_keyboard(settings.FRONTEND_URL),
-    )
+    await send_recent_orders(callback.message, callback.from_user.id)
     await callback.answer()
 
 
@@ -131,24 +308,22 @@ async def handle_order_callback(callback: CallbackQuery):
     order.status = new_status
     order.save(update_fields=['status'])
 
-    # Track the change for signal-based notification
-    order.tracker_status = old_status  # used in signals.py
+    order.tracker_status = old_status
 
-    label = dict(Order.Status.choices).get(new_status, new_status)
-    await callback.answer(f"✅ Holat o'zgardi: {label}")
+    emoji = STATUS_EMOJI.get(new_status, '📋')
+    label = STATUS_LABEL.get(new_status, new_status)
+    await callback.answer(f"{emoji} Holat o'zgardi: {label}")
 
-    # Update admin message
     action_user = callback.from_user.full_name
     try:
         await callback.message.edit_text(
-            callback.message.text + f"\n\n✏️ <b>{action_user}</b> tomonidan o'zgartirildi: <b>{label}</b>",
+            callback.message.text + f"\n\n✏️ <b>{action_user}</b> tomonidan o'zgartirildi: {emoji} <b>{label}</b>",
             parse_mode='HTML',
             reply_markup=_remaining_keyboard(order_id, new_status),
         )
     except Exception:
-        pass  # Message may not be editable
+        pass
 
-    # Notify customer
     from bot.notifications import notify_status_change
     import asyncio
     asyncio.create_task(notify_status_change(order_id, new_status))
@@ -159,7 +334,7 @@ def _remaining_keyboard(order_id: int, current_status: str):
     if current_status == 'yolda':
         return order_delivered_keyboard(order_id)
     if current_status in ('yetkazildi', 'bekor_qilindi'):
-        return None  # No more actions
+        return None
     return order_admin_keyboard(order_id)
 
 
@@ -180,30 +355,35 @@ async def process_successful_payment(message: Message):
             order_id = int(payload.split("_")[1])
             from asgiref.sync import sync_to_async
             from apps.orders.models import Order
-            
-            # Buyurtmani topamiz va to'langan deb belgilaymiz
+
             order = await sync_to_async(Order.objects.get)(id=order_id)
             if order.payment_status != 'paid':
                 order.payment_status = 'paid'
                 await sync_to_async(order.save)(update_fields=['payment_status'])
-                
-                # Mijozga minnatdorchilik
+
                 await message.answer(
-                    f"✅ <b>To'lov qabul qilindi!</b>\n\nBuyurtma raqami: <b>#{order.id}</b>\nXaridingiz uchun rahmat!",
+                    f"✅ <b>To'lov qabul qilindi!</b>\n\n"
+                    f"Buyurtma raqami: <b>#{order.id}</b>\n"
+                    f"Xaridingiz uchun rahmat! 🙏",
                     parse_mode='HTML'
                 )
-                
-                # Adminga xabar berish
+
                 admin_group = settings.ADMIN_GROUP_ID
                 if admin_group:
                     await message.bot.send_message(
                         chat_id=admin_group,
-                        text=f"✅ <b>Buyurtma #{order.id} to'landi (Click orqali)</b>\n\nXaridor: {message.from_user.full_name}",
+                        text=(
+                            f"✅ <b>Buyurtma #{order.id} to'landi (Click orqali)</b>\n\n"
+                            f"Xaridor: {message.from_user.full_name}"
+                        ),
                         parse_mode='HTML'
                     )
         except Exception as e:
             logger.error("Error processing successful payment: %s", e)
-            await message.answer("To'lov qabul qilindi, lekin tizimda xatolik yuz berdi. Iltimos, admin bilan bog'laning.")
+            await message.answer(
+                "To'lov qabul qilindi, lekin tizimda xatolik yuz berdi. "
+                "Iltimos, admin bilan bog'laning."
+            )
 
 
 # ─── Feedback Rating Callback ─────────────────────────────────────────────────
@@ -245,9 +425,14 @@ async def handle_feedback_rating_callback(callback: CallbackQuery):
         await callback.answer("Baholash so'rovi topilmadi")
         return
 
+    stars = "⭐" * rating
     await callback.answer("Rahmat! Bahongiz qabul qilindi.")
     await callback.message.edit_text(
-        callback.message.text + f"\n\n⭐️ <b>Sizning bahoingiz: {rating} yulduz</b>\n\nFikr-mulohazangiz bo'lsa, ushbu xabarga <b>Javob berish (Reply)</b> orqali yozib yuboring (matn ko'rinishida) 👇",
+        callback.message.text + (
+            f"\n\n{stars} <b>Sizning bahoingiz: {rating} yulduz</b>\n\n"
+            f"Fikr-mulohazangiz bo'lsa, ushbu xabarga <b>Javob berish (Reply)</b> "
+            f"orqali yozib yuboring 👇"
+        ),
         parse_mode='HTML'
     )
 
@@ -279,8 +464,7 @@ async def handle_feedback_comment(message: Message):
         req = await save_comment(message.from_user.id, message.text)
         if req:
             await message.reply("Fikringiz uchun rahmat! Tizimga saqlandi. 😊")
-            
-            # Also notify admin group about the feedback!
+
             admin_group = settings.ADMIN_GROUP_ID
             if admin_group:
                 stars = "⭐" * req.rating if req.rating else "Bahosiz"
@@ -308,9 +492,13 @@ async def cmd_chek(message: Message):
 
     @sync_to_async
     def get_latest_order(telegram_id):
-        order = Order.objects.filter(user__telegram_id=telegram_id, status='yetkazildi').select_related('user', 'address').prefetch_related('items').order_by('-created_at').first()
+        order = Order.objects.filter(
+            user__telegram_id=telegram_id, status='yetkazildi'
+        ).select_related('user', 'address').prefetch_related('items').order_by('-created_at').first()
         if not order:
-            order = Order.objects.filter(user__telegram_id=telegram_id).select_related('user', 'address').prefetch_related('items').order_by('-created_at').first()
+            order = Order.objects.filter(
+                user__telegram_id=telegram_id
+            ).select_related('user', 'address').prefetch_related('items').order_by('-created_at').first()
         return order
 
     order = await get_latest_order(message.from_user.id)

@@ -1,11 +1,13 @@
 from django.urls import path
 from .views_ssr import (
     catalog_view, product_detail_view, toggle_favorite_view, submit_review_view,
-    product_by_barcode_view, bundle_detail_view
+    product_by_barcode_view, bundle_detail_view, promotions_view
 )
 
 urlpatterns = [
     path('catalog/', catalog_view, name='catalog'),
+    path('promotions/', promotions_view, name='promotions'),
+    path('aksiyalar/', promotions_view, name='promotions_uz'),
     path('product/<int:pk>/', product_detail_view, name='product_detail'),
     path('bundle/<int:pk>/', bundle_detail_view, name='bundle_detail'),
     path('product/<int:product_id>/favorite/', toggle_favorite_view, name='toggle_favorite'),
