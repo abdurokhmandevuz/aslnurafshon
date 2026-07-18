@@ -104,6 +104,16 @@ async def notify_new_order(order_pk: int):
         logger.warning('Cannot notify admin group (order #%s): %s', order_pk, exc)
 
     try:
+        from bot.keyboards import order_admin_keyboard
+        await _send_admin_direct_messages(
+            bot,
+            _admin_new_order_text(order),
+            reply_markup=order_admin_keyboard(order_pk),
+        )
+    except Exception as exc:
+        logger.warning('Cannot notify admin private chats (order #%s): %s', order_pk, exc)
+
+    try:
         # 3. Notify all active couriers
         from apps.accounts.models import Courier
         couriers = Courier.objects.filter(is_active=True)
@@ -212,6 +222,16 @@ async def notify_low_stock(variant_id: int):
     except Exception as exc:
         logger.warning('Cannot send low stock alert: %s', exc)
 
+    try:
+        text = (
+            f"<b>Ombor ogohlantirishi</b>\n\n"
+            f"Mahsulot: <b>{variant.product.name} ({variant.label})</b>\n"
+            f"Qoldi: <b>{variant.stock_qty} ta</b>"
+        )
+        await _send_admin_direct_messages(bot, text)
+    except Exception as exc:
+        logger.warning('Cannot notify admin private chats about low stock: %s', exc)
+
     await bot.session.close()
 
 
@@ -230,6 +250,24 @@ def _get_bot():
     except Exception as exc:
         logger.error('Cannot create bot: %s', exc)
         return None
+
+
+async def _send_admin_direct_messages(bot, text: str, reply_markup=None):
+    """Send critical notices to every configured admin private chat."""
+    from django.conf import settings
+
+    for telegram_id in settings.ADMIN_TELEGRAM_IDS:
+        if telegram_id == settings.ADMIN_GROUP_ID:
+            continue
+        try:
+            await bot.send_message(
+                chat_id=telegram_id,
+                text=text,
+                parse_mode='HTML',
+                reply_markup=reply_markup,
+            )
+        except Exception as exc:
+            logger.warning('Cannot notify admin %s: %s', telegram_id, exc)
 
 
 def _customer_new_order_text(order) -> str:
@@ -312,3 +350,16 @@ async def notify_corporate_inquiry(inquiry_id: int):
             )
     except Exception as exc:
         logger.error('Cannot notify admin group of corporate inquiry #%s: %s', inquiry_id, exc)
+
+    try:
+        text = (
+            f"<b>KORPORATIV / ULGURJI SO'ROV #{inquiry.id}</b>\n\n"
+            f"Kompaniya: <b>{inquiry.company_name}</b>\n"
+            f"Mas'ul shaxs: <b>{inquiry.contact_person}</b>\n"
+            f"Telefon: <code>{inquiry.phone}</code>\n"
+            f"Taxminiy hajm: <b>{inquiry.estimated_quantity:,} ta</b>\n"
+            f"Izoh: <i>{inquiry.comment or '-'}</i>"
+        )
+        await _send_admin_direct_messages(bot, text)
+    except Exception as exc:
+        logger.warning('Cannot notify admin private chats about corporate inquiry: %s', exc)

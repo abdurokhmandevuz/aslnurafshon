@@ -32,6 +32,7 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 from aiohttp import web
 
 from bot.handlers import router
+from bot.admin import admin_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,6 +52,8 @@ async def on_startup(bot: Bot):
         BotCommand(command='contact', description='Aloqa'),
         BotCommand(command='chek', description='Oxirgi chek'),
         BotCommand(command='help', description='Yordam'),
+        BotCommand(command='admin', description='Admin panel'),
+        BotCommand(command='id', description='Chat ID olish'),
     ])
     webhook_url = settings.BOT_WEBHOOK_URL
     if webhook_url:
@@ -69,6 +72,7 @@ async def on_shutdown(bot: Bot):
 
 def build_dispatcher() -> Dispatcher:
     dp = Dispatcher()
+    dp.include_router(admin_router)
     dp.include_router(router)
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)

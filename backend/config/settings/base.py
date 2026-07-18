@@ -196,6 +196,10 @@ CORS_ALLOW_HEADERS = [
 BOT_TOKEN = clean_env_value(config('BOT_TOKEN', default=''))
 BOT_WEBHOOK_URL = clean_env_value(config('BOT_WEBHOOK_URL', default=''))
 ADMIN_GROUP_ID = config('ADMIN_GROUP_ID', default='', cast=lambda x: int(x) if x else None)
+ADMIN_TELEGRAM_IDS = {
+    int(value) for value in clean_csv_values(config('ADMIN_TELEGRAM_IDS', default='', cast=Csv()))
+    if value.isdigit()
+}
 CLICK_PROVIDER_TOKEN = clean_env_value(config('CLICK_PROVIDER_TOKEN', default=''))
 FRONTEND_URL = clean_env_value(config('FRONTEND_URL', default=RAILWAY_APP_URL)).rstrip('/')
 

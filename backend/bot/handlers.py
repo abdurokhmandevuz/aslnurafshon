@@ -273,6 +273,11 @@ async def handle_order_callback(callback: CallbackQuery):
     Callback data format: order:<action>:<order_id>
     Actions: confirm | dispatch | delivered | cancel
     """
+    from bot.admin import is_admin
+    if not is_admin(callback.from_user.id):
+        await callback.answer("Bu amal faqat admin uchun.", show_alert=True)
+        return
+
     parts = callback.data.split(':')
     if len(parts) != 3:
         await callback.answer("Noto'g'ri format")
