@@ -3,6 +3,7 @@ set -euo pipefail
 
 echo "Running migrations..."
 python manage.py migrate --noinput
+python manage.py ensure_admin
 
 if [ -n "${BOT_TOKEN:-}" ]; then
   echo "Starting Telegram bot in polling mode..."
