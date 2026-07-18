@@ -165,13 +165,13 @@
     {% endif %}
 
     <!-- Katalog -->
-    {% if url_name == 'catalog' and request.GET.category or url_name == 'product_detail' %}
-    <button onclick="window.location.href='{% url 'catalog' %}?category={{ categories.0.id|default:'' }}'" class="flex flex-col items-center justify-center text-primary font-medium p-2 rounded-xl transition-all group">
+    {% if url_name == 'catalog' and request.GET.view == 'all' or url_name == 'product_detail' %}
+    <button onclick="window.location.href='{% url 'catalog' %}?view=all'" class="flex flex-col items-center justify-center text-primary font-medium p-2 rounded-xl transition-all group">
         <span class="material-symbols-outlined text-primary mb-0.5" data-icon="grid_view" style="font-variation-settings: 'FILL' 1;">grid_view</span>
         <span class="text-[10px] font-bold">{% trans "Katalog" %}</span>
     </button>
     {% else %}
-    <button onclick="window.location.href='{% url 'catalog' %}?category={{ categories.0.id|default:'' }}'" class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant/30 rounded-xl transition-all group">
+    <button onclick="window.location.href='{% url 'catalog' %}?view=all'" class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant/30 rounded-xl transition-all group">
         <span class="material-symbols-outlined group-hover:text-primary transition-colors mb-0.5" data-icon="grid_view">grid_view</span>
         <span class="text-[10px] group-hover:text-primary transition-colors">{% trans "Katalog" %}</span>
     </button>

@@ -17,10 +17,24 @@ from .models import (
 )
 from apps.orders.views_ssr import get_or_auth_user
 
+
+def _prepare_products(queryset, limit=None):
+    if limit is not None:
+        queryset = queryset[:limit]
+    products = list(queryset)
+    for product in products:
+        product.quick_variant = product.available_variants[0] if product.available_variants else None
+        product.display_discount = product.discount_percent if product.discount_percent < 100 else 0
+        product.display_price = product.min_price_val
+        if product.display_discount and product.min_price_val:
+            product.display_price = int(product.min_price_val * (100 - product.display_discount) / 100)
+    return products
+
+
 def catalog_view(request):
-    categories = Category.objects.filter(is_active=True).annotate(
+    categories = list(Category.objects.filter(is_active=True).annotate(
         product_count=Count('products', filter=Q(products__is_active=True))
-    ).order_by('order', 'name')
+    ).order_by('order', 'name'))
 
     available_variants = Prefetch(
         'variants',
@@ -35,6 +49,9 @@ def catalog_view(request):
     )
 
     category_id = request.GET.get('category')
+    query = request.GET.get('q', '').strip()
+    show_all = request.GET.get('view') == 'all'
+    is_home = not category_id and not query and not show_all
     is_bundle_category = False
     bundles = []
     
@@ -54,9 +71,8 @@ def catalog_view(request):
         except Category.DoesNotExist:
             products = base_products
     else:
-        products = base_products
+        products = base_products if not is_home else Product.objects.none()
 
-    query = request.GET.get('q')
     if query:
         if is_bundle_category:
             bundles = bundles.filter(name__icontains=query)
@@ -66,13 +82,7 @@ def catalog_view(request):
             )
 
     if not is_bundle_category:
-        products = list(products)
-        for product in products:
-            product.quick_variant = product.available_variants[0] if product.available_variants else None
-            product.display_discount = product.discount_percent if product.discount_percent < 100 else 0
-            product.display_price = product.min_price_val
-            if product.display_discount and product.min_price_val:
-                product.display_price = int(product.min_price_val * (100 - product.display_discount) / 100)
+        products = _prepare_products(products)
 
     # Load favorites
     user = get_or_auth_user(request)
@@ -93,16 +103,28 @@ def catalog_view(request):
         .prefetch_related('items__variant__product')
         .order_by('-discount_percent', '-created_at')[:4]
     )
+    home_sections = []
+    if is_home:
+        for category in categories[:6]:
+            category_products = _prepare_products(base_products.filter(category_id=category.id), limit=5)
+            if category_products:
+                home_sections.append({
+                    'category': category,
+                    'products': category_products,
+                })
 
     context = {
         'categories': categories,
         'products': products,
         'bundles': bundles,
         'is_bundle_category': is_bundle_category,
+        'is_home': is_home,
+        'show_all': show_all,
         'favorite_product_ids': favorite_product_ids,
         'daily_deal': daily_deal,
         'daily_deal_expires_at': daily_deal.expires_at if daily_deal else None,
         'featured_bundles': featured_bundles,
+        'home_sections': home_sections,
     }
     return render(request, 'katalog.html', context)
 
