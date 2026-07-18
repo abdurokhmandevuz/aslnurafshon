@@ -3,6 +3,7 @@ from django.db.models import Count, Min, Prefetch, Q
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.utils import timezone
+from datetime import timedelta
 import json
 from .models import (
     Banner,
@@ -80,11 +81,13 @@ def catalog_view(request):
         favorite_product_ids = list(user.favorites.values_list('product_id', flat=True))
 
     today = timezone.localdate()
+    now = timezone.now()
     daily_deal = DailyDeal.objects.filter(
         is_active=True,
-        date=today,
         discount_percent__lt=100,
-    ).select_related('variant__product').first()
+        starts_at__lte=now,
+        starts_at__gt=now - timedelta(hours=24),
+    ).select_related('variant__product').order_by('-starts_at').first()
     featured_bundles = list(
         ProductBundle.objects.filter(is_active=True)
         .prefetch_related('items__variant__product')
@@ -98,6 +101,7 @@ def catalog_view(request):
         'is_bundle_category': is_bundle_category,
         'favorite_product_ids': favorite_product_ids,
         'daily_deal': daily_deal,
+        'daily_deal_expires_at': daily_deal.expires_at if daily_deal else None,
         'featured_bundles': featured_bundles,
     }
     return render(request, 'katalog.html', context)
@@ -125,8 +129,12 @@ def promotions_view(request):
         .order_by('-discount_percent', '-created_at')
     )
     daily_deal = (
-        DailyDeal.objects.filter(is_active=True, date=timezone.localdate(), discount_percent__lt=100)
-        .select_related('variant__product')
+        DailyDeal.objects.filter(
+            is_active=True,
+            discount_percent__lt=100,
+            starts_at__lte=timezone.now(),
+            starts_at__gt=timezone.now() - timedelta(hours=24),
+        ).select_related('variant__product')
         .first()
     )
     return render(request, 'aksiyalar.html', {

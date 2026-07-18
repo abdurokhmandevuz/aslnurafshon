@@ -119,12 +119,14 @@
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-[80px] md:pb-0">
 <!-- TopAppBar (From JSON) -->
-<header class="flex justify-between items-center px-margin-mobile h-14 w-full bg-surface docked full-width sticky top-0 z-40">
-        <!-- Left: Logo & Title (Back button removed) -->
-        <div class="flex items-center gap-sm">
-<img alt="Asl Nurafshon Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiWXHYmMB1XfMHAiYfbOwbGJSvZcX4glaFhRk1VQZLwQFft7cigCkvqjs6eiW79p0jAbivTP-JtlLDLAQGKDsZZgLeodEF0b4XLnVm11naH2Mu6C7jT4oM_oUSKae4QML3ZXjusH4sDHyXPRzAoORLD_5htnO-YDCEa7yBgr0cUXJe58J7ZPtM-aPA-X0dN9yv0GL0KK5RjscppnguA3whlOLP99Iz3k00p8wwf0cxLuf7j4X-ZcpwgQ"/>
-<h1 class="font-headline-sm text-headline-sm-mobile font-bold text-primary">Asl Nurafshon</h1>
-</div>
+<header class="flex justify-between items-center px-margin-mobile h-14 w-full bg-surface docked full-width sticky top-0 z-40 border-b border-outline-variant/20">
+        <div class="flex min-w-0 items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-primary">location_on</span>
+            <div class="min-w-0">
+                <p class="truncate text-sm font-bold text-on-surface">Nurafshon <span class="material-symbols-outlined align-middle text-[16px]">keyboard_arrow_down</span></p>
+                <p class="truncate text-[10px] text-on-surface-variant">{% trans "yetkazib beriladigan hudud" %}</p>
+            </div>
+        </div>
         <form action="{% url 'set_language_exempt' %}" method="post" class="flex items-center">
             {% csrf_token %}
             <input name="next" type="hidden" value="{{ request.get_full_path|default:'/' }}">

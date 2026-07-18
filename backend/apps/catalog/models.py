@@ -9,6 +9,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator
 from django.utils.text import slugify
 from django.utils import timezone
+from datetime import timedelta
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import threading
@@ -209,6 +210,7 @@ class DailyDeal(models.Model):
         default=0, validators=[MaxValueValidator(99)], verbose_name="Chegirma (%)"
     )
     date = models.DateField(unique=True, verbose_name="Sana")
+    starts_at = models.DateTimeField(default=timezone.now, verbose_name="Boshlanish vaqti")
     is_active = models.BooleanField(default=True, verbose_name="Faol")
 
     class Meta:
@@ -226,6 +228,10 @@ class DailyDeal(models.Model):
         if self.discount_percent:
             return int(p * (100 - self.discount_percent) / 100)
         return p
+
+    @property
+    def expires_at(self):
+        return self.starts_at + timedelta(hours=24)
 
 
 class ProductReview(models.Model):

@@ -287,7 +287,12 @@ async def deal_discount(message: Message, state: FSMContext):
     def save_deal():
         deal, _ = DailyDeal.objects.update_or_create(
             date=timezone.localdate(),
-            defaults={'variant': ProductVariant.objects.get(pk=data['variant_id']), 'discount_percent': discount, 'is_active': True},
+            defaults={
+                'variant': ProductVariant.objects.get(pk=data['variant_id']),
+                'discount_percent': discount,
+                'is_active': True,
+                'starts_at': timezone.now(),
+            },
         )
         return deal
 
