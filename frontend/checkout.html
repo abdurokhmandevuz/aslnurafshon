@@ -157,11 +157,8 @@
 <section class="flex flex-col gap-sm">
 <label class="font-label-md text-label-md text-primary-container">Yetkazib berish manzili</label>
 <div class="group relative flex items-center bg-inverse-on-surface rounded-lg p-3 transition-colors border border-transparent focus-within:border-primary focus-within:bg-surface">
-<span class="material-symbols-outlined text-outline mr-md" data-icon="location_on">location_on</span>
-<input class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant/50" placeholder="Manzilni kiriting yoki xaritadan tanlang" type="text" value="Toshkent sh., Yunusobod t., 14-daha, 42-uy"/>
-<button class="ml-sm text-secondary hover:bg-secondary-container/20 p-2 rounded-full transition-colors flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="edit">edit</span>
-</button>
+<span class="material-symbols-outlined text-outline mr-md">location_on</span>
+<input id="address-input" class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant/50" placeholder="Manzilni kiriting yoki xaritadan tanlang" type="text"/>
 </div>
 <button class="self-start flex items-center gap-xs text-secondary font-label-md text-label-md mt-1 py-2 px-3 rounded-lg hover:bg-surface-container-low transition-colors">
 <span class="material-symbols-outlined text-[18px]" data-icon="map">map</span>
@@ -172,20 +169,20 @@
 <section class="flex flex-col gap-sm">
 <label class="font-label-md text-label-md text-primary-container">Yetkazib berish vaqti</label>
 <div class="flex gap-sm overflow-x-auto hide-scrollbar pb-2 snap-x">
-<button class="snap-start flex-shrink-0 bg-primary-container text-on-primary-container border-2 border-primary rounded-lg py-3 px-5 font-label-md text-label-md flex flex-col items-start min-w-[120px]">
-<span class="text-on-primary-container/80 font-label-sm text-label-sm font-normal">Bugun</span>
+<button onclick="selectTimeSlot('tez', this)" class="timeslot-btn snap-start flex-shrink-0 bg-primary text-white border-2 border-primary rounded-lg py-3 px-5 font-label-md text-label-md flex flex-col items-start min-w-[120px]">
+<span class="text-white/80 text-xs font-normal">Bugun</span>
 <span>Tez orada</span>
 </button>
-<button class="snap-start flex-shrink-0 bg-surface text-on-surface border border-outline-variant hover:border-outline rounded-lg py-3 px-5 font-label-md text-label-md flex flex-col items-start min-w-[120px] transition-colors">
-<span class="text-on-surface-variant font-label-sm text-label-sm font-normal">Bugun</span>
+<button onclick="selectTimeSlot('14-16', this)" class="timeslot-btn snap-start flex-shrink-0 bg-surface-container-low text-on-surface border border-outline-variant hover:border-primary rounded-lg py-3 px-5 font-label-md text-label-md flex flex-col items-start min-w-[120px] transition-colors">
+<span class="text-on-surface-variant text-xs font-normal">Bugun</span>
 <span>14:00 - 16:00</span>
 </button>
-<button class="snap-start flex-shrink-0 bg-surface text-on-surface border border-outline-variant hover:border-outline rounded-lg py-3 px-5 font-label-md text-label-md flex flex-col items-start min-w-[120px] transition-colors">
-<span class="text-on-surface-variant font-label-sm text-label-sm font-normal">Bugun</span>
+<button onclick="selectTimeSlot('16-18', this)" class="timeslot-btn snap-start flex-shrink-0 bg-surface-container-low text-on-surface border border-outline-variant hover:border-primary rounded-lg py-3 px-5 font-label-md text-label-md flex flex-col items-start min-w-[120px] transition-colors">
+<span class="text-on-surface-variant text-xs font-normal">Bugun</span>
 <span>16:00 - 18:00</span>
 </button>
-<button class="snap-start flex-shrink-0 bg-surface text-on-surface border border-outline-variant hover:border-outline rounded-lg py-3 px-5 font-label-md text-label-md flex flex-col items-start min-w-[120px] transition-colors">
-<span class="text-on-surface-variant font-label-sm text-label-sm font-normal">Ertaga</span>
+<button onclick="selectTimeSlot('ertaga-10-12', this)" class="timeslot-btn snap-start flex-shrink-0 bg-surface-container-low text-on-surface border border-outline-variant hover:border-primary rounded-lg py-3 px-5 font-label-md text-label-md flex flex-col items-start min-w-[120px] transition-colors">
+<span class="text-on-surface-variant text-xs font-normal">Ertaga</span>
 <span>10:00 - 12:00</span>
 </button>
 </div>
@@ -194,28 +191,18 @@
 <section class="flex flex-col gap-sm">
 <label class="font-label-md text-label-md text-primary-container">To'lov usuli</label>
 <div class="grid grid-cols-3 gap-md">
-<!-- Active Option -->
-<label class="relative cursor-pointer bg-primary-container/10 border-2 border-primary rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
-<input checked="" class="sr-only" name="payment" type="radio"/>
-<span class="material-symbols-outlined text-primary text-[32px]" data-icon="account_balance_wallet">account_balance_wallet</span>
+<button onclick="selectPayment('payme', this)" class="payment-btn relative cursor-pointer bg-primary/10 border-2 border-primary rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-primary text-[32px]">account_balance_wallet</span>
 <span class="font-label-md text-label-md text-primary">Payme</span>
-<!-- Checkmark indicator -->
-<div class="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined text-[14px] text-on-primary" data-icon="check">check</span>
-</div>
-</label>
-<!-- Inactive Option -->
-<label class="relative cursor-pointer bg-surface border border-outline-variant hover:border-outline rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
-<input class="sr-only" name="payment" type="radio"/>
-<span class="material-symbols-outlined text-outline text-[32px]" data-icon="credit_card">credit_card</span>
+</button>
+<button onclick="selectPayment('click', this)" class="payment-btn relative cursor-pointer bg-surface border border-outline-variant hover:border-primary rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-outline text-[32px]">credit_card</span>
 <span class="font-label-md text-label-md text-on-surface-variant">Click</span>
-</label>
-<!-- Inactive Option -->
-<label class="relative cursor-pointer bg-surface border border-outline-variant hover:border-outline rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
-<input class="sr-only" name="payment" type="radio"/>
-<span class="material-symbols-outlined text-outline text-[32px]" data-icon="payments">payments</span>
+</button>
+<button onclick="selectPayment('cash', this)" class="payment-btn relative cursor-pointer bg-surface border border-outline-variant hover:border-primary rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-outline text-[32px]">payments</span>
 <span class="font-label-md text-label-md text-on-surface-variant">Naqd</span>
-</label>
+</button>
 </div>
 </section>
 <!-- Section: Order Summary -->
@@ -232,7 +219,11 @@
 </div>
 <div class="flex justify-between items-center text-on-surface-variant font-body-md text-body-md">
 <span>Yetkazib berish</span>
-<span id="checkout-delivery">15,000 UZS</span>
+<span id="checkout-delivery">15 000 UZS</span>
+</div>
+<div id="checkout-discount-row" class="flex justify-between items-center text-green-600 font-body-md text-body-md" style="display:none">
+<span>Chegirma</span>
+<span id="checkout-discount">-0 UZS</span>
 </div>
 <div class="flex justify-between items-center font-headline-sm text-headline-sm text-primary mt-sm pt-sm border-t border-surface-container-high">
 <span>Jami to'lov</span>
@@ -243,8 +234,8 @@
 </main>
 <!-- Sticky Bottom Action Bar -->
 <div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/30 z-50 p-margin-mobile shadow-level-2 md:relative md:bg-transparent md:border-none md:shadow-none md:p-0 md:mb-lg md:max-w-[800px] md:mx-auto">
-<button onclick="submitOrder()" class="w-full bg-primary text-on-primary font-label-md text-label-md md:text-body-lg rounded-xl py-4 flex justify-center items-center hover:bg-primary-container transition-colors shadow-level-1">
-            Buyurtmani tasdiqlash
-        </button>
+<button id="submit-order-btn" onclick="submitOrder()" class="w-full bg-primary text-on-primary font-label-md text-label-md md:text-body-lg rounded-xl py-4 flex justify-center items-center hover:bg-primary-container transition-colors shadow-level-1 active:scale-95">
+    ✅ Buyurtmani tasdiqlash
+</button>
 </div>
 </body></html>
