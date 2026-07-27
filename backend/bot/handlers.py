@@ -419,12 +419,13 @@ async def process_location(message: Message, state: FSMContext):
 
 # ─── Payment Receipt Photo Handler ───────────────────────────────────────────
 
-@router.message(F.photo | OrderState.waiting_for_receipt)
+@router.message(OrderState.waiting_for_receipt)
+@router.message(F.photo)
 async def process_receipt_photo(message: Message, state: FSMContext):
     user_id = message.from_user.id
     order_id = PENDING_RECEIPT_ORDERS.get(user_id)
 
-    if not message.photo:
+    if not message.photo and not message.document:
         await message.answer("Iltimos, to'lov cheki <b>rasmini (skrinshot)</b> yuboring 📸", parse_mode='HTML')
         return
 
@@ -446,27 +447,37 @@ async def process_receipt_photo(message: Message, state: FSMContext):
         await state.clear()
         return
 
-    # Download photo to media/payment_proofs/
-    photo = message.photo[-1]
-    file_info = await message.bot.get_file(photo.file_id)
+    try:
+        # Download photo or document to media/payment_proofs/
+        if message.photo:
+            photo = message.photo[-1]
+            file_id = photo.file_id
+        else:
+            file_id = message.document.file_id
 
-    import os
-    from django.conf import settings
-    rel_dir = os.path.join('payment_proofs', order.created_at.strftime('%Y/%m'))
-    abs_dir = os.path.join(settings.MEDIA_ROOT, rel_dir)
-    os.makedirs(abs_dir, exist_ok=True)
+        file_info = await message.bot.get_file(file_id)
 
-    filename = f"order_{order.id}_{photo.file_id[:8]}.jpg"
-    abs_path = os.path.join(abs_dir, filename)
-    rel_path = os.path.join(rel_dir, filename).replace('\\', '/')
+        import os
+        from django.conf import settings
+        rel_dir = os.path.join('payment_proofs', order.created_at.strftime('%Y/%m'))
+        abs_dir = os.path.join(settings.MEDIA_ROOT, rel_dir)
+        os.makedirs(abs_dir, exist_ok=True)
 
-    await message.bot.download_file(file_info.file_path, abs_path)
+        filename = f"order_{order.id}_{file_id[:8]}.jpg"
+        abs_path = os.path.join(abs_dir, filename)
+        rel_path = os.path.join(rel_dir, filename).replace('\\', '/')
 
-    @sync_to_async
-    def save_proof():
-        order.payment_proof = rel_path
-        order.save(update_fields=['payment_proof'])
-        return order
+        await message.bot.download_file(file_info.file_path, abs_path)
+
+        @sync_to_async
+        def save_proof():
+            order.payment_proof = rel_path
+            order.save(update_fields=['payment_proof'])
+            return order
+
+        await save_proof()
+    except Exception as exc:
+        logger.error("Save receipt error: %s", exc)
 
     await save_proof()
 
