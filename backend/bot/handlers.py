@@ -322,6 +322,14 @@ async def process_phone(message: Message, state: FSMContext):
 
 @router.message(OrderState.waiting_for_location)
 async def process_location(message: Message, state: FSMContext):
+    if message.text in {"✏️ Manzilni matn qilib yozish", "Manzilni matn qilib yozish"}:
+        await message.answer(
+            "✍️ <b>Manzilingizni matn ko'rinishida yozib yuboring:</b>\n"
+            "<i>(Masalan: Nurafshon sh., Navoiy ko'chasi 12-uy)</i>",
+            parse_mode='HTML'
+        )
+        return
+
     address_text = ""
     if message.location:
         address_text = f"GPS: {message.location.latitude}, {message.location.longitude}"
