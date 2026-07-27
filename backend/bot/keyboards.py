@@ -176,16 +176,50 @@ def product_detail_inline_keyboard(product_id: int, variants) -> InlineKeyboardM
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-def cart_inline_keyboard(has_items: bool) -> InlineKeyboardMarkup:
-    if not has_items:
+def cart_inline_keyboard(cart: dict = None, variants_dict: dict = None) -> InlineKeyboardMarkup:
+    if not cart:
         return InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🛍 Choy tanlash", callback_data="bot_catalog", style="success")],
             [InlineKeyboardButton(text="🏠 Bosh menu", callback_data="main_menu")],
         ])
+
+    buttons = []
+    if variants_dict:
+        for vid, qty in cart.items():
+            if vid in variants_dict:
+                v = variants_dict[vid]
+                title = f"{v.product.name} ({v.label})"
+                buttons.append([
+                    InlineKeyboardButton(text="➖", callback_data=f"cart_dec:{vid}"),
+                    InlineKeyboardButton(text=f"{title}: {qty} ta", callback_data="none"),
+                    InlineKeyboardButton(text="➕", callback_data=f"cart_inc:{vid}"),
+                    InlineKeyboardButton(text="❌", callback_data=f"cart_del:{vid}"),
+                ])
+
+    buttons.append([InlineKeyboardButton(text="✅ Buyurtma berish (Checkout)", callback_data="checkout_bot", style="success")])
+    buttons.append([InlineKeyboardButton(text="➕ Yana mahsulot qo'shish", callback_data="bot_catalog")])
+    buttons.append([InlineKeyboardButton(text="🗑 Savatni tozalash", callback_data="clear_cart", style="danger")])
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def saved_addresses_keyboard(addresses) -> InlineKeyboardMarkup:
+    buttons = []
+    for addr in addresses:
+        title = addr.title or f"Manzil #{addr.id}"
+        text = f"📍 {title}: {addr.address_text[:30]}"
+        buttons.append([InlineKeyboardButton(text=text, callback_data=f"use_addr:{addr.id}")])
+    buttons.append([InlineKeyboardButton(text="✏️ Yangi manzil kiritish", callback_data="new_addr")])
+    buttons.append([InlineKeyboardButton(text="❌ Bekor qilish", callback_data="cancel_order", style="danger")])
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def courier_order_keyboard(order_id: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="✅ Buyurtma berish (Checkout)", callback_data="checkout_bot", style="success")],
-        [InlineKeyboardButton(text="➕ Yana mahsulot qo'shish", callback_data="bot_catalog")],
-        [InlineKeyboardButton(text="🗑 Savatni tozalash", callback_data="clear_cart", style="danger")],
+        [
+            InlineKeyboardButton(text="🛵 Qabul qildim", callback_data=f"courier:accept:{order_id}", style="primary"),
+            InlineKeyboardButton(text="✅ Yetkazib berdim", callback_data=f"courier:delivered:{order_id}", style="success"),
+        ]
     ])
 
 

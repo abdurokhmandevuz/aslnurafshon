@@ -159,6 +159,8 @@ class Order(models.Model):
         verbose_name='Promo-kod'
     )
     discount_amount = models.PositiveIntegerField(default=0, verbose_name='Chegirma summasi')
+    cashback_used = models.PositiveIntegerField(default=0, verbose_name='Ishlatilgan keshbek')
+    cashback_earned = models.PositiveIntegerField(default=0, verbose_name='Ishlangan keshbek')
     delivery_fee = models.PositiveIntegerField(default=0, verbose_name='Yetkazish narxi')
     total = models.PositiveIntegerField(default=0, verbose_name='Jami summa')
     comment = models.TextField(blank=True, verbose_name='Izoh')

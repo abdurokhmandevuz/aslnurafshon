@@ -16,6 +16,7 @@ class TelegramUser(models.Model):
     phone = models.CharField(max_length=20, blank=True, verbose_name='Telefon')
     language_code = models.CharField(max_length=8, blank=True, default='uz')
     last_login = models.DateTimeField(null=True, blank=True, verbose_name='Oxirgi faollik')
+    cashback_balance = models.PositiveIntegerField(default=0, verbose_name="Keshbek balansi (UZS)")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

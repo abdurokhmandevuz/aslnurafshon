@@ -230,7 +230,36 @@ async def add_variant_to_cart(callback: CallbackQuery):
     await callback.answer(f"✅ {variant.product.name} ({variant.label}) savatga qo'shildi! (Jami: {total_count} ta)", show_alert=True)
 
 
-# ─── View Cart ────────────────────────────────────────────────────────────────
+# ─── View Cart & Quantity Controls ───────────────────────────────────────────
+
+@router.callback_query(F.data.startswith("cart_inc:"))
+async def handle_cart_inc(callback: CallbackQuery):
+    var_id = int(callback.data.split(":")[1])
+    user_id = callback.from_user.id
+    if user_id in USER_CARTS and var_id in USER_CARTS[user_id]:
+        USER_CARTS[user_id][var_id] += 1
+    await view_bot_cart(callback)
+
+
+@router.callback_query(F.data.startswith("cart_dec:"))
+async def handle_cart_dec(callback: CallbackQuery):
+    var_id = int(callback.data.split(":")[1])
+    user_id = callback.from_user.id
+    if user_id in USER_CARTS and var_id in USER_CARTS[user_id]:
+        USER_CARTS[user_id][var_id] -= 1
+        if USER_CARTS[user_id][var_id] <= 0:
+            USER_CARTS[user_id].pop(var_id)
+    await view_bot_cart(callback)
+
+
+@router.callback_query(F.data.startswith("cart_del:"))
+async def handle_cart_del(callback: CallbackQuery):
+    var_id = int(callback.data.split(":")[1])
+    user_id = callback.from_user.id
+    if user_id in USER_CARTS and var_id in USER_CARTS[user_id]:
+        USER_CARTS[user_id].pop(var_id)
+    await view_bot_cart(callback)
+
 
 @router.callback_query(F.data == "view_cart")
 async def view_bot_cart(callback: CallbackQuery):
@@ -241,7 +270,7 @@ async def view_bot_cart(callback: CallbackQuery):
         await safe_edit_message(
             callback.message,
             "🛒 <b>Savatingiz bo'sh.</b>\n\nKatalogdan mahsulotlarni tanlang!",
-            reply_markup=cart_inline_keyboard(has_items=False)
+            reply_markup=cart_inline_keyboard(cart=None)
         )
         await callback.answer()
         return
@@ -251,12 +280,15 @@ async def view_bot_cart(callback: CallbackQuery):
 
     variant_ids = list(cart.keys())
     variants = await sync_to_async(lambda: list(ProductVariant.objects.filter(id__in=variant_ids).select_related('product')))()
+    variants_dict = {v.id: v for v in variants}
 
     total_sum = 0
     lines = ["🛒 <b>Savatdagi mahsulotlar:</b>\n"]
 
     for v in variants:
-        qty = cart[v.id]
+        qty = cart.get(v.id, 0)
+        if qty <= 0:
+            continue
         item_total = v.price * qty
         total_sum += item_total
         lines.append(f"• <b>{v.product.name}</b> ({v.label})\n  {qty} ta × {v.price:,} = <b>{item_total:,} UZS</b>")
@@ -268,8 +300,13 @@ async def view_bot_cart(callback: CallbackQuery):
     lines.append(f"Yetkazib berish: <b>{'Bepul 🎉' if delivery_fee == 0 else f'{delivery_fee:,} UZS'}</b>")
     lines.append(f"<b>Jami to'lov: {grand_total:,} UZS</b>")
 
+    from apps.accounts.models import TelegramUser
+    tuser = await sync_to_async(lambda: TelegramUser.objects.filter(telegram_id=user_id).first())()
+    if tuser and tuser.cashback_balance > 0:
+        lines.append(f"\n✨ Sizda <b>{tuser.cashback_balance:,} UZS</b> keshbek bor!")
+
     text = "\n".join(lines)
-    markup = cart_inline_keyboard(has_items=True)
+    markup = cart_inline_keyboard(cart=cart, variants_dict=variants_dict)
 
     await safe_edit_message(callback.message, text, reply_markup=markup)
     await callback.answer()
@@ -317,12 +354,63 @@ async def process_phone(message: Message, state: FSMContext):
 
     await state.update_data(phone=phone)
     await state.set_state(OrderState.waiting_for_location)
-    await message.answer(
-        f"✅ Telefon: <b>{phone}</b>\n\n"
+
+    from asgiref.sync import sync_to_async
+    from apps.accounts.models import Address
+
+    user_id = message.from_user.id
+    addresses = await sync_to_async(lambda: list(Address.objects.filter(user__telegram_id=user_id)))()
+
+    if addresses:
+        await message.answer(
+            f"✅ Telefon: <b>{phone}</b>\n\n"
+            "📍 <b>Saqlangan manzillaringizdan birini tanlang</b> yoki yangi manzil yuboring 👇",
+            parse_mode='HTML',
+            reply_markup=saved_addresses_keyboard(addresses)
+        )
+    else:
+        await message.answer(
+            f"✅ Telefon: <b>{phone}</b>\n\n"
+            "📍 Endi yetkazib berish <b>manzilini</b> yuboring (Joylashuv tugmasini bosing yoki matn yozing) 👇",
+            parse_mode='HTML',
+            reply_markup=request_location_keyboard()
+        )
+
+
+@router.callback_query(F.data.startswith("use_addr:"))
+async def handle_use_saved_address(callback: CallbackQuery, state: FSMContext):
+    addr_id = int(callback.data.split(":")[1])
+    from asgiref.sync import sync_to_async
+    from apps.accounts.models import Address
+
+    try:
+        addr = await sync_to_async(Address.objects.get)(id=addr_id)
+        await callback.message.answer(f"📍 Manzil tanlandi: <b>{addr.address_text}</b>", parse_mode='HTML')
+        fake_msg = callback.message
+        fake_msg.text = addr.address_text
+        fake_msg.from_user = callback.from_user
+        await process_location(fake_msg, state)
+        await callback.answer()
+    except Exception as err:
+        logger.error("use_saved_address error: %s", err)
+        await callback.answer("Manzil topilmadi", show_alert=True)
+
+
+@router.callback_query(F.data == "new_addr")
+async def handle_new_address(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer(
         "📍 Endi yetkazib berish <b>manzilini</b> yuboring (Joylashuv tugmasini bosing yoki matn yozing) 👇",
         parse_mode='HTML',
         reply_markup=request_location_keyboard()
     )
+    await callback.answer()
+
+
+@router.callback_query(F.data == "cancel_order")
+async def handle_cancel_order(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.answer("Xarid bekor qilindi.", reply_markup=main_reply_keyboard())
+    await callback.answer()
 
 
 @router.message(OrderState.waiting_for_location)
