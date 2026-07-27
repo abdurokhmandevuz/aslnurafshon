@@ -13,8 +13,33 @@ import os
 from django.views.static import serve as static_serve
 
 # Support both local dev (../frontend) and Railway layout (../frontend)
-_BASE = settings.BASE_DIR.parent
-FRONTEND_DIR = str(_BASE / 'frontend')
+import logging
+logger = logging.getLogger(__name__)
+
+possible_dirs = [
+    os.path.join(settings.BASE_DIR.parent, 'frontend'),
+    os.path.join(settings.BASE_DIR, 'frontend'),
+    os.path.join(os.path.dirname(settings.BASE_DIR), 'frontend'),
+    '/app/frontend',
+    '/workspace/frontend',
+]
+
+FRONTEND_DIR = None
+for d in possible_dirs:
+    if os.path.exists(d) and os.path.isdir(d):
+        FRONTEND_DIR = d
+        break
+
+if not FRONTEND_DIR:
+    # Use default
+    FRONTEND_DIR = os.path.join(settings.BASE_DIR.parent, 'frontend')
+    logger.warning(f"FRONTEND_DIR NOT FOUND in standard locations! Falling back to: {FRONTEND_DIR}")
+else:
+    logger.info(f"Resolved FRONTEND_DIR at: {FRONTEND_DIR}")
+    try:
+        logger.info(f"Files in FRONTEND_DIR: {os.listdir(FRONTEND_DIR)}")
+    except Exception as e:
+        logger.warning(f"Could not list FRONTEND_DIR: {e}")
 
 
 def serve_frontend(request, path='index.html'):
@@ -23,7 +48,6 @@ def serve_frontend(request, path='index.html'):
         path = 'index.html'
     full_path = os.path.join(FRONTEND_DIR, path)
     if not os.path.exists(full_path):
-        # Fall back to index.html for SPA-style routing
         path = 'index.html'
     return static_serve(request, path, document_root=FRONTEND_DIR)
 

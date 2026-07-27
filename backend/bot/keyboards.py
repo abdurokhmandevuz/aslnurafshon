@@ -10,12 +10,16 @@ def _url(base: str, path: str) -> str:
     return f"{base.rstrip('/')}/{path.lstrip('/')}"
 
 
-def main_reply_keyboard() -> ReplyKeyboardMarkup:
+def main_reply_keyboard(frontend_url: str = None) -> ReplyKeyboardMarkup:
     """Persistent reply keyboard at the bottom of chat."""
+    if not frontend_url:
+        from django.conf import settings
+        frontend_url = settings.FRONTEND_URL
+
     return ReplyKeyboardMarkup(
         keyboard=[
             [
-                KeyboardButton(text="🛍 Do'konni ochish (Web)"),
+                KeyboardButton(text="🛍 Do'konni ochish (Web)", web_app=WebAppInfo(url=_url(frontend_url, "/"))),
                 KeyboardButton(text="☕ Choy tanlash (Bot)"),
             ],
             [
@@ -37,7 +41,7 @@ def main_menu_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(
         text="🛍 Web App Do'kon",
-        web_app=WebAppInfo(url=_url(frontend_url, "index.html")),
+        web_app=WebAppInfo(url=_url(frontend_url, "/")),
         style="primary",
     )
     builder.button(
@@ -51,7 +55,7 @@ def main_menu_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
     )
     builder.button(
         text="🔥 Aksiyalar",
-        web_app=WebAppInfo(url=_url(frontend_url, "aksiyalar.html")),
+        web_app=WebAppInfo(url=_url(frontend_url, "/?next=/aksiyalar/")),
         style="danger",
     )
     builder.button(
@@ -115,7 +119,7 @@ def shop_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
         [
             InlineKeyboardButton(
                 text="🛍 Web App Do'kon",
-                web_app=WebAppInfo(url=_url(frontend_url, "index.html")),
+                web_app=WebAppInfo(url=_url(frontend_url, "/")),
                 style="primary",
             ),
             InlineKeyboardButton(
@@ -132,7 +136,7 @@ def orders_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
         [
             InlineKeyboardButton(
                 text="📱 Web App'da ko'rish",
-                web_app=WebAppInfo(url=_url(frontend_url, "buyurtmalar.html")),
+                web_app=WebAppInfo(url=_url(frontend_url, "/?next=/orders/")),
             ),
         ],
         [
@@ -146,7 +150,7 @@ def promo_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(
             text="🔥 Aksiyalarni ko'rish",
-            web_app=WebAppInfo(url=_url(frontend_url, "aksiyalar.html")),
+            web_app=WebAppInfo(url=_url(frontend_url, "/?next=/aksiyalar/")),
             style="danger",
         )
     ]])

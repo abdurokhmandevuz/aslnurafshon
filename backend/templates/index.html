@@ -61,26 +61,28 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (data.is_courier) {
                                 window.location.href = '/courier/';
                             } else {
-                                window.location.href = '/catalog/';
+                                const nextUrl = new URLSearchParams(window.location.search).get('next') || '/catalog/';
+                                window.location.href = nextUrl;
                             }
                         } else {
-                            // Auth fail bo'lsa ham katalogga kiritamiz
-                            window.location.href = '/catalog/';
+                            const nextUrl = new URLSearchParams(window.location.search).get('next') || '/catalog/';
+                            window.location.href = nextUrl;
                         }
                     })
                     .catch(e => {
                         console.error('Auth error:', e);
-                        window.location.href = '/catalog/';
+                        const nextUrl = new URLSearchParams(window.location.search).get('next') || '/catalog/';
+                        window.location.href = nextUrl;
                     });
                 } else {
-                    // initData 2 soniyadan keyin ham yo'q bo'lsa
-                    window.location.href = '/catalog/';
+                    const nextUrl = new URLSearchParams(window.location.search).get('next') || '/catalog/';
+                    window.location.href = nextUrl;
                 }
             }
-        }, 100); // Har 100ms da tekshiramiz
+        }, 100);
     } else {
-        // Telegram WebApp mavjud emas
-        window.location.href = '/catalog/';
+        const nextUrl = new URLSearchParams(window.location.search).get('next') || '/catalog/';
+        window.location.href = nextUrl;
     }
 });
 </script>

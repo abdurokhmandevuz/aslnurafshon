@@ -142,7 +142,7 @@ async def handle_open_web_shop(message: Message, state: FSMContext):
     markup = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(
             text="🌐 Web App Do'konni Ochish",
-            web_app=WebAppInfo(url=_url(settings.FRONTEND_URL, "index.html")),
+            web_app=WebAppInfo(url=_url(settings.FRONTEND_URL, "/")),
             style="primary",
         )
     ]])
