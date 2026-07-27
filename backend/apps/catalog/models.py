@@ -203,23 +203,25 @@ class FavoriteProduct(models.Model):
 
 
 class DailyDeal(models.Model):
-    """Daily deal configuration (one active variant per day)."""
+    """Daily deal configuration."""
 
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, verbose_name="Mahsulot varianti")
     discount_percent = models.PositiveSmallIntegerField(
         default=0, validators=[MaxValueValidator(99)], verbose_name="Chegirma (%)"
     )
-    date = models.DateField(unique=True, verbose_name="Sana")
+    image = models.ImageField(upload_to='deals/', null=True, blank=True, verbose_name="Taklif rasmi")
+    delivery_fee = models.PositiveIntegerField(default=15000, verbose_name="Yetkazib berish narxi (UZS)")
     starts_at = models.DateTimeField(default=timezone.now, verbose_name="Boshlanish vaqti")
+    ends_at = models.DateTimeField(null=True, blank=True, verbose_name="Tugash vaqti")
     is_active = models.BooleanField(default=True, verbose_name="Faol")
 
     class Meta:
         verbose_name = "Kunlik taklif"
         verbose_name_plural = "Kunlik takliflar"
-        ordering = ['-date']
+        ordering = ['-id']
 
     def __str__(self):
-        return f"{self.date}: {self.variant} (-{self.discount_percent}%)"
+        return f"{self.variant} (-{self.discount_percent}%)"
 
     @property
     def deal_price(self):

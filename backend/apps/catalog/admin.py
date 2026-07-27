@@ -159,9 +159,9 @@ class FavoriteProductAdmin(admin.ModelAdmin):
 
 @admin.register(DailyDeal)
 class DailyDealAdmin(admin.ModelAdmin):
-    list_display = ('date', 'variant', 'discount_percent', 'deal_price', 'is_active')
-    list_editable = ('discount_percent', 'is_active')
-    list_filter = ('is_active', 'date')
+    list_display = ('variant', 'discount_percent', 'delivery_fee', 'deal_price', 'starts_at', 'ends_at', 'is_active')
+    list_editable = ('discount_percent', 'delivery_fee', 'is_active')
+    list_filter = ('is_active', 'starts_at')
     search_fields = ('variant__product__name', 'variant__label')
 
 

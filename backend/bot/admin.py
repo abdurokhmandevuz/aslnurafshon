@@ -58,6 +58,15 @@ class CardForm(StatesGroup):
     card_holder = State()
 
 
+class DealWizardForm(StatesGroup):
+    selecting_variants = State()
+    photo = State()
+    delivery_fee = State()
+    discount = State()
+    duration = State()
+    confirm = State()
+
+
 def is_admin(telegram_id: int) -> bool:
     return telegram_id in settings.ADMIN_TELEGRAM_IDS
 
@@ -250,12 +259,22 @@ async def product_stock(message: Message, state: FSMContext):
     )
 
 
+# ─── Daily Deal Wizard Handlers ──────────────────────────────────────────────
+
 @admin_router.callback_query(F.data == 'admin:deal')
 async def deal_start(callback: CallbackQuery, state: FSMContext):
     if not is_admin(callback.from_user.id):
         await _deny(callback)
         return
     await state.clear()
+    await state.set_state(DealWizardForm.selecting_variants)
+    await state.update_data(selected_ids=[])
+    await render_deal_variant_selection(callback, state)
+
+
+async def render_deal_variant_selection(event: Message | CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    selected_ids = set(data.get('selected_ids', []))
 
     from apps.catalog.models import ProductVariant
     variants = await sync_to_async(list)(
@@ -264,58 +283,266 @@ async def deal_start(callback: CallbackQuery, state: FSMContext):
     )
 
     if not variants:
-        await callback.message.answer("Hali faol mahsulotlar yo'q. Avval mahsulot qo'shing.")
-        await callback.answer()
+        msg = "Hali faol mahsulotlar yo'q. Avval mahsulot qo'shing."
+        if isinstance(event, CallbackQuery):
+            await event.message.answer(msg)
+            await event.answer()
+        else:
+            await event.answer(msg)
         return
 
     buttons = []
     for item in variants:
-        btn_text = f"☕ {item.product.name} — {item.label} ({item.price:,} UZS)"
-        buttons.append([InlineKeyboardButton(text=btn_text, callback_data=f'admin:deal-variant:{item.id}')])
+        is_sel = item.id in selected_ids
+        icon = "✅" if is_sel else "❌"
+        btn_text = f"{icon} {item.product.name} ({item.label}) — {item.price:,} UZS"
+        buttons.append([InlineKeyboardButton(text=btn_text, callback_data=f'admin:deal-toggle:{item.id}')])
+
+    sel_count = len(selected_ids)
+    if sel_count > 0:
+        buttons.append([InlineKeyboardButton(text=f"➡️ Keyingi bosqich ({sel_count} ta tanlandi)", callback_data='admin:deal-next')])
     buttons.append([InlineKeyboardButton(text="❌ Bekor qilish", callback_data='admin:home')])
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
-    await callback.message.answer("<b>🔥 Kunlik taklif uchun mahsulotni tanlang:</b>", parse_mode='HTML', reply_markup=keyboard)
+    text = (
+        "<b>🔥 Kunlik taklif uchun mahsulotlarni tanlang:</b>\n\n"
+        "Mahsulot ustiga bosib ptichka <b>(✅)</b> qo'ying. "
+        "Bir nechta tanlashingiz mumkin. Yakunlash uchun <i>Keyingi bosqich</i> tugmasini bosing 👇"
+    )
+
+    if isinstance(event, CallbackQuery):
+        await safe_edit_message(event.message, text, reply_markup=keyboard)
+        await event.answer()
+    else:
+        await event.answer(text, parse_mode='HTML', reply_markup=keyboard)
+
+
+@admin_router.callback_query(DealWizardForm.selecting_variants, F.data.startswith('admin:deal-toggle:'))
+async def deal_toggle_variant(callback: CallbackQuery, state: FSMContext):
+    var_id = int(callback.data.split(':')[-1])
+    data = await state.get_data()
+    selected_ids = set(data.get('selected_ids', []))
+
+    if var_id in selected_ids:
+        selected_ids.remove(var_id)
+    else:
+        selected_ids.add(var_id)
+
+    await state.update_data(selected_ids=list(selected_ids))
+    await render_deal_variant_selection(callback, state)
+
+
+@admin_router.callback_query(DealWizardForm.selecting_variants, F.data == 'admin:deal-next')
+async def deal_next_to_photo(callback: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    if not data.get('selected_ids'):
+        await callback.answer("Kamida 1 ta mahsulot tanlang!", show_alert=True)
+        return
+
+    await state.set_state(DealWizardForm.photo)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="⏭ Rasmsiz davom etish", callback_data='admin:deal-skip-photo')
+    ]])
+    await callback.message.answer(
+        "📸 <b>Kunlik taklif uchun rasm yuklang:</b>\n\n"
+        "Rasmni shu yerga yuboring yoki rasm qo'shmaslik uchun tugmani bosing 👇",
+        parse_mode='HTML',
+        reply_markup=keyboard
+    )
     await callback.answer()
 
 
-@admin_router.callback_query(F.data.startswith('admin:deal-variant:'))
-async def deal_variant(callback: CallbackQuery, state: FSMContext):
+@admin_router.message(DealWizardForm.photo, F.photo)
+@admin_router.callback_query(DealWizardForm.photo, F.data == 'admin:deal-skip-photo')
+async def deal_process_photo(event: Message | CallbackQuery, state: FSMContext):
+    photo_id = None
+    if isinstance(event, Message) and event.photo:
+        photo_id = event.photo[-1].file_id
+        msg = event
+    else:
+        msg = event.message
+        await event.answer()
+
+    await state.update_data(photo_id=photo_id)
+    await state.set_state(DealWizardForm.delivery_fee)
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="⏭ O'tkazib yuborish (15,000 UZS)", callback_data='admin:deal-skip-delivery')
+    ]])
+    await msg.answer(
+        "🚚 <b>Dastavka narxini kiriting (UZS):</b>\n\n"
+        "<i>(Masalan: 10000 yoki 0 - bepul)</i>\n\n"
+        "Standart 15,000 UZS bo'lib qolishi uchun tugmani bosing 👇",
+        parse_mode='HTML',
+        reply_markup=keyboard
+    )
+
+
+@admin_router.message(DealWizardForm.delivery_fee)
+@admin_router.callback_query(DealWizardForm.delivery_fee, F.data == 'admin:deal-skip-delivery')
+async def deal_process_delivery(event: Message | CallbackQuery, state: FSMContext):
+    fee = 15000
+    if isinstance(event, Message):
+        val = _parse_number(event.text or '')
+        if val is not None:
+            fee = val
+        msg = event
+    else:
+        msg = event.message
+        await event.answer()
+
+    await state.update_data(delivery_fee=fee)
+    await state.set_state(DealWizardForm.discount)
+    await msg.answer("🏷 <b>Chegirma foizini kiriting (1 dan 99 gacha):</b>\n<i>(Masalan: 20)</i>", parse_mode='HTML')
+
+
+@admin_router.message(DealWizardForm.discount)
+async def deal_process_discount(message: Message, state: FSMContext):
+    discount = _parse_number(message.text or '')
+    if discount is None or not 1 <= discount <= 99:
+        await message.answer("Chegirma foizi 1 dan 99 gacha son bo'lishi kerak.")
+        return
+
+    await state.update_data(discount_percent=discount)
+    await state.set_state(DealWizardForm.duration)
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="⏭ O'tkazib yuborish (24 soat)", callback_data='admin:deal-skip-duration')
+    ]])
+    await message.answer(
+        "⏰ <b>Kunlik taklif amal qilish vaqtini kiriting (soatda):</b>\n\n"
+        "<i>(Masalan: 12 yoki 24 yoki 48)</i>\n\n"
+        "Standart 24 soat bo'lib qolishi uchun tugmani bosing 👇",
+        parse_mode='HTML',
+        reply_markup=keyboard
+    )
+
+
+@admin_router.message(DealWizardForm.duration)
+@admin_router.callback_query(DealWizardForm.duration, F.data == 'admin:deal-skip-duration')
+async def deal_process_duration(event: Message | CallbackQuery, state: FSMContext):
+    hours = 24
+    if isinstance(event, Message):
+        val = _parse_number(event.text or '')
+        if val is not None and val > 0:
+            hours = val
+        msg = event
+    else:
+        msg = event.message
+        await event.answer()
+
+    await state.update_data(duration_hours=hours)
+    await state.set_state(DealWizardForm.confirm)
+
+    data = await state.get_data()
+    selected_ids = data.get('selected_ids', [])
+    discount = data.get('discount_percent', 0)
+    fee = data.get('delivery_fee', 15000)
+
+    from apps.catalog.models import ProductVariant
+    variants = await sync_to_async(list)(
+        ProductVariant.objects.filter(id__in=selected_ids).select_related('product')
+    )
+
+    lines = ["<b>🔥 KUNLIK TAKLIF KONSEPSIYASI VA HISOB-KITOBLARI:</b>\n"]
+    for idx, v in enumerate(variants, 1):
+        deal_price = int(v.price * (100 - discount) / 100)
+        total_with_del = deal_price + fee
+        lines.append(
+            f"<b>{idx}. {v.product.name}</b> ({v.label})\n"
+            f"  • Asl narxi: <s>{v.price:,} UZS</s>\n"
+            f"  • Chegirmali narx (-{discount}%): <b>{deal_price:,} UZS</b>\n"
+            f"  • Dastavka narxi: <b>{fee:,} UZS</b>\n"
+            f"  • Jami (1 ta uchun): <b>{total_with_del:,} UZS</b>\n"
+        )
+
+    lines.append(f"⏰ Amal qilish muddati: <b>{hours} soat</b>")
+    lines.append(f"📸 Rasm: <b>{'Yuklangan ✅' if data.get('photo_id') else 'Mavjud emas ❌'}</b>\n")
+    lines.append("Mijozlarga e'lon qilishni tasdiqlaysizmi? 👇")
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🚀 Mijozlarga e'lon qilish (Avto-yuborish)", callback_data='admin:deal-broadcast')],
+        [InlineKeyboardButton(text="❌ Bekor qilish", callback_data='admin:home')]
+    ])
+
+    await msg.answer("\n".join(lines), parse_mode='HTML', reply_markup=keyboard)
+
+
+@admin_router.callback_query(DealWizardForm.confirm, F.data == 'admin:deal-broadcast')
+async def deal_broadcast_confirm(callback: CallbackQuery, state: FSMContext):
     if not is_admin(callback.from_user.id):
         await _deny(callback)
         return
-    variant_id = int(callback.data.split(':')[-1])
-    await state.update_data(variant_id=variant_id)
-    await state.set_state(DealForm.discount)
-    await callback.message.answer("Chegirma foizini yuboring (1 dan 99 gacha):")
-    await callback.answer()
 
-
-@admin_router.message(DealForm.discount)
-async def deal_discount(message: Message, state: FSMContext):
-    discount = _parse_number(message.text or '')
-    if discount is None or not 1 <= discount <= 99:
-        await message.answer("Chegirma 1 dan 99 gacha bo'lishi kerak.")
-        return
     data = await state.get_data()
+    selected_ids = data.get('selected_ids', [])
+    discount = data.get('discount_percent', 0)
+    fee = data.get('delivery_fee', 15000)
+    hours = data.get('duration_hours', 24)
+    photo_id = data.get('photo_id')
+
     from apps.catalog.models import DailyDeal, ProductVariant
+    from apps.accounts.models import TelegramUser
+    from django.utils import timezone
+    import datetime
+
+    ends_at = timezone.now() + datetime.timedelta(hours=hours)
 
     @sync_to_async
-    def save_deal():
-        deal, _ = DailyDeal.objects.update_or_create(
-            date=timezone.localdate(),
-            defaults={
-                'variant': ProductVariant.objects.get(pk=data['variant_id']),
-                'discount_percent': discount,
-                'is_active': True,
-                'starts_at': timezone.now(),
-            },
-        )
-        return deal
+    def create_deals_in_db():
+        created_deals = []
+        for vid in selected_ids:
+            variant = ProductVariant.objects.get(id=vid)
+            deal = DailyDeal.objects.create(
+                variant=variant,
+                discount_percent=discount,
+                delivery_fee=fee,
+                starts_at=timezone.now(),
+                ends_at=ends_at,
+                is_active=True
+            )
+            created_deals.append(deal)
+        return created_deals
 
-    deal = await save_deal()
+    deals = await create_deals_in_db()
     await state.clear()
-    await message.answer(f"Bugungi taklif saqlandi: <b>{deal.variant}</b> (-{discount}%).", parse_mode='HTML', reply_markup=admin_menu())
+
+    # Broadcast to all users
+    users = await sync_to_async(list)(TelegramUser.objects.values_list('telegram_id', flat=True))
+    sent_count = 0
+
+    for deal in deals:
+        v = deal.variant
+        deal_price = deal.deal_price
+        caption = (
+            f"🔥 <b>KUNLIK MAXSUS TAKLIF!</b> 🔥\n\n"
+            f"☕ <b>{v.product.name}</b> ({v.label})\n"
+            f"<s>{v.price:,} UZS</s> ➡️ <b>{deal_price:,} UZS</b> (-{discount}%)\n"
+            f"🚚 Dastavka: <b>{'Bepul 🎉' if fee == 0 else f'{fee:,} UZS'}</b>\n"
+            f"⏰ Amal qilish vaqti: <b>{hours} soat</b>\n\n"
+            f"⚡️ Shoshiling, eng sifatli mahsulotlar chegirmada!"
+        )
+        markup = InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(text="🛒 Savatga qo'shish (Xarid)", callback_data=f"add_deal:{deal.id}")
+        ]])
+
+        for u_id in users:
+            try:
+                if photo_id:
+                    await callback.bot.send_photo(u_id, photo_id, caption=caption, parse_mode='HTML', reply_markup=markup)
+                else:
+                    await callback.bot.send_message(u_id, caption, parse_mode='HTML', reply_markup=markup)
+                sent_count += 1
+                await asyncio.sleep(0.04)
+            except Exception:
+                pass
+
+    await callback.message.answer(
+        f"✅ <b>Kunlik taklif saqlandi!</b>\n\nJami {len(deals)} ta mahsulot {sent_count} ta mijozga e'lon qilindi.",
+        parse_mode='HTML',
+        reply_markup=admin_menu()
+    )
+    await callback.answer()
 
 
 @admin_router.callback_query(F.data == 'admin:bundle')

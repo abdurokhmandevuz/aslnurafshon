@@ -11,6 +11,9 @@ class PromoCode(models.Model):
     usage_limit = models.PositiveIntegerField(default=100, verbose_name="Ishlatilish limiti")
     times_used = models.PositiveIntegerField(default=0, verbose_name="Ishlatilgan soni")
     min_order_amount = models.PositiveIntegerField(default=0, verbose_name="Minimal buyurtma summasi")
+    used_by_users = models.ManyToManyField(
+        TelegramUser, blank=True, related_name='used_promocodes', verbose_name="Ishlatgan foydalanuvchilar"
+    )
     is_active = models.BooleanField(default=True, verbose_name="Faol")
 
     class Meta:

@@ -66,6 +66,7 @@ async def safe_edit_message(message: Message, text: str, reply_markup=None, pars
 # ─── FSM States for Bot Ordering Flow ─────────────────────────────────────────
 
 class OrderState(StatesGroup):
+    waiting_for_promocode = State()
     waiting_for_phone = State()
     waiting_for_location = State()
     waiting_for_receipt = State()
@@ -78,6 +79,7 @@ class UserSettingsState(StatesGroup):
 
 # In-memory user cart storage: { user_id: { variant_id: quantity } }
 USER_CARTS = {}
+USER_CARTS_DEAL_FLAGS = {}
 # Pending order for receipt upload: { user_id: order_id }
 PENDING_RECEIPT_ORDERS = {}
 
@@ -132,9 +134,27 @@ async def cmd_start(message: Message, state: FSMContext):
     )
 
 
-# ─── Bot Catalog Browsing ─────────────────────────────────────────────────────
+@router.message(F.text == "🛍 Do'konni ochish (Web)")
+async def handle_open_web_shop(message: Message, state: FSMContext):
+    await state.clear()
+    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+    from bot.keyboards import _url
+    markup = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(
+            text="🌐 Web App Do'konni Ochish",
+            web_app=WebAppInfo(url=_url(settings.FRONTEND_URL, "index.html")),
+            style="primary",
+        )
+    ]])
+    await message.answer(
+        "🌐 <b>Asl Nurafshon Web App do'koni</b>\n\n"
+        "Quyidagi tugmani bosib, interaktiv veb-do'konimizni ochishingiz va mahsulotlarni qulay tarzda ko'rishingiz mumkin 👇",
+        parse_mode='HTML',
+        reply_markup=markup,
+    )
 
-@router.message(F.text.in_({"☕ Choy tanlash (Bot)", "☕ Bot Katalogi", "/catalog", "🛍 Do'konni ochish (Web)"}))
+
+@router.message(F.text.in_({"☕ Choy tanlash (Bot)", "☕ Bot Katalogi", "/catalog"}))
 @router.callback_query(F.data == "bot_catalog")
 async def show_bot_catalog(event: Message | CallbackQuery, state: FSMContext):
     await state.clear()
@@ -441,6 +461,100 @@ async def add_variant_to_cart(callback: CallbackQuery):
     await callback.answer(f"✅ {variant.product.name} ({variant.label}) savatga qo'shildi! (Jami: {total_count} ta)", show_alert=True)
 
 
+# ─── Add Daily Deal to Cart ───────────────────────────────────────────────────
+
+@router.callback_query(F.data.startswith("add_deal:"))
+async def handle_add_deal_to_cart(callback: CallbackQuery):
+    deal_id = int(callback.data.split(":")[1])
+    user_id = callback.from_user.id
+
+    from asgiref.sync import sync_to_async
+    from apps.catalog.models import DailyDeal
+    from django.utils import timezone
+
+    try:
+        deal = await sync_to_async(DailyDeal.objects.select_related('variant', 'variant__product').get)(id=deal_id)
+        if not deal.is_active or (deal.ends_at and timezone.now() > deal.ends_at):
+            await callback.answer("⚠️ Ushbu kunlik taklif muddati tugagan!", show_alert=True)
+            return
+
+        var_id = deal.variant.id
+        if user_id not in USER_CARTS:
+            USER_CARTS[user_id] = {}
+
+        USER_CARTS[user_id][var_id] = USER_CARTS[user_id].get(var_id, 0) + 1
+        USER_CARTS_DEAL_FLAGS[user_id] = True
+
+        total_count = sum(USER_CARTS[user_id].values())
+        await callback.answer(
+            f"🔥 {deal.variant.product.name} (Kunlik taklif -{deal.discount_percent}%) savatga qo'shildi! (Jami: {total_count} ta)",
+            show_alert=True
+        )
+    except Exception as err:
+        logger.error("Add deal error: %s", err)
+        await callback.answer("Taklif topilmadi", show_alert=True)
+
+
+# ─── Apply Promocode Flow ─────────────────────────────────────────────────────
+
+@router.callback_query(F.data == "apply_promocode")
+async def handle_apply_promocode(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    if USER_CARTS_DEAL_FLAGS.get(user_id, False):
+        await callback.message.answer(
+            "⚠️ <b>Kechirasiz, promo-kod qo'llab bo'lmaydi!</b>\n\n"
+            "Savatingizda <b>Kunlik taklif (Daily Deal)</b> yoki chegirmali mahsulot borligi sababli promo-kod ishlatish mumkin emas.",
+            parse_mode='HTML'
+        )
+        await callback.answer()
+        return
+
+    await state.set_state(OrderState.waiting_for_promocode)
+    await callback.message.answer(
+        "🎁 <b>Promo-kodni kiriting:</b>\n\n<i>(Masalan: NURAFSHON10)</i>",
+        parse_mode='HTML'
+    )
+    await callback.answer()
+
+
+@router.message(OrderState.waiting_for_promocode)
+async def process_promocode(message: Message, state: FSMContext):
+    code_text = (message.text or '').strip().upper()
+    user_id = message.from_user.id
+
+    from asgiref.sync import sync_to_async
+    from apps.orders.models import PromoCode
+    from apps.accounts.models import TelegramUser
+
+    @sync_to_async
+    def check_promo():
+        promo = PromoCode.objects.filter(code=code_text, is_active=True).first()
+        if not promo:
+            return None, "⚠️ Promo-kod topilmadi yoki aktiv emas."
+        if not promo.is_valid():
+            return None, "⚠️ Promo-kod muddati o'tgan yoki ishlatish limiti tugagan."
+
+        tuser = TelegramUser.objects.filter(telegram_id=user_id).first()
+        if tuser and promo.used_by_users.filter(id=tuser.id).exists():
+            return None, "⚠️ Siz ushbu promo-koddan avval foydalangansiz! Har bir promo-kod 1 kishiga faqat 1 marta beriladi."
+
+        return promo, None
+
+    promo, err_msg = await check_promo()
+    if err_msg:
+        await message.answer(err_msg, parse_mode='HTML')
+        await state.clear()
+        return
+
+    await state.update_data(applied_promo_code=promo.code, promo_discount_percent=promo.discount_percent)
+    await state.clear()
+    await message.answer(
+        f"✅ <b>PROMO-KOD QO'LLANDI!</b>\n\nPromo-kod: <b>{promo.code}</b> (-{promo.discount_percent}% chegirma)",
+        parse_mode='HTML',
+        reply_markup=main_reply_keyboard()
+    )
+
+
 # ─── View Cart & Quantity Controls ───────────────────────────────────────────
 
 @router.callback_query(F.data.startswith("cart_inc:"))
@@ -527,6 +641,7 @@ async def view_bot_cart(callback: CallbackQuery):
 async def clear_bot_cart(callback: CallbackQuery):
     user_id = callback.from_user.id
     USER_CARTS[user_id] = {}
+    USER_CARTS_DEAL_FLAGS[user_id] = False
     await callback.answer("🗑 Savat tozalandi", show_alert=True)
     await view_bot_cart(callback)
 
@@ -641,6 +756,19 @@ async def _execute_order_creation(message: Message, state: FSMContext, address_t
                     quantity=qty,
                     price_at_order=v.price
                 )
+
+        applied_promo_code = data.get('applied_promo_code')
+        promo_discount_percent = data.get('promo_discount_percent', 0)
+
+        if applied_promo_code and promo_discount_percent > 0:
+            discount_amount = int(subtotal * promo_discount_percent / 100)
+            subtotal = max(0, subtotal - discount_amount)
+            from apps.orders.models import PromoCode
+            promo_obj = PromoCode.objects.filter(code=applied_promo_code).first()
+            if promo_obj:
+                promo_obj.used_by_users.add(tuser)
+                promo_obj.times_used += 1
+                promo_obj.save(update_fields=['times_used'])
 
         fee = 0 if subtotal >= 150000 else 15000
         order.subtotal = subtotal

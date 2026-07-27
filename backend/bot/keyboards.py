@@ -217,6 +217,7 @@ def cart_inline_keyboard(cart: dict = None, variants_dict: dict = None) -> Inlin
                     InlineKeyboardButton(text="❌", callback_data=f"cart_del:{vid}"),
                 ])
 
+    buttons.append([InlineKeyboardButton(text="🎁 Promo-kod kiritish", callback_data="apply_promocode")])
     buttons.append([InlineKeyboardButton(text="✅ Buyurtma berish (Checkout)", callback_data="checkout_bot", style="success")])
     buttons.append([InlineKeyboardButton(text="➕ Yana mahsulot qo'shish", callback_data="bot_catalog")])
     buttons.append([InlineKeyboardButton(text="🗑 Savatni tozalash", callback_data="clear_cart", style="danger")])

@@ -9,6 +9,18 @@ from django.views.static import serve
 from apps.orders.views_ssr import set_language_exempt
 
 
+import os
+from django.views.static import serve as static_serve
+
+FRONTEND_DIR = os.path.join(settings.BASE_DIR.parent, 'frontend')
+
+
+def serve_frontend(request, path='index.html'):
+    if not path or path == '/':
+        path = 'index.html'
+    return static_serve(request, path, document_root=FRONTEND_DIR)
+
+
 def health_check(_request):
     return JsonResponse({'status': 'ok'})
 
@@ -29,11 +41,15 @@ urlpatterns = [
     path('', include('apps.accounts.urls_ssr')),
     path('', include('apps.catalog.urls_ssr')),
     path('', include('apps.orders.urls_ssr')),
+
+    # Frontend Static & HTML Routes
+    path('', serve_frontend, kwargs={'path': 'index.html'}),
+    re_path(r'^(?P<path>.*\.html)$', serve_frontend),
+    re_path(r'^(?P<path>.*\.js)$', serve_frontend),
+    re_path(r'^(?P<path>.*\.css)$', serve_frontend),
 ]
 
 urlpatterns += [
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
