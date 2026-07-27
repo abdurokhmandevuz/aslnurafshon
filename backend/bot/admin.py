@@ -47,6 +47,17 @@ class BroadcastForm(StatesGroup):
     confirm = State()
 
 
+class PromoCodeForm(StatesGroup):
+    code = State()
+    discount_percent = State()
+
+
+class CardForm(StatesGroup):
+    bank_name = State()
+    card_number = State()
+    card_holder = State()
+
+
 def is_admin(telegram_id: int) -> bool:
     return telegram_id in settings.ADMIN_TELEGRAM_IDS
 
@@ -244,40 +255,39 @@ async def deal_start(callback: CallbackQuery, state: FSMContext):
     if not is_admin(callback.from_user.id):
         await _deny(callback)
         return
-    await state.set_state(DealForm.search)
-    await callback.message.answer("Kunlik taklif uchun mahsulot yoki variant nomini yozing.")
+    await state.clear()
+
+    from apps.catalog.models import ProductVariant
+    variants = await sync_to_async(list)(
+        ProductVariant.objects.filter(is_available=True)
+        .select_related('product').order_by('product__name', 'price')[:30]
+    )
+
+    if not variants:
+        await callback.message.answer("Hali faol mahsulotlar yo'q. Avval mahsulot qo'shing.")
+        await callback.answer()
+        return
+
+    buttons = []
+    for item in variants:
+        btn_text = f"☕ {item.product.name} — {item.label} ({item.price:,} UZS)"
+        buttons.append([InlineKeyboardButton(text=btn_text, callback_data=f'admin:deal-variant:{item.id}')])
+    buttons.append([InlineKeyboardButton(text="❌ Bekor qilish", callback_data='admin:home')])
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    await callback.message.answer("<b>🔥 Kunlik taklif uchun mahsulotni tanlang:</b>", parse_mode='HTML', reply_markup=keyboard)
     await callback.answer()
 
 
-async def _variant_choices(message: Message, state: FSMContext, prefix: str, query: str):
-    from apps.catalog.models import ProductVariant
-    variants = await sync_to_async(list)(
-        ProductVariant.objects.filter(is_available=True, product__name__icontains=query)
-        .select_related('product').order_by('product__name', 'price')[:8]
-    )
-    if not variants:
-        await message.answer("Mos mahsulot topilmadi. Boshqa nom bilan qayta yuboring.")
-        return
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=f"{item.product.name} - {item.label} ({item.price:,} UZS)", callback_data=f'{prefix}:{item.id}')]
-        for item in variants
-    ])
-    await message.answer("Variantni tanlang.", reply_markup=keyboard)
-
-
-@admin_router.message(DealForm.search)
-async def deal_search(message: Message, state: FSMContext):
-    await _variant_choices(message, state, 'admin:deal-variant', (message.text or '').strip())
-
-
-@admin_router.callback_query(DealForm.search, F.data.startswith('admin:deal-variant:'))
+@admin_router.callback_query(F.data.startswith('admin:deal-variant:'))
 async def deal_variant(callback: CallbackQuery, state: FSMContext):
     if not is_admin(callback.from_user.id):
         await _deny(callback)
         return
-    await state.update_data(variant_id=int(callback.data.rsplit(':', 1)[1]))
+    variant_id = int(callback.data.split(':')[-1])
+    await state.update_data(variant_id=variant_id)
     await state.set_state(DealForm.discount)
-    await callback.message.answer("Chegirma foizini yuboring: 1 dan 99 gacha.")
+    await callback.message.answer("Chegirma foizini yuboring (1 dan 99 gacha):")
     await callback.answer()
 
 
@@ -513,3 +523,121 @@ async def broadcast_send(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.answer(f"Xabar {sent} ta mijozga yuborildi.", reply_markup=admin_menu())
     await callback.answer()
+
+
+# ─── PromoCode & Card Handlers ───────────────────────────────────────────────
+
+@admin_router.callback_query(F.data == 'admin:promocode')
+async def promocode_start(callback: CallbackQuery, state: FSMContext):
+    if not is_admin(callback.from_user.id):
+        await _deny(callback)
+        return
+    await state.set_state(PromoCodeForm.code)
+    await callback.message.answer("<b>🎁 Yangi Promo-kod yaratish</b>\n\nPromo-kod matnini yuboring (masalan: <code>NURAFSHON10</code>):", parse_mode='HTML')
+    await callback.answer()
+
+
+@admin_router.message(PromoCodeForm.code)
+async def promocode_code(message: Message, state: FSMContext):
+    if not _is_admin_message(message):
+        await _deny(message)
+        return
+    code_text = (message.text or '').strip().upper()
+    if not code_text:
+        await message.answer("Promo-kod matnini yuboring.")
+        return
+    await state.update_data(code=code_text)
+    await state.set_state(PromoCodeForm.discount_percent)
+    await message.answer("Chegirma foizini yuboring (masalan: <code>10</code>):", parse_mode='HTML')
+
+
+@admin_router.message(PromoCodeForm.discount_percent)
+async def promocode_discount(message: Message, state: FSMContext):
+    discount = _parse_number(message.text or '')
+    if discount is None or not 1 <= discount <= 99:
+        await message.answer("Chegirma foizi 1 dan 99 gacha son bo'lishi kerak.")
+        return
+    data = await state.get_data()
+    from apps.orders.models import PromoCode
+    import datetime
+
+    @sync_to_async
+    def create_promo():
+        promo, _ = PromoCode.objects.update_or_create(
+            code=data['code'],
+            defaults={
+                'discount_percent': discount,
+                'valid_until': timezone.now() + datetime.timedelta(days=365),
+                'usage_limit': 1000,
+                'is_active': True,
+            }
+        )
+        return promo
+
+    promo = await create_promo()
+    await state.clear()
+    await message.answer(f"✅ Promo-kod yaratildi: <b>{promo.code}</b> (-{discount}%)", parse_mode='HTML', reply_markup=admin_menu())
+
+
+@admin_router.callback_query(F.data == 'admin:card')
+async def card_start(callback: CallbackQuery, state: FSMContext):
+    if not is_admin(callback.from_user.id):
+        await _deny(callback)
+        return
+    await state.set_state(CardForm.bank_name)
+    await callback.message.answer("<b>💳 Bank kartasini kiritish</b>\n\nBank nomini yuboring (masalan: <code>Kapitalbank</code>):", parse_mode='HTML')
+    await callback.answer()
+
+
+@admin_router.message(CardForm.bank_name)
+async def card_bank_name(message: Message, state: FSMContext):
+    bank_name = (message.text or '').strip()
+    if not bank_name:
+        await message.answer("Bank nomini yuboring.")
+        return
+    await state.update_data(bank_name=bank_name)
+    await state.set_state(CardForm.card_number)
+    await message.answer("Karta raqamini yuboring (masalan: <code>8600 1234 5678 9012</code>):", parse_mode='HTML')
+
+
+@admin_router.message(CardForm.card_number)
+async def card_number(message: Message, state: FSMContext):
+    card_num = (message.text or '').strip()
+    if not card_num:
+        await message.answer("Karta raqamini yuboring.")
+        return
+    await state.update_data(card_number=card_num)
+    await state.set_state(CardForm.card_holder)
+    await message.answer("Karta egasining ismini yuboring (masalan: <code>ASL NURAFSHON MCHJ</code>):", parse_mode='HTML')
+
+
+@admin_router.message(CardForm.card_holder)
+async def card_holder(message: Message, state: FSMContext):
+    holder = (message.text or '').strip()
+    if not holder:
+        await message.answer("Karta egasini yuboring.")
+        return
+    data = await state.get_data()
+    from apps.orders.models import BankCard
+
+    @sync_to_async
+    def save_card():
+        BankCard.objects.all().update(is_active=False)
+        card = BankCard.objects.create(
+            bank_name=data['bank_name'],
+            card_number=data['card_number'],
+            card_holder=holder,
+            is_active=True
+        )
+        return card
+
+    card = await save_card()
+    await state.clear()
+    await message.answer(
+        f"✅ Yangi to'lov kartasi o'rnatildi!\n\n"
+        f"🏦 Bank: <b>{card.bank_name}</b>\n"
+        f"💳 Karta: <code>{card.card_number}</code>\n"
+        f"👤 Egasi: <b>{card.card_holder}</b>",
+        parse_mode='HTML',
+        reply_markup=admin_menu()
+    )

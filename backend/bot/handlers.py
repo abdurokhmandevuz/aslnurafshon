@@ -134,9 +134,10 @@ async def cmd_start(message: Message, state: FSMContext):
 
 # ─── Bot Catalog Browsing ─────────────────────────────────────────────────────
 
-@router.message(F.text.in_({"☕ Choy tanlash (Bot)", "☕ Bot Katalogi", "/catalog"}))
+@router.message(F.text.in_({"☕ Choy tanlash (Bot)", "☕ Bot Katalogi", "/catalog", "🛍 Do'konni ochish (Web)"}))
 @router.callback_query(F.data == "bot_catalog")
-async def show_bot_catalog(event: Message | CallbackQuery):
+async def show_bot_catalog(event: Message | CallbackQuery, state: FSMContext):
+    await state.clear()
     from asgiref.sync import sync_to_async
     from apps.catalog.models import Category
 
