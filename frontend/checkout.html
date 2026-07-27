@@ -187,32 +187,42 @@
 </button>
 </div>
 </section>
-<!-- Section: Payment Method -->
+<!-- Section: Payment Method & Bank Transfer -->
 <section class="flex flex-col gap-sm">
-<label class="font-label-md text-label-md text-primary-container">To'lov usuli</label>
-<div class="grid grid-cols-3 gap-md">
-<button onclick="selectPayment('payme', this)" class="payment-btn relative cursor-pointer bg-primary/10 border-2 border-primary rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
-<span class="material-symbols-outlined text-primary text-[32px]">account_balance_wallet</span>
-<span class="font-label-md text-label-md text-primary">Payme</span>
+<label class="font-bold text-base text-primary">💳 To'lov Usuli (Karta / Naqd)</label>
+<div class="grid grid-cols-2 gap-md">
+<button onclick="selectPayment('card_transfer', this)" class="payment-btn relative cursor-pointer bg-amber-50 border-2 border-amber-600 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all shadow-sm">
+<span class="material-symbols-outlined text-amber-700 text-[32px]">credit_card</span>
+<span class="font-bold text-amber-900 text-sm">Karta o'tkazmasi</span>
 </button>
-<button onclick="selectPayment('click', this)" class="payment-btn relative cursor-pointer bg-surface border border-outline-variant hover:border-primary rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
-<span class="material-symbols-outlined text-outline text-[32px]">credit_card</span>
-<span class="font-label-md text-label-md text-on-surface-variant">Click</span>
-</button>
-<button onclick="selectPayment('cash', this)" class="payment-btn relative cursor-pointer bg-surface border border-outline-variant hover:border-primary rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-colors">
+<button onclick="selectPayment('cash', this)" class="payment-btn relative cursor-pointer bg-surface border-2 border-outline-variant hover:border-amber-600 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all">
 <span class="material-symbols-outlined text-outline text-[32px]">payments</span>
-<span class="font-label-md text-label-md text-on-surface-variant">Naqd</span>
+<span class="font-bold text-on-surface-variant text-sm">Naqd pul</span>
 </button>
 </div>
+
+<!-- Dynamic Bank Card Details -->
+<div id="bank-card-info" class="w-full">
+<!-- Loaded dynamically from API -->
+</div>
+
+<!-- Receipt Upload Box -->
+<div id="receipt-upload-block" class="bg-amber-50/50 border-2 border-dashed border-amber-300 rounded-2xl p-4 flex flex-col items-center text-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-amber-600 text-[36px]">receipt_long</span>
+<div class="font-bold text-sm text-amber-900">To'lov cheki rasm / skrinshotini yuklang</div>
+<p class="text-xs text-amber-700">To'lov qilgach, chek rasmini yuklasangiz admin tezda tasdiqlaydi.</p>
+<input id="receipt-file-input" type="file" accept="image/*" class="block w-full text-xs text-stone-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer mt-2"/>
+</div>
 </section>
+
 <!-- Section: Order Summary -->
-<section class="bg-surface rounded-xl shadow-level-1 p-md md:p-lg border border-surface-container-high mb-lg">
-<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md">Buyurtma tarkibi</h3>
+<section class="bg-surface rounded-2xl shadow-level-1 p-md md:p-lg border border-surface-container-high mb-lg">
+<h3 class="font-bold text-lg text-on-surface mb-md">Buyurtma tarkibi</h3>
 <div id="checkout-items" class="flex flex-col gap-md">
 <!-- Items loaded by JS -->
 </div>
 <!-- Totals -->
-<div class="flex flex-col gap-2 mt-md pt-2">
+<div class="flex flex-col gap-2 mt-md pt-2 border-t border-surface-container-high">
 <div class="flex justify-between items-center text-on-surface-variant font-body-md text-body-md">
 <span>Mahsulotlar summasi</span>
 <span id="checkout-subtotal">0 UZS</span>
@@ -221,11 +231,11 @@
 <span>Yetkazib berish</span>
 <span id="checkout-delivery">15 000 UZS</span>
 </div>
-<div id="checkout-discount-row" class="flex justify-between items-center text-green-600 font-body-md text-body-md" style="display:none">
+<div id="checkout-discount-row" class="flex justify-between items-center text-emerald-600 font-body-md text-body-md" style="display:none">
 <span>Chegirma</span>
 <span id="checkout-discount">-0 UZS</span>
 </div>
-<div class="flex justify-between items-center font-headline-sm text-headline-sm text-primary mt-sm pt-sm border-t border-surface-container-high">
+<div class="flex justify-between items-center font-bold text-xl text-amber-900 mt-sm pt-sm border-t border-surface-container-high">
 <span>Jami to'lov</span>
 <span id="checkout-total">0 UZS</span>
 </div>
@@ -234,8 +244,9 @@
 </main>
 <!-- Sticky Bottom Action Bar -->
 <div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant/30 z-50 p-margin-mobile shadow-level-2 md:relative md:bg-transparent md:border-none md:shadow-none md:p-0 md:mb-lg md:max-w-[800px] md:mx-auto">
-<button id="submit-order-btn" onclick="submitOrder()" class="w-full bg-primary text-on-primary font-label-md text-label-md md:text-body-lg rounded-xl py-4 flex justify-center items-center hover:bg-primary-container transition-colors shadow-level-1 active:scale-95">
-    ✅ Buyurtmani tasdiqlash
+<button id="submit-order-btn" onclick="submitOrder()" class="w-full bg-gradient-to-r from-amber-700 to-amber-900 text-white font-bold text-base md:text-lg rounded-2xl py-4 flex justify-center items-center gap-2 hover:brightness-110 shadow-lg active:scale-98 transition-all">
+    <span class="material-symbols-outlined">check_circle</span>
+    BUYURTMANI TASDIQLASH
 </button>
 </div>
 </body></html>

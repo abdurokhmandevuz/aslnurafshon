@@ -602,6 +602,7 @@ function loadCheckout() {
     }
 
     if (totalEl) totalEl.textContent = `${Number(total).toLocaleString()} UZS`;
+    loadBankCardInfo();
 }
 
 // To'lov turi tanlash
@@ -628,6 +629,57 @@ function selectTimeSlot(slot, btn) {
     haptic('light');
 }
 
+async function loadBankCardInfo() {
+    const cardEl = document.getElementById('bank-card-info');
+    if (!cardEl) return;
+    try {
+        const card = await fetchAPI('/bank-card/');
+        cardEl.innerHTML = `
+        <div class="bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 text-white rounded-2xl p-5 shadow-lg border border-amber-700/40 relative overflow-hidden my-3">
+            <div class="flex justify-between items-center mb-3">
+                <span class="font-bold text-base tracking-wider uppercase">${card.bank_name || 'Kapitalbank'}</span>
+                <span class="text-xs bg-amber-500/20 text-amber-200 px-3 py-1 rounded-full border border-amber-500/30">Plastik karta o'tkazmasi</span>
+            </div>
+            <div class="text-xl md:text-2xl font-mono tracking-widest my-2 font-bold text-amber-200 cursor-pointer flex items-center justify-between bg-black/20 p-3 rounded-xl border border-white/10" onclick="copyCardNumber('${card.card_number}')">
+                <span>${card.card_number}</span>
+                <span class="material-symbols-outlined text-base text-amber-300">content_copy</span>
+            </div>
+            <div class="flex justify-between items-end mt-3 text-xs">
+                <div>
+                    <div class="text-white/60 text-[10px] uppercase">Karta egasi</div>
+                    <div class="font-bold text-sm text-white">${card.card_holder}</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-white/60 text-[10px] uppercase">Bosing</div>
+                    <div class="text-amber-300 text-xs">Nusxalash uchun</div>
+                </div>
+            </div>
+        </div>`;
+    } catch(e) { console.error("loadBankCardInfo error", e); }
+}
+
+function copyCardNumber(num) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(num.replace(/\s+/g, ''));
+    }
+    haptic('success');
+    showToast("Karta raqami nusxalandi! 📋", "success");
+}
+
+async function uploadPaymentProof(orderId, file) {
+    const formData = new FormData();
+    formData.append('payment_proof', file);
+    const url = `${API_BASE_URL}/orders/${orderId}/proof/`;
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Telegram-Data': initData
+        },
+        body: formData
+    });
+    return response.json();
+}
+
 async function submitOrder() {
     const cart = getCart();
     if (cart.length === 0) return;
@@ -646,6 +698,9 @@ async function submitOrder() {
     const promoCode = localStorage.getItem('promo_code') || '';
     const deliverySlot = localStorage.getItem('delivery_slot') || '';
 
+    const proofInput = document.querySelector('#receipt-file-input');
+    const proofFile = proofInput && proofInput.files ? proofInput.files[0] : null;
+
     const submitBtn = document.getElementById('submit-order-btn');
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Yuborilmoqda...'; }
 
@@ -654,6 +709,16 @@ async function submitOrder() {
             method: 'POST',
             body: JSON.stringify({ items, address, payment_type: paymentType, promo_code: promoCode, delivery_slot: deliverySlot })
         });
+
+        const orderId = response.id;
+
+        if (proofFile && orderId) {
+            try {
+                await uploadPaymentProof(orderId, proofFile);
+            } catch (pErr) {
+                console.error("Proof upload error", pErr);
+            }
+        }
 
         localStorage.removeItem('cart');
         localStorage.removeItem('promo_discount');

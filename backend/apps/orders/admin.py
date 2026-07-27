@@ -4,7 +4,14 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.http import HttpResponse
 
-from .models import Order, OrderItem, PromoCode, DeliveryTimeSlot, FeedbackRequest, CorporateInquiry
+from .models import Order, OrderItem, PromoCode, DeliveryTimeSlot, FeedbackRequest, CorporateInquiry, BankCard
+
+@admin.register(BankCard)
+class BankCardAdmin(admin.ModelAdmin):
+    list_display = ('bank_name', 'card_number', 'card_holder', 'is_active', 'created_at')
+    list_editable = ('is_active',)
+    search_fields = ('bank_name', 'card_number', 'card_holder')
+
 
 @admin.register(PromoCode)
 class PromoCodeAdmin(admin.ModelAdmin):
@@ -35,14 +42,26 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'user_display', 'courier', 'status_badge', 'payment_status_badge',
-        'total_display', 'created_at',
+        'proof_preview', 'total_display', 'created_at',
     )
     list_filter = ('status', 'payment_status', 'courier', 'payment_method')
     search_fields = ('id', 'user__full_name', 'user__username', 'user__phone')
-    readonly_fields = ('user', 'subtotal', 'promo_code', 'discount_amount', 'delivery_fee', 'total', 'created_at', 'updated_at')
+    readonly_fields = ('user', 'subtotal', 'promo_code', 'discount_amount', 'delivery_fee', 'total', 'proof_preview_detail', 'created_at', 'updated_at')
     inlines = [OrderItemInline]
     actions = ['mark_as_preparing', 'mark_as_delivering', 'mark_as_delivered', 'export_to_csv']
     date_hierarchy = 'created_at'
+
+    def proof_preview(self, obj):
+        if obj.payment_proof:
+            return format_html('<a href="{}" target="_blank"><img src="{}" style="max-height:40px;border-radius:4px;"/></a>', obj.payment_proof.url, obj.payment_proof.url)
+        return "Chek yo'q"
+    proof_preview.short_description = "To'lov cheki"
+
+    def proof_preview_detail(self, obj):
+        if obj.payment_proof:
+            return format_html('<a href="{}" target="_blank"><img src="{}" style="max-height:300px;border-radius:8px;"/></a>', obj.payment_proof.url, obj.payment_proof.url)
+        return "Chek yuklanmagan"
+    proof_preview_detail.short_description = "Chek rasmi"
     list_per_page = 30
 
     def user_display(self, obj):

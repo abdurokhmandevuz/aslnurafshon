@@ -38,6 +38,22 @@ class PromoCode(models.Model):
         return min(self.discount_amount, order_amount)
 
 
+class BankCard(models.Model):
+    """Admin-configured bank card for manual transfer payments."""
+    bank_name = models.CharField(max_length=100, default="Kapitalbank", verbose_name="Bank nomi")
+    card_number = models.CharField(max_length=30, verbose_name="Karta raqami")
+    card_holder = models.CharField(max_length=100, verbose_name="Karta egasi")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Bank kartasi"
+        verbose_name_plural = "Bank kartalari"
+
+    def __str__(self):
+        return f"{self.bank_name}: {self.card_number} ({self.card_holder})"
+
+
 class DeliveryTimeSlot(models.Model):
     """Delivery time slots configuration."""
     label = models.CharField(max_length=100, verbose_name="Vaqt oralig'i (matn)")
@@ -126,6 +142,12 @@ class Order(models.Model):
         choices=PaymentStatus.choices,
         default=PaymentStatus.PENDING,
         verbose_name="To'lov holati",
+    )
+    payment_proof = models.ImageField(
+        upload_to='payment_proofs/%Y/%m/',
+        null=True,
+        blank=True,
+        verbose_name="To'lov cheki (rasm)",
     )
     subtotal = models.PositiveIntegerField(default=0, verbose_name='Mahsulotlar summasi')
     promo_code = models.ForeignKey(

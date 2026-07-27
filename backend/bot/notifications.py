@@ -94,12 +94,31 @@ async def notify_new_order(order_pk: int):
         admin_group = settings.ADMIN_GROUP_ID
         if admin_group:
             from bot.keyboards import order_admin_keyboard
-            await bot.send_message(
-                chat_id=admin_group,
-                text=_admin_new_order_text(order),
-                parse_mode='HTML',
-                reply_markup=order_admin_keyboard(order_pk),
-            )
+            if order.payment_proof:
+                from aiogram.types import FSInputFile
+                try:
+                    await bot.send_photo(
+                        chat_id=admin_group,
+                        photo=FSInputFile(order.payment_proof.path),
+                        caption=_admin_new_order_text(order) + "\n\n📸 <b>To'lov cheki biriktirildi!</b>",
+                        parse_mode='HTML',
+                        reply_markup=order_admin_keyboard(order_pk),
+                    )
+                except Exception as photo_err:
+                    logger.warning("Could not send photo to admin group: %s", photo_err)
+                    await bot.send_message(
+                        chat_id=admin_group,
+                        text=_admin_new_order_text(order),
+                        parse_mode='HTML',
+                        reply_markup=order_admin_keyboard(order_pk),
+                    )
+            else:
+                await bot.send_message(
+                    chat_id=admin_group,
+                    text=_admin_new_order_text(order),
+                    parse_mode='HTML',
+                    reply_markup=order_admin_keyboard(order_pk),
+                )
     except Exception as exc:
         logger.warning('Cannot notify admin group (order #%s): %s', order_pk, exc)
 

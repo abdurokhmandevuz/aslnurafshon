@@ -136,6 +136,15 @@ class OrderCreateSerializer(serializers.Serializer):
         return order
 
 
+from .models import Order, OrderItem, BankCard
+
+
+class BankCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankCard
+        fields = ['id', 'bank_name', 'card_number', 'card_holder']
+
+
 class OrderListSerializer(serializers.ModelSerializer):
     """Compact order summary for list view."""
 
@@ -151,6 +160,7 @@ class OrderListSerializer(serializers.ModelSerializer):
             'id', 'status', 'status_display',
             'delivery_type', 'payment_method',
             'payment_status', 'payment_status_display',
+            'payment_proof',
             'subtotal', 'delivery_fee', 'total',
             'items_count', 'created_at',
         ]
@@ -175,6 +185,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             'id', 'status', 'status_display',
             'delivery_type', 'address', 'delivery_time_slot',
             'payment_method', 'payment_status', 'payment_status_display',
+            'payment_proof',
             'subtotal', 'delivery_fee', 'total',
             'comment', 'items', 'created_at', 'updated_at',
         ]
