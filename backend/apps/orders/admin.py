@@ -51,6 +51,57 @@ class OrderAdmin(admin.ModelAdmin):
     actions = ['confirm_payment', 'mark_as_preparing', 'mark_as_delivering', 'mark_as_delivered', 'export_to_csv']
     date_hierarchy = 'created_at'
 
+    def proof_preview(self, obj):
+        if obj.payment_proof:
+            return format_html('<a href="{}" target="_blank"><img src="{}" style="max-height:40px;border-radius:4px;"/></a>', obj.payment_proof.url, obj.payment_proof.url)
+        return "Chek yo'q"
+    proof_preview.short_description = "To'lov cheki"
+
+    def proof_preview_detail(self, obj):
+        if obj.payment_proof:
+            return format_html('<a href="{}" target="_blank"><img src="{}" style="max-height:300px;border-radius:8px;"/></a>', obj.payment_proof.url, obj.payment_proof.url)
+        return "Chek yuklanmagan"
+    proof_preview_detail.short_description = "Chek rasmi"
+    list_per_page = 30
+
+    def user_display(self, obj):
+        if obj.user:
+            return f"{obj.user.full_name} ({getattr(obj.user, 'phone', '')})"
+        return "Noma'lum"
+    user_display.short_description = 'Mijoz'
+
+    def status_badge(self, obj):
+        colors = {
+            'yangi': '#C7E0F4',
+            'tayyorlanmoqda': '#FFDF99',
+            'yolda': '#EADDFF',
+            'yetkazildi': '#C4EED0',
+            'bekor_qilindi': '#FFDAD6',
+        }
+        color = colors.get(obj.status, '#eeeeee')
+        return format_html(
+            '<span style="background:{};color:black;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:500;">{}</span>',
+            color, obj.get_status_display()
+        )
+    status_badge.short_description = 'Holat'
+
+    def payment_status_badge(self, obj):
+        colors = {
+            'pending': '#FFE082',
+            'paid': '#C8E6C9',
+            'failed': '#FFCDD2',
+        }
+        color = colors.get(obj.payment_status, '#eeeeee')
+        return format_html(
+            '<span style="background:{};color:black;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:500;">{}</span>',
+            color, obj.get_payment_status_display()
+        )
+    payment_status_badge.short_description = "To'lov"
+
+    def total_display(self, obj):
+        return f"{obj.total:,} so'm"
+    total_display.short_description = 'Jami'
+
     def _notify_async(self, order_id, status):
         import threading, asyncio
         from bot.notifications import notify_status_change
