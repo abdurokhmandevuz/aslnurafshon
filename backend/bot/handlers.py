@@ -45,6 +45,21 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
+async def safe_edit_message(message: Message, text: str, reply_markup=None, parse_mode='HTML'):
+    """Safe message updater that works on both text messages and photo messages cleanly."""
+    try:
+        if message.photo:
+            try:
+                await message.delete()
+            except Exception:
+                pass
+            return await message.answer(text, reply_markup=reply_markup, parse_mode=parse_mode)
+        else:
+            return await message.edit_text(text, reply_markup=reply_markup, parse_mode=parse_mode)
+    except Exception:
+        return await message.answer(text, reply_markup=reply_markup, parse_mode=parse_mode)
+
+
 # ─── FSM States for Bot Ordering Flow ─────────────────────────────────────────
 
 class OrderState(StatesGroup):
@@ -118,7 +133,7 @@ async def show_bot_catalog(event: Message | CallbackQuery):
     markup = categories_inline_keyboard(categories)
 
     if isinstance(event, CallbackQuery):
-        await event.message.edit_text(text, parse_mode='HTML', reply_markup=markup)
+        await safe_edit_message(event.message, text, reply_markup=markup)
         await event.answer()
     else:
         await event.answer(text, parse_mode='HTML', reply_markup=markup)
@@ -139,7 +154,7 @@ async def show_category_products(callback: CallbackQuery):
 
     text = f"🍵 <b>{cat.name}</b> bo'limi mahsulotlari:\n\nBatafsil ko'rish uchun bosing 👇"
     markup = products_inline_keyboard(products, cat_id)
-    await callback.message.edit_text(text, parse_mode='HTML', reply_markup=markup)
+    await safe_edit_message(callback.message, text, reply_markup=markup)
     await callback.answer()
 
 
@@ -177,12 +192,16 @@ async def show_product_detail(callback: CallbackQuery):
                 parse_mode='HTML',
                 reply_markup=markup
             )
+            try:
+                await callback.message.delete()
+            except Exception:
+                pass
             await callback.answer()
             return
         except Exception:
             pass
 
-    await callback.message.edit_text(text, parse_mode='HTML', reply_markup=markup)
+    await safe_edit_message(callback.message, text, reply_markup=markup)
     await callback.answer()
 
 
@@ -214,9 +233,9 @@ async def view_bot_cart(callback: CallbackQuery):
     cart = USER_CARTS.get(user_id, {})
 
     if not cart:
-        await callback.message.edit_text(
+        await safe_edit_message(
+            callback.message,
             "🛒 <b>Savatingiz bo'sh.</b>\n\nKatalogdan mahsulotlarni tanlang!",
-            parse_mode='HTML',
             reply_markup=cart_inline_keyboard(has_items=False)
         )
         await callback.answer()
@@ -247,7 +266,7 @@ async def view_bot_cart(callback: CallbackQuery):
     text = "\n".join(lines)
     markup = cart_inline_keyboard(has_items=True)
 
-    await callback.message.edit_text(text, parse_mode='HTML', reply_markup=markup)
+    await safe_edit_message(callback.message, text, reply_markup=markup)
     await callback.answer()
 
 
@@ -563,9 +582,9 @@ async def cmd_contact(message: Message):
 
 @router.callback_query(F.data == "main_menu")
 async def cb_main_menu(callback: CallbackQuery):
-    await callback.message.answer(
+    await safe_edit_message(
+        callback.message,
         "☕ <b>Asl Nurafshon</b>\n\nDo'konni ochish uchun bosing 👇",
-        parse_mode='HTML',
         reply_markup=main_menu_keyboard(settings.FRONTEND_URL),
     )
     await callback.answer()
@@ -573,7 +592,7 @@ async def cb_main_menu(callback: CallbackQuery):
 
 @router.callback_query(F.data == "contact")
 async def cb_contact(callback: CallbackQuery):
-    await callback.message.answer(CONTACT_TEXT, parse_mode='HTML')
+    await safe_edit_message(callback.message, CONTACT_TEXT)
     await callback.answer()
 
 

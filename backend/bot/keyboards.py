@@ -120,10 +120,14 @@ def promo_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
 
 def categories_inline_keyboard(categories) -> InlineKeyboardMarkup:
     buttons = []
-    for cat in categories:
-        buttons.append([InlineKeyboardButton(text=f"🍵 {cat.name}", callback_data=f"cat:{cat.id}")])
-    buttons.append([InlineKeyboardButton(text="🛒 Savatimni ko'rish", callback_data="view_cart")])
-    buttons.append([InlineKeyboardButton(text="🏠 Bosh menu", callback_data="main_menu")])
+    category_emojis = ["🍃", "☕", "🫖", "✨", "🎁", "⭐"]
+    for idx, cat in enumerate(categories):
+        emoji = category_emojis[idx % len(category_emojis)]
+        buttons.append([InlineKeyboardButton(text=f"{emoji} {cat.name}", callback_data=f"cat:{cat.id}")])
+    buttons.append([
+        InlineKeyboardButton(text="🛒 Savat", callback_data="view_cart"),
+        InlineKeyboardButton(text="🏠 Menu", callback_data="main_menu"),
+    ])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
