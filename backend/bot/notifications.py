@@ -383,3 +383,108 @@ async def notify_corporate_inquiry(inquiry_id: int):
         await _send_admin_direct_messages(bot, text)
     except Exception as exc:
         logger.warning('Cannot notify admin private chats about corporate inquiry: %s', exc)
+
+    await bot.session.close()
+
+
+# ─── Broadcast Helpers for Deals & Combos ─────────────────────────────────────
+
+async def broadcast_daily_deal_to_all_users(deal_id: int):
+    """Broadcast DailyDeal to all Telegram users."""
+    try:
+        import os
+        _ensure_django()
+        from apps.catalog.models import DailyDeal
+        from apps.accounts.models import TelegramUser
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
+
+        deal = DailyDeal.objects.select_related('variant', 'variant__product').get(pk=deal_id)
+        bot = _get_bot()
+        if bot is None:
+            return
+
+        users = list(TelegramUser.objects.values_list('telegram_id', flat=True))
+        v = deal.variant
+        deal_price = deal.deal_price
+        fee = deal.delivery_fee
+        discount = deal.discount_percent
+
+        caption = (
+            f"🔥 <b>KUNLIK MAXSUS TAKLIF!</b> 🔥\n\n"
+            f"☕ <b>{v.product.name}</b> ({v.label})\n"
+            f"<s>{v.price:,} UZS</s> ➡️ <b>{deal_price:,} UZS</b> (-{discount}%)\n"
+            f"🚚 Dastavka: <b>{'Bepul 🎉' if fee == 0 else f'{fee:,} UZS'}</b>\n\n"
+            f"⚡️ Shoshiling, mahsulotlar soni cheklangan!"
+        )
+        markup = InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(text="🛒 Savatga qo'shish (Xarid)", callback_data=f"add_deal:{deal.id}")
+        ]])
+
+        for u_id in users:
+            try:
+                if deal.image and os.path.exists(deal.image.path):
+                    await bot.send_photo(u_id, FSInputFile(deal.image.path), caption=caption, parse_mode='HTML', reply_markup=markup)
+                else:
+                    await bot.send_message(u_id, caption, parse_mode='HTML', reply_markup=markup)
+            except Exception:
+                pass
+
+        await bot.session.close()
+    except Exception as exc:
+        logger.error('broadcast_daily_deal error: %s', exc)
+
+
+async def broadcast_bundle_to_all_users(bundle_id: int):
+    """Broadcast ProductBundle (Combo) to all Telegram users."""
+    try:
+        import os
+        _ensure_django()
+        from apps.catalog.models import ProductBundle
+        from apps.accounts.models import TelegramUser
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
+
+        bundle = ProductBundle.objects.prefetch_related('items__variant__product').get(pk=bundle_id)
+        bot = _get_bot()
+        if bot is None:
+            return
+
+        users = list(TelegramUser.objects.values_list('telegram_id', flat=True))
+        caption = (
+            f"🎁 <b>KOMBO TO'PLAM!</b> 🎁\n\n"
+            f"📦 <b>{bundle.name}</b>\n"
+            f"<s>{bundle.original_price:,} UZS</s> ➡️ <b>{bundle.price:,} UZS</b> (-{bundle.discount_percent}%)\n\n"
+            f"<i>{bundle.description or ''}</i>\n\n"
+            f"⚡️ Tejamkor va qulay to'plam!"
+        )
+        markup = InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(text="🛒 Savatga qo'shish (Xarid)", callback_data=f"add_bundle:{bundle.id}")
+        ]])
+
+        for u_id in users:
+            try:
+                if bundle.image and os.path.exists(bundle.image.path):
+                    await bot.send_photo(u_id, FSInputFile(bundle.image.path), caption=caption, parse_mode='HTML', reply_markup=markup)
+                else:
+                    await bot.send_message(u_id, caption, parse_mode='HTML', reply_markup=markup)
+            except Exception:
+                pass
+
+        await bot.session.close()
+    except Exception as exc:
+        logger.error('broadcast_bundle error: %s', exc)
+
+
+def notify_broadcast_async(target_id: int, target_type: str = 'deal'):
+    """Helper to run broadcast async task in a separate thread from sync Django code."""
+    import threading, asyncio
+    def run():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        if target_type == 'deal':
+            loop.run_until_complete(broadcast_daily_deal_to_all_users(target_id))
+        elif target_type == 'bundle':
+            loop.run_until_complete(broadcast_bundle_to_all_users(target_id))
+        loop.close()
+
+    t = threading.Thread(target=run, daemon=True)
+    t.start()

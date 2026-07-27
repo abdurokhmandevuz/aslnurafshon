@@ -163,6 +163,20 @@ class DailyDealAdmin(admin.ModelAdmin):
     list_editable = ('discount_percent', 'delivery_fee', 'is_active')
     list_filter = ('is_active', 'starts_at')
     search_fields = ('variant__product__name', 'variant__label')
+    actions = ['broadcast_selected_deals']
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        from bot.notifications import notify_broadcast_async
+        notify_broadcast_async(obj.id, 'deal')
+        self.message_user(request, f"✅ Kunlik taklif saqlandi va barcha mijozlarga avtomatik e'lon qilindi!")
+
+    @admin.action(description="📢 Tanlangan takliflarni mijozlarga e'lon qilish (Qayta yuborish)")
+    def broadcast_selected_deals(self, request, queryset):
+        from bot.notifications import notify_broadcast_async
+        for deal in queryset:
+            notify_broadcast_async(deal.id, 'deal')
+        self.message_user(request, f"✅ {queryset.count()} ta taklif barcha mijozlarga e'lon qilindi!")
 
 
 @admin.register(ProductReview)
@@ -183,3 +197,17 @@ class ProductBundleAdmin(admin.ModelAdmin):
     list_editable = ('is_active',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [BundleItemInline]
+    actions = ['broadcast_selected_bundles']
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        from bot.notifications import notify_broadcast_async
+        notify_broadcast_async(obj.id, 'bundle')
+        self.message_user(request, f"✅ Kombo to'plam saqlandi va barcha mijozlarga avtomatik e'lon qilindi!")
+
+    @admin.action(description="📢 Tanlangan kombolarni mijozlarga e'lon qilish (Qayta yuborish)")
+    def broadcast_selected_bundles(self, request, queryset):
+        from bot.notifications import notify_broadcast_async
+        for bundle in queryset:
+            notify_broadcast_async(bundle.id, 'bundle')
+        self.message_user(request, f"✅ {queryset.count()} ta kombo to'plam barcha mijozlarga e'lon qilindi!")
