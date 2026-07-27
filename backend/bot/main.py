@@ -45,15 +45,12 @@ WEBHOOK_PATH = '/bot/webhook'
 
 async def on_startup(bot: Bot):
     await bot.set_my_commands([
-        BotCommand(command='start', description='Bosh menu'),
-        BotCommand(command='shop', description="Do'konni ochish"),
-        BotCommand(command='orders', description='Buyurtmalarim'),
-        BotCommand(command='promo', description='Aksiyalar'),
-        BotCommand(command='contact', description='Aloqa'),
-        BotCommand(command='chek', description='Oxirgi chek'),
-        BotCommand(command='help', description='Yordam'),
-        BotCommand(command='admin', description='Admin panel'),
-        BotCommand(command='id', description='Chat ID olish'),
+        BotCommand(command='start',   description='🏠 Bosh menu'),
+        BotCommand(command='shop',    description="🛍 Do'konni ochish"),
+        BotCommand(command='orders',  description='📦 Buyurtmalarim'),
+        BotCommand(command='promo',   description='🔥 Aksiyalar'),
+        BotCommand(command='contact', description='📞 Aloqa'),
+        BotCommand(command='help',    description='❓ Yordam'),
     ])
     webhook_url = settings.BOT_WEBHOOK_URL
     if webhook_url:
