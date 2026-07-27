@@ -20,11 +20,11 @@ def main_reply_keyboard() -> ReplyKeyboardMarkup:
             ],
             [
                 KeyboardButton(text="📦 Buyurtmalarim"),
-                KeyboardButton(text="👤 Profil"),
+                KeyboardButton(text="🛒 Savat"),
             ],
             [
+                KeyboardButton(text="👤 Profil & Sozlamalar"),
                 KeyboardButton(text="📞 Aloqa va Manzil"),
-                KeyboardButton(text="⚙️ Sozlamalar"),
             ],
         ],
         resize_keyboard=True,
@@ -71,19 +71,18 @@ def main_menu_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
 
 
 def profile_inline_keyboard() -> InlineKeyboardMarkup:
+    """Combined profile + settings inline keyboard."""
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📦 Buyurtmalar tarixi", callback_data="my_orders")],
-        [InlineKeyboardButton(text="⚙️ Sozlamalar", callback_data="user_settings")],
+        [InlineKeyboardButton(text="📱 Telefon raqamni yangilash", callback_data="change_phone")],
+        [InlineKeyboardButton(text="📍 Saqlangan manzillar", callback_data="manage_addresses")],
         [InlineKeyboardButton(text="🏠 Bosh menu", callback_data="main_menu")],
     ])
 
 
 def settings_inline_keyboard() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="📱 Telefon raqamni yangilash", callback_data="change_phone")],
-        [InlineKeyboardButton(text="📍 Saqlangan manzillar", callback_data="manage_addresses")],
-        [InlineKeyboardButton(text="🏠 Bosh menu", callback_data="main_menu")],
-    ])
+    """Alias for profile_inline_keyboard (kept for compatibility)."""
+    return profile_inline_keyboard()
 
 
 def request_phone_keyboard() -> ReplyKeyboardMarkup:
@@ -129,12 +128,18 @@ def shop_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
 
 
 def orders_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(
-            text="📦 Barcha buyurtmalar (Web)",
-            web_app=WebAppInfo(url=_url(frontend_url, "buyurtmalar.html")),
-        )
-    ]])
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="📱 Web App'da ko'rish",
+                web_app=WebAppInfo(url=_url(frontend_url, "buyurtmalar.html")),
+            ),
+        ],
+        [
+            InlineKeyboardButton(text="🔄 Yangilash", callback_data="my_orders"),
+            InlineKeyboardButton(text="🏠 Bosh menu", callback_data="main_menu"),
+        ],
+    ])
 
 
 def promo_keyboard(frontend_url: str) -> InlineKeyboardMarkup:

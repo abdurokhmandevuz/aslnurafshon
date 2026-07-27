@@ -241,7 +241,7 @@ async def show_product_detail(callback: CallbackQuery):
 
 # ─── User Profile & Settings ──────────────────────────────────────────────────
 
-@router.message(F.text.in_({"👤 Profil", "/profile"}))
+@router.message(F.text.in_({"👤 Profil & Sozlamalar", "👤 Profil", "/profile"}))
 @router.callback_query(F.data == "user_profile")
 async def show_user_profile(event: Message | CallbackQuery):
     user_id = event.from_user.id
@@ -463,6 +463,49 @@ async def add_variant_to_cart(callback: CallbackQuery):
 
 # ─── Add Daily Deal to Cart ───────────────────────────────────────────────────
 
+@router.message(F.text == "🛒 Savat")
+async def handle_cart_button(message: Message):
+    """Reply keyboard Savat button — open cart."""
+    user_id = message.from_user.id
+    cart = USER_CARTS.get(user_id, {})
+    if not cart:
+        from asgiref.sync import sync_to_async
+        from apps.catalog.models import Category
+        categories = await sync_to_async(lambda: list(Category.objects.filter(is_active=True)))()
+        await message.answer(
+            "🛒 <b>Savatingiz bo'sh!</b>\n\nDo'kondan mahsulot tanlang 👇",
+            parse_mode='HTML',
+            reply_markup=categories_inline_keyboard(categories)
+        )
+        return
+
+    from asgiref.sync import sync_to_async
+    from apps.catalog.models import ProductVariant
+
+    var_ids = list(cart.keys())
+    variants_qs = await sync_to_async(lambda: list(
+        ProductVariant.objects.select_related('product').filter(id__in=var_ids)
+    ))()
+    variants_dict = {v.id: v for v in variants_qs}
+
+    total = sum(
+        variants_dict[vid].price * qty
+        for vid, qty in cart.items() if vid in variants_dict
+    )
+    lines = ["🛒 <b>Savatingiz:</b>\n"]
+    for vid, qty in cart.items():
+        if vid in variants_dict:
+            v = variants_dict[vid]
+            lines.append(f"• {v.product.name} ({v.label}) × {qty} = <b>{v.price * qty:,} UZS</b>")
+    lines.append(f"\n💰 Jami: <b>{total:,} UZS</b>")
+
+    await message.answer(
+        "\n".join(lines),
+        parse_mode='HTML',
+        reply_markup=cart_inline_keyboard(cart, variants_dict)
+    )
+
+
 @router.callback_query(F.data.startswith("add_deal:"))
 async def handle_add_deal_to_cart(callback: CallbackQuery):
     deal_id = int(callback.data.split(":")[1])
@@ -493,6 +536,43 @@ async def handle_add_deal_to_cart(callback: CallbackQuery):
     except Exception as err:
         logger.error("Add deal error: %s", err)
         await callback.answer("Taklif topilmadi", show_alert=True)
+
+
+# ─── Add Bundle (Combo) to Cart ──────────────────────────────────────────────
+
+@router.callback_query(F.data.startswith("add_bundle:"))
+async def handle_add_bundle_to_cart(callback: CallbackQuery):
+    bundle_id = int(callback.data.split(":")[1])
+    user_id = callback.from_user.id
+
+    from asgiref.sync import sync_to_async
+    from apps.catalog.models import ProductBundle
+
+    try:
+        bundle = await sync_to_async(
+            ProductBundle.objects.prefetch_related('items__variant__product').get
+        )(id=bundle_id, is_active=True)
+    except Exception:
+        await callback.answer("⚠️ Bu kombo topilmadi yoki aktiv emas!", show_alert=True)
+        return
+
+    if user_id not in USER_CARTS:
+        USER_CARTS[user_id] = {}
+    USER_CARTS_DEAL_FLAGS[user_id] = True
+
+    added = []
+    items = await sync_to_async(lambda: list(bundle.items.select_related('variant__product').all()))()
+    for item in items:
+        vid = item.variant_id
+        USER_CARTS[user_id][vid] = USER_CARTS[user_id].get(vid, 0) + item.quantity
+        added.append(item.variant.product.name)
+
+    total_count = sum(USER_CARTS[user_id].values())
+    names = ", ".join(added[:3])
+    await callback.answer(
+        f"🎁 Kombo '{bundle.name}' savatga qo'shildi! ({names}…) — Jami: {total_count} ta",
+        show_alert=True
+    )
 
 
 # ─── Apply Promocode Flow ─────────────────────────────────────────────────────
