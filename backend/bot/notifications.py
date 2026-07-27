@@ -188,22 +188,8 @@ async def notify_status_change(order_pk: int, new_status: str):
             parse_mode='HTML',
         )
         
-        # If order is delivered, calculate 3% cashback and generate PDF receipt
+        # If order is delivered, generate and send PDF receipt
         if new_status == 'yetkazildi':
-            if order.user:
-                try:
-                    earned = int(order.total * 0.03)
-                    order.cashback_earned = earned
-                    order.save(update_fields=['cashback_earned'])
-                    order.user.cashback_balance += earned
-                    order.user.save(update_fields=['cashback_balance'])
-                    await bot.send_message(
-                        chat_id=order.user.telegram_id,
-                        text=f"🎁 Buyurtmangiz uchun <b>+{earned:,} UZS</b> keshbek hisobingizga qo'shildi! (Jami keshbek: <b>{order.user.cashback_balance:,} UZS</b>)",
-                        parse_mode='HTML'
-                    )
-                except Exception as cb_err:
-                    logger.error('Cashback credit error for order #%s: %s', order_pk, cb_err)
 
             try:
                 from apps.orders.utils import generate_receipt_pdf

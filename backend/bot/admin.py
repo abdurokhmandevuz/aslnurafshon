@@ -52,16 +52,23 @@ def is_admin(telegram_id: int) -> bool:
 
 
 def admin_menu() -> InlineKeyboardMarkup:
+    web_admin_url = "https://aslnurafshon.up.railway.app/admin/"
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="Mahsulot qo'shish", callback_data='admin:product'),
-            InlineKeyboardButton(text="Kunlik taklif", callback_data='admin:deal'),
+            InlineKeyboardButton(text="➕ Mahsulot qo'shish", callback_data='admin:product'),
+            InlineKeyboardButton(text="🔥 Kunlik taklif", callback_data='admin:deal'),
         ],
         [
-            InlineKeyboardButton(text="Combo yaratish", callback_data='admin:bundle'),
-            InlineKeyboardButton(text="Bugungi hisobot", callback_data='admin:report'),
+            InlineKeyboardButton(text="🎁 Promo-kod yaratish", callback_data='admin:promocode'),
+            InlineKeyboardButton(text="💳 Karta sozlamalari", callback_data='admin:card'),
         ],
-        [InlineKeyboardButton(text="Mijozlarga xabar", callback_data='admin:broadcast')],
+        [
+            InlineKeyboardButton(text="📊 Bugungi hisobot", callback_data='admin:report'),
+            InlineKeyboardButton(text="📢 Mijozlarga xabar", callback_data='admin:broadcast'),
+        ],
+        [
+            InlineKeyboardButton(text="🌐 Veb Admin Panel", url=web_admin_url),
+        ],
     ])
 
 

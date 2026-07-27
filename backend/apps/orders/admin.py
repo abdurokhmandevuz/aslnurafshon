@@ -48,71 +48,50 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ('id', 'user__full_name', 'user__username', 'user__phone')
     readonly_fields = ('user', 'subtotal', 'promo_code', 'discount_amount', 'delivery_fee', 'total', 'proof_preview_detail', 'created_at', 'updated_at')
     inlines = [OrderItemInline]
-    actions = ['mark_as_preparing', 'mark_as_delivering', 'mark_as_delivered', 'export_to_csv']
+    actions = ['confirm_payment', 'mark_as_preparing', 'mark_as_delivering', 'mark_as_delivered', 'export_to_csv']
     date_hierarchy = 'created_at'
 
-    def proof_preview(self, obj):
-        if obj.payment_proof:
-            return format_html('<a href="{}" target="_blank"><img src="{}" style="max-height:40px;border-radius:4px;"/></a>', obj.payment_proof.url, obj.payment_proof.url)
-        return "Chek yo'q"
-    proof_preview.short_description = "To'lov cheki"
+    def _notify_async(self, order_id, status):
+        import threading, asyncio
+        from bot.notifications import notify_status_change
+        def runner():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(notify_status_change(order_id, status))
+            loop.close()
+        threading.Thread(target=runner, daemon=True).start()
 
-    def proof_preview_detail(self, obj):
-        if obj.payment_proof:
-            return format_html('<a href="{}" target="_blank"><img src="{}" style="max-height:300px;border-radius:8px;"/></a>', obj.payment_proof.url, obj.payment_proof.url)
-        return "Chek yuklanmagan"
-    proof_preview_detail.short_description = "Chek rasmi"
-    list_per_page = 30
-
-    def user_display(self, obj):
-        if obj.user:
-            return f"{obj.user.full_name} ({getattr(obj.user, 'phone_number', '')})"
-        return "Noma'lum"
-    user_display.short_description = 'Mijoz'
-
-    def status_badge(self, obj):
-        colors = {
-            'yangi': '#C7E0F4',
-            'tayyorlanmoqda': '#FFDF99',
-            'yolda': '#EADDFF',
-            'yetkazildi': '#C4EED0',
-            'bekor_qilindi': '#FFDAD6',
-        }
-        color = colors.get(obj.status, '#eeeeee')
-        return format_html(
-            '<span style="background:{};color:black;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:500;">{}</span>',
-            color, obj.get_status_display()
-        )
-    status_badge.short_description = 'Holat'
-
-    def payment_status_badge(self, obj):
-        colors = {
-            'pending': '#FFE082',
-            'paid': '#C8E6C9',
-            'failed': '#FFCDD2',
-        }
-        color = colors.get(obj.payment_status, '#eeeeee')
-        return format_html(
-            '<span style="background:{};color:black;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:500;">{}</span>',
-            color, obj.get_payment_status_display()
-        )
-    payment_status_badge.short_description = "To'lov"
-
-    def total_display(self, obj):
-        return f"{obj.total:,} so'm"
-    total_display.short_description = 'Jami'
+    def confirm_payment(self, request, queryset):
+        for order in queryset:
+            order.payment_status = 'paid'
+            order.save(update_fields=['payment_status'])
+        self.message_user(request, f"{queryset.count()} ta buyurtmaning to'lovi tasdiqlandi.")
+    confirm_payment.short_description = "✅ To'lovni tasdiqlash ('To'langan' qilish)"
 
     def mark_as_preparing(self, request, queryset):
-        queryset.update(status='tayyorlanmoqda')
-    mark_as_preparing.short_description = "Belgilanganlarni 'Tayyorlanmoqda' qilish"
+        for order in queryset:
+            order.status = 'tayyorlanmoqda'
+            order.save(update_fields=['status'])
+            self._notify_async(order.id, 'tayyorlanmoqda')
+        self.message_user(request, f"{queryset.count()} ta buyurtma 'Tayyorlanmoqda' holatiga o'tkazildi va mijozga bildirishnoma yuborildi.")
+    mark_as_preparing.short_description = "👨‍🍳 Belgilanganlarni 'Tayyorlanmoqda' qilish"
 
     def mark_as_delivering(self, request, queryset):
-        queryset.update(status='yolda')
-    mark_as_delivering.short_description = "Belgilanganlarni 'Yo'lda' qilish"
+        for order in queryset:
+            order.status = 'yolda'
+            order.save(update_fields=['status'])
+            self._notify_async(order.id, 'yolda')
+        self.message_user(request, f"{queryset.count()} ta buyurtma 'Yo'lda' holatiga o'tkazildi va mijozga bildirishnoma yuborildi.")
+    mark_as_delivering.short_description = "🚚 Belgilanganlarni 'Yo'lda' qilish"
 
     def mark_as_delivered(self, request, queryset):
-        queryset.update(status='yetkazildi')
-    mark_as_delivered.short_description = "Belgilanganlarni 'Yetkazildi' qilish"
+        for order in queryset:
+            order.status = 'yetkazildi'
+            order.payment_status = 'paid'
+            order.save(update_fields=['status', 'payment_status'])
+            self._notify_async(order.id, 'yetkazildi')
+        self.message_user(request, f"{queryset.count()} ta buyurtma 'Yetkazildi' holatiga o'tkazildi va mijozga chek bilan bildirishnoma yuborildi.")
+    mark_as_delivered.short_description = "✅ Belgilanganlarni 'Yetkazildi' qilish"
 
     def export_to_csv(self, request, queryset):
         response = HttpResponse(content_type='text/csv; charset=utf-8')

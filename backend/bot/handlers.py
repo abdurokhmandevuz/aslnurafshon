@@ -39,6 +39,9 @@ from bot.keyboards import (
     request_location_keyboard,
     order_admin_keyboard,
     order_delivered_keyboard,
+    saved_addresses_keyboard,
+    profile_inline_keyboard,
+    settings_inline_keyboard,
 )
 
 logger = logging.getLogger(__name__)
@@ -208,6 +211,61 @@ async def show_product_detail(callback: CallbackQuery):
 
     await safe_edit_message(callback.message, text, reply_markup=markup)
     await callback.answer()
+
+
+# ─── User Profile & Settings ──────────────────────────────────────────────────
+
+@router.message(F.text.in_({"👤 Profil", "/profile"}))
+@router.callback_query(F.data == "user_profile")
+async def show_user_profile(event: Message | CallbackQuery):
+    user_id = event.from_user.id
+    from asgiref.sync import sync_to_async
+    from apps.accounts.models import TelegramUser
+    from apps.orders.models import Order
+
+    @sync_to_async
+    def get_profile_data():
+        tuser = TelegramUser.objects.filter(telegram_id=user_id).first()
+        if not tuser:
+            return None
+        orders_count = Order.objects.filter(user=tuser).count()
+        addresses_count = tuser.addresses.count()
+        return tuser, orders_count, addresses_count
+
+    data = await get_profile_data()
+    if not data or not data[0]:
+        text = "👤 <b>Mening Profilim</b>\n\nMa'lumotlar hali yaratilmagan."
+    else:
+        tuser, orders_count, addresses_count = data
+        phone_str = tuser.phone or "Kiritilmagan"
+        text = (
+            f"👤 <b>Mening Profilim</b>\n\n"
+            f"👤 Ism: <b>{tuser.full_name}</b>\n"
+            f"📱 Telefon: <b>{phone_str}</b>\n"
+            f"📦 Buyurtmalar soni: <b>{orders_count} ta</b>\n"
+            f"📍 Saqlangan manzillar: <b>{addresses_count} ta</b>\n"
+            f"💰 Keshbek balansi: <b>{tuser.cashback_balance:,} UZS</b>"
+        )
+
+    if isinstance(event, CallbackQuery):
+        await safe_edit_message(event.message, text, reply_markup=profile_inline_keyboard())
+        await event.answer()
+    else:
+        await event.answer(text, parse_mode='HTML', reply_markup=profile_inline_keyboard())
+
+
+@router.message(F.text.in_({"⚙️ Sozlamalar", "/settings"}))
+@router.callback_query(F.data == "user_settings")
+async def show_user_settings(event: Message | CallbackQuery):
+    text = (
+        "⚙️ <b>Sozlamalar paneli</b>\n\n"
+        "Quyidagi tugmalar orqali profil ma'lumotlaringizni tahrirlashingiz mumkin 👇"
+    )
+    if isinstance(event, CallbackQuery):
+        await safe_edit_message(event.message, text, reply_markup=settings_inline_keyboard())
+        await event.answer()
+    else:
+        await event.answer(text, parse_mode='HTML', reply_markup=settings_inline_keyboard())
 
 
 # ─── Add Variant to Cart ──────────────────────────────────────────────────────

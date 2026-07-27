@@ -78,7 +78,8 @@ class ActivityFilter(admin.SimpleListFilter):
 
 @admin.register(TelegramUser)
 class TelegramUserAdmin(admin.ModelAdmin):
-    list_display = ('telegram_id', 'full_name', 'username', 'phone', 'total_orders_count', 'total_spent_display', 'days_since_last_order', 'created_at')
+    list_display = ('telegram_id', 'full_name', 'username', 'phone', 'cashback_balance', 'total_orders_count', 'total_spent_display', 'days_since_last_order', 'created_at')
+    list_editable = ('cashback_balance',)
     list_filter = (SpendLevelFilter, ActivityFilter, 'created_at')
     search_fields = ('telegram_id', 'full_name', 'username', 'phone')
     readonly_fields = ('telegram_id', 'created_at')

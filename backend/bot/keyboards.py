@@ -20,10 +20,11 @@ def main_reply_keyboard() -> ReplyKeyboardMarkup:
             ],
             [
                 KeyboardButton(text="📦 Buyurtmalarim"),
-                KeyboardButton(text="🔄 Qayta buyurtma"),
+                KeyboardButton(text="👤 Profil"),
             ],
             [
                 KeyboardButton(text="📞 Aloqa va Manzil"),
+                KeyboardButton(text="⚙️ Sozlamalar"),
             ],
         ],
         resize_keyboard=True,
@@ -32,7 +33,7 @@ def main_reply_keyboard() -> ReplyKeyboardMarkup:
 
 
 def main_menu_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
-    """Main start inline menu using InlineKeyboardBuilder with adjust(1, 1, 2, 2)."""
+    """Main start inline menu using InlineKeyboardBuilder with adjust(1, 1, 2, 2, 1)."""
     builder = InlineKeyboardBuilder()
     builder.button(
         text="🛍 Web App Do'kon",
@@ -54,15 +55,35 @@ def main_menu_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
         style="danger",
     )
     builder.button(
-        text="🔄 Qayta buyurtma",
-        callback_data="reorder_last",
+        text="👤 Profil",
+        callback_data="user_profile",
     )
     builder.button(
         text="📞 Aloqa",
         callback_data="contact",
     )
-    builder.adjust(1, 1, 2, 2)
+    builder.button(
+        text="⚙️ Sozlamalar",
+        callback_data="user_settings",
+    )
+    builder.adjust(1, 1, 2, 2, 1)
     return builder.as_markup()
+
+
+def profile_inline_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📦 Buyurtmalar tarixi", callback_data="my_orders")],
+        [InlineKeyboardButton(text="⚙️ Sozlamalar", callback_data="user_settings")],
+        [InlineKeyboardButton(text="🏠 Bosh menu", callback_data="main_menu")],
+    ])
+
+
+def settings_inline_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📱 Telefon raqamni yangilash", callback_data="change_phone")],
+        [InlineKeyboardButton(text="📍 Saqlangan manzillar", callback_data="manage_addresses")],
+        [InlineKeyboardButton(text="🏠 Bosh menu", callback_data="main_menu")],
+    ])
 
 
 def request_phone_keyboard() -> ReplyKeyboardMarkup:
