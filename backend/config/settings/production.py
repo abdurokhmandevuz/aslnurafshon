@@ -7,13 +7,23 @@ from .base import *  # noqa: F401,F403
 DEBUG = False
 
 # ─── Database (Local PostgreSQL on Oracle) ────────────────────────────────────
-DATABASES = {
-    'default': dj_database_url.parse(
-        clean_env_value(config('DATABASE_URL')),
-        conn_max_age=600,
-        ssl_require=False,  # Local PostgreSQL on Oracle — SSL not needed
-    )
-}
+_db_url = clean_env_value(config('DATABASE_URL', default=''))
+
+if _db_url:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            _db_url,
+            conn_max_age=600,
+            ssl_require=False,
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ─── Security ─────────────────────────────────────────────────────────────────
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

@@ -156,9 +156,10 @@ async def show_product_detail(callback: CallbackQuery):
         await callback.answer("Hozirda bu mahsulot mavjud emas", show_alert=True)
         return
 
+    desc = product.description or "Ajoyib ta'm va yuqori sifatli choy."
     text = (
         f"🍃 <b>{product.name}</b>\n\n"
-        f"<i>{product.description or 'Ajoyib ta'm va yuqori sifatli choy.'}</i>\n\n"
+        f"<i>{desc}</i>\n\n"
         f"<b>Mavjud variantlar (og'irligi):</b>\n"
     )
     for v in variants:
