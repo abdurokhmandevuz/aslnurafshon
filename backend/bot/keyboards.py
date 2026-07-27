@@ -3,6 +3,7 @@ from aiogram.types import (
     InlineKeyboardButton, InlineKeyboardMarkup,
     KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 )
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def _url(base: str, path: str) -> str:
@@ -31,36 +32,37 @@ def main_reply_keyboard() -> ReplyKeyboardMarkup:
 
 
 def main_menu_keyboard(frontend_url: str) -> InlineKeyboardMarkup:
-    """Main start inline menu."""
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(
-                text="🌐 Web App Do'kon",
-                web_app=WebAppInfo(url=_url(frontend_url, "index.html")),
-                style="primary",
-            ),
-            InlineKeyboardButton(
-                text="💬 Botda xarid qilish",
-                callback_data="bot_catalog",
-                style="success",
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                text="📦 Buyurtmalarim",
-                callback_data="my_orders",
-            ),
-            InlineKeyboardButton(
-                text="🔥 Aksiyalar",
-                web_app=WebAppInfo(url=_url(frontend_url, "aksiyalar.html")),
-                style="danger",
-            ),
-        ],
-        [
-            InlineKeyboardButton(text="🔄 Qayta buyurtma", callback_data="reorder_last"),
-            InlineKeyboardButton(text="📞 Aloqa", callback_data="contact"),
-        ],
-    ])
+    """Main start inline menu using InlineKeyboardBuilder with adjust(1, 1, 2, 2)."""
+    builder = InlineKeyboardBuilder()
+    builder.button(
+        text="🛍 Web App Do'kon",
+        web_app=WebAppInfo(url=_url(frontend_url, "index.html")),
+        style="primary",
+    )
+    builder.button(
+        text="💬 Botda xarid qilish",
+        callback_data="bot_catalog",
+        style="success",
+    )
+    builder.button(
+        text="📦 Buyurtmalarim",
+        callback_data="my_orders",
+    )
+    builder.button(
+        text="🔥 Aksiyalar",
+        web_app=WebAppInfo(url=_url(frontend_url, "aksiyalar.html")),
+        style="danger",
+    )
+    builder.button(
+        text="🔄 Qayta buyurtma",
+        callback_data="reorder_last",
+    )
+    builder.button(
+        text="📞 Aloqa",
+        callback_data="contact",
+    )
+    builder.adjust(1, 1, 2, 2)
+    return builder.as_markup()
 
 
 def request_phone_keyboard() -> ReplyKeyboardMarkup:

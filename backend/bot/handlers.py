@@ -105,15 +105,20 @@ async def cmd_start(message: Message, state: FSMContext):
     except Exception as e:
         logger.warning("save_user error: %s", e)
 
-    await message.answer(
+    welcome_text = (
         f"Assalomu alaykum, <b>{user.first_name}</b>! 👋\n\n"
         "☕ <b>Asl Nurafshon</b> — premium choy va kofe do'koniga xush kelibsiz!\n\n"
-        "Quyidagi tugmalar orqali xarid qilishingiz mumkin 👇",
+        "Bizning do'konimizda eng yuqori sifatli va xushbo'y choy hamda kofe mahsulotlarini qulay tarzda buyurtma qilishingiz mumkin.\n\n"
+        "Quyidagi menyudan kerakli bo'limni tanlang 👇"
+    )
+
+    await message.answer(
+        welcome_text,
         parse_mode='HTML',
         reply_markup=main_reply_keyboard(),
     )
     await message.answer(
-        "Do'kon menusi:",
+        "<b>Do'kon Bosh Menusi:</b>",
         parse_mode='HTML',
         reply_markup=main_menu_keyboard(settings.FRONTEND_URL),
     )
