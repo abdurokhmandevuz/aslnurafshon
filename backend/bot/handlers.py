@@ -71,6 +71,11 @@ class OrderState(StatesGroup):
     waiting_for_receipt = State()
 
 
+class UserSettingsState(StatesGroup):
+    waiting_for_new_phone = State()
+    waiting_for_new_address = State()
+
+
 # In-memory user cart storage: { user_id: { variant_id: quantity } }
 USER_CARTS = {}
 # Pending order for receipt upload: { user_id: order_id }
@@ -268,6 +273,153 @@ async def show_user_settings(event: Message | CallbackQuery):
         await event.answer(text, parse_mode='HTML', reply_markup=settings_inline_keyboard())
 
 
+# ─── Settings Action Handlers ──────────────────────────────────────────────────
+
+@router.callback_query(F.data == "change_phone")
+async def handle_change_phone(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(UserSettingsState.waiting_for_new_phone)
+    await callback.message.answer(
+        "📱 <b>Yangi telefon raqamingizni yuboring:</b>\n\nTugmani bosing yoki raqamni yozing 👇",
+        parse_mode='HTML',
+        reply_markup=request_phone_keyboard()
+    )
+    await callback.answer()
+
+
+@router.message(UserSettingsState.waiting_for_new_phone)
+async def process_new_phone(message: Message, state: FSMContext):
+    phone = ""
+    if message.contact:
+        phone = message.contact.phone_number
+    elif message.text and message.text != "❌ Bekor qilish":
+        phone = message.text.strip()
+    else:
+        await state.clear()
+        await message.answer("Bekor qilindi.", reply_markup=main_reply_keyboard())
+        return
+
+    user_id = message.from_user.id
+    from asgiref.sync import sync_to_async
+    from apps.accounts.models import TelegramUser
+
+    @sync_to_async
+    def update_user_phone():
+        tuser, _ = TelegramUser.objects.get_or_create(
+            telegram_id=user_id,
+            defaults={'full_name': message.from_user.full_name}
+        )
+        tuser.phone = phone
+        tuser.save(update_fields=['phone'])
+        return tuser
+
+    await update_user_phone()
+    await state.clear()
+    await message.answer(
+        f"✅ Telefon raqamingiz muvaffaqiyatli yangilandi: <b>{phone}</b>",
+        parse_mode='HTML',
+        reply_markup=main_reply_keyboard()
+    )
+
+
+@router.callback_query(F.data == "manage_addresses")
+async def handle_manage_addresses(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    from asgiref.sync import sync_to_async
+    from apps.accounts.models import Address
+
+    addresses = await sync_to_async(lambda: list(Address.objects.filter(user__telegram_id=user_id)))()
+
+    from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+    if not addresses:
+        text = "📍 <b>Sizda hali saqlangan manzillar yo'q.</b>\n\nYangi manzil qo'shish uchun tugmani bosing 👇"
+        buttons = [
+            [InlineKeyboardButton(text="➕ Yangi manzil qo'shish", callback_data="add_address")],
+            [InlineKeyboardButton(text="⚙️ Sozlamalar", callback_data="user_settings")],
+        ]
+    else:
+        text = "📍 <b>Saqlangan manzillaringiz:</b>\n"
+        buttons = []
+        for idx, addr in enumerate(addresses, 1):
+            text += f"\n<b>{idx}.</b> {addr.address_text}"
+            buttons.append([
+                InlineKeyboardButton(text=f"🗑 {idx}-manzilni o'chirish", callback_data=f"del_addr:{addr.id}")
+            ])
+        buttons.append([InlineKeyboardButton(text="➕ Yangi manzil qo'shish", callback_data="add_address")])
+        buttons.append([InlineKeyboardButton(text="⚙️ Sozlamalar", callback_data="user_settings")])
+
+    markup = InlineKeyboardMarkup(inline_keyboard=buttons)
+    await safe_edit_message(callback.message, text, reply_markup=markup)
+    await callback.answer()
+
+
+@router.callback_query(F.data == "add_address")
+async def handle_add_address(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(UserSettingsState.waiting_for_new_address)
+    await callback.message.answer(
+        "📍 <b>Yangi manzilni yuboring:</b>\n\nJoylashuv tugmasini bosing yoki matn shaklida yozing 👇",
+        parse_mode='HTML',
+        reply_markup=request_location_keyboard()
+    )
+    await callback.answer()
+
+
+@router.message(UserSettingsState.waiting_for_new_address)
+async def process_new_address(message: Message, state: FSMContext):
+    if message.text in {"✏️ Manzilni matn qilib yozish", "Manzilni matn qilib yozish"}:
+        await message.answer(
+            "✍️ <b>Manzilingizni matn ko'rinishida yozib yuboring:</b>\n"
+            "<i>(Masalan: Nurafshon sh., Navoiy ko'chasi 12-uy)</i>",
+            parse_mode='HTML'
+        )
+        return
+
+    address_text = ""
+    if message.location:
+        address_text = f"GPS: {message.location.latitude}, {message.location.longitude}"
+    elif message.text and message.text != "❌ Bekor qilish":
+        address_text = message.text.strip()
+    else:
+        await state.clear()
+        await message.answer("Bekor qilindi.", reply_markup=main_reply_keyboard())
+        return
+
+    user_id = message.from_user.id
+    from asgiref.sync import sync_to_async
+    from apps.accounts.models import TelegramUser, Address
+
+    @sync_to_async
+    def save_address():
+        tuser, _ = TelegramUser.objects.get_or_create(
+            telegram_id=user_id,
+            defaults={'full_name': message.from_user.full_name}
+        )
+        return Address.objects.create(user=tuser, address_text=address_text, title="Manzil")
+
+    await save_address()
+    await state.clear()
+    await message.answer(
+        f"✅ Yangi manzil saqlandi:\n<b>{address_text}</b>",
+        parse_mode='HTML',
+        reply_markup=main_reply_keyboard()
+    )
+
+
+@router.callback_query(F.data.startswith("del_addr:"))
+async def handle_delete_address(callback: CallbackQuery):
+    addr_id = int(callback.data.split(":")[1])
+    from asgiref.sync import sync_to_async
+    from apps.accounts.models import Address
+
+    @sync_to_async
+    def delete_addr():
+        Address.objects.filter(id=addr_id, user__telegram_id=callback.from_user.id).delete()
+
+    await delete_addr()
+    await callback.answer("🗑 Manzil o'chirildi", show_alert=True)
+    await handle_manage_addresses(callback)
+
+
 # ─── Add Variant to Cart ──────────────────────────────────────────────────────
 
 @router.callback_query(F.data.startswith("addvar:"))
@@ -435,65 +587,10 @@ async def process_phone(message: Message, state: FSMContext):
         )
 
 
-@router.callback_query(F.data.startswith("use_addr:"))
-async def handle_use_saved_address(callback: CallbackQuery, state: FSMContext):
-    addr_id = int(callback.data.split(":")[1])
-    from asgiref.sync import sync_to_async
-    from apps.accounts.models import Address
-
-    try:
-        addr = await sync_to_async(Address.objects.get)(id=addr_id)
-        await callback.message.answer(f"📍 Manzil tanlandi: <b>{addr.address_text}</b>", parse_mode='HTML')
-        fake_msg = callback.message
-        fake_msg.text = addr.address_text
-        fake_msg.from_user = callback.from_user
-        await process_location(fake_msg, state)
-        await callback.answer()
-    except Exception as err:
-        logger.error("use_saved_address error: %s", err)
-        await callback.answer("Manzil topilmadi", show_alert=True)
-
-
-@router.callback_query(F.data == "new_addr")
-async def handle_new_address(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer(
-        "📍 Endi yetkazib berish <b>manzilini</b> yuboring (Joylashuv tugmasini bosing yoki matn yozing) 👇",
-        parse_mode='HTML',
-        reply_markup=request_location_keyboard()
-    )
-    await callback.answer()
-
-
-@router.callback_query(F.data == "cancel_order")
-async def handle_cancel_order(callback: CallbackQuery, state: FSMContext):
-    await state.clear()
-    await callback.message.answer("Xarid bekor qilindi.", reply_markup=main_reply_keyboard())
-    await callback.answer()
-
-
-@router.message(OrderState.waiting_for_location)
-async def process_location(message: Message, state: FSMContext):
-    if message.text in {"✏️ Manzilni matn qilib yozish", "Manzilni matn qilib yozish"}:
-        await message.answer(
-            "✍️ <b>Manzilingizni matn ko'rinishida yozib yuboring:</b>\n"
-            "<i>(Masalan: Nurafshon sh., Navoiy ko'chasi 12-uy)</i>",
-            parse_mode='HTML'
-        )
-        return
-
-    address_text = ""
-    if message.location:
-        address_text = f"GPS: {message.location.latitude}, {message.location.longitude}"
-    elif message.text and message.text != "❌ Bekor qilish":
-        address_text = message.text.strip()
-    else:
-        await state.clear()
-        await message.answer("Xarid bekor qilindi.", reply_markup=main_reply_keyboard())
-        return
-
+async def _execute_order_creation(message: Message, state: FSMContext, address_text: str, user_obj):
     data = await state.get_data()
     phone = data.get('phone', '')
-    user_id = message.from_user.id
+    user_id = user_obj.id
     cart = USER_CARTS.get(user_id, {})
 
     if not cart:
@@ -501,7 +598,6 @@ async def process_location(message: Message, state: FSMContext):
         await message.answer("Savat bo'sh qoldi.", reply_markup=main_reply_keyboard())
         return
 
-    # Create Order in DB
     from asgiref.sync import sync_to_async
     from apps.accounts.models import TelegramUser, Address
     from apps.catalog.models import ProductVariant
@@ -511,7 +607,7 @@ async def process_location(message: Message, state: FSMContext):
     def create_order_in_db():
         tuser, _ = TelegramUser.objects.get_or_create(
             telegram_id=user_id,
-            defaults={'full_name': message.from_user.full_name, 'phone': phone}
+            defaults={'full_name': user_obj.full_name, 'phone': phone}
         )
         if phone:
             tuser.phone = phone
@@ -558,7 +654,6 @@ async def process_location(message: Message, state: FSMContext):
         PENDING_RECEIPT_ORDERS[user_id] = order.id
         await state.set_state(OrderState.waiting_for_receipt)
 
-        # Get Bank card info
         card = await sync_to_async(lambda: BankCard.objects.filter(is_active=True).first())()
         bank_str = f"<b>{card.bank_name}</b>\n💳 Karta raqam: <code>{card.card_number}</code>\n👤 Egasi: <b>{card.card_holder}</b>" if card else "<b>Karta raqami:</b> <code>8600 1234 5678 9012</code>\n (Kapitalbank)"
 
@@ -574,6 +669,62 @@ async def process_location(message: Message, state: FSMContext):
         logger.error("Create order error: %s", e)
         await state.clear()
         await message.answer("Buyurtma yaratishda xatolik yuz berdi. Qayta urining.", reply_markup=main_reply_keyboard())
+
+
+@router.callback_query(F.data.startswith("use_addr:"))
+async def handle_use_saved_address(callback: CallbackQuery, state: FSMContext):
+    addr_id = int(callback.data.split(":")[1])
+    from asgiref.sync import sync_to_async
+    from apps.accounts.models import Address
+
+    try:
+        addr = await sync_to_async(Address.objects.get)(id=addr_id)
+        await callback.message.answer(f"📍 Manzil tanlandi: <b>{addr.address_text}</b>", parse_mode='HTML')
+        await _execute_order_creation(callback.message, state, addr.address_text, callback.from_user)
+        await callback.answer()
+    except Exception as err:
+        logger.error("use_saved_address error: %s", err)
+        await callback.answer("Manzil topilmadi", show_alert=True)
+
+
+@router.callback_query(F.data == "new_addr")
+async def handle_new_address(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer(
+        "📍 Endi yetkazib berish <b>manzilini</b> yuboring (Joylashuv tugmasini bosing yoki matn yozing) 👇",
+        parse_mode='HTML',
+        reply_markup=request_location_keyboard()
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data == "cancel_order")
+async def handle_cancel_order(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.answer("Xarid bekor qilindi.", reply_markup=main_reply_keyboard())
+    await callback.answer()
+
+
+@router.message(OrderState.waiting_for_location)
+async def process_location(message: Message, state: FSMContext):
+    if message.text in {"✏️ Manzilni matn qilib yozish", "Manzilni matn qilib yozish"}:
+        await message.answer(
+            "✍️ <b>Manzilingizni matn ko'rinishida yozib yuboring:</b>\n"
+            "<i>(Masalan: Nurafshon sh., Navoiy ko'chasi 12-uy)</i>",
+            parse_mode='HTML'
+        )
+        return
+
+    address_text = ""
+    if message.location:
+        address_text = f"GPS: {message.location.latitude}, {message.location.longitude}"
+    elif message.text and message.text != "❌ Bekor qilish":
+        address_text = message.text.strip()
+    else:
+        await state.clear()
+        await message.answer("Xarid bekor qilindi.", reply_markup=main_reply_keyboard())
+        return
+
+    await _execute_order_creation(message, state, address_text, message.from_user)
 
 
 # ─── Payment Receipt Photo Handler ───────────────────────────────────────────
